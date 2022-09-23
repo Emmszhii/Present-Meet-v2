@@ -164,7 +164,10 @@ const joinRoomInit = async () => {
   await rtm.client.login(rtmOption);
 
   // give the name of the local user to remote users
-  await rtm.client.addOrUpdateLocalUserAttributes({ name: userData.fullName });
+  await rtm.client.addOrUpdateLocalUserAttributes({
+    name: userData.fullName,
+    rtcId: userData.rtcId,
+  });
 
   // create channel with meetingId
   rtm.channel = await rtm.client.createChannel(meetingId);

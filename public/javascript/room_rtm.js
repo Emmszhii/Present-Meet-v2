@@ -27,7 +27,12 @@ const handleMemberJoin = async (MemberId) => {
 // add member dom when user join
 const addMemberToDom = async (MemberId) => {
   // get user name
-  const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
+  const { name, rtcId } = await rtm.client.getUserAttributesByKeys(MemberId, [
+    'name',
+    'rtcId',
+  ]);
+  // store the their name in an array
+  users.push({ name, rtcId, MemberId });
 
   const membersWrapper = document.getElementById('member__list');
   const memberItem = `
@@ -55,6 +60,14 @@ const handleMemberLeft = async (MemberId) => {
 
 // remove user dom when they left function
 const removeMemberFromDom = async (MemberId) => {
+  // removing remote users when they left
+  for (let i = 0; users.length > i; i++) {
+    if (users[i].MemberId === MemberId) {
+      console.log(`deleted`);
+      users.splice(i, 1);
+    }
+  }
+
   const memberWrapper = document.getElementById(`member__${MemberId}__wrapper`);
   const name =
     memberWrapper.getElementsByClassName('member_name')[0].textContent;
@@ -81,12 +94,6 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // Initialize data variable to parse the data
   const data = JSON.parse(messageData.text);
 
-  if (data.type === 'info') {
-    // console.log(data.name, data.rtcId);
-    users.push({ name: data.name, rtcId: data.rtcId });
-    console.log(users);
-  }
-
   // Add dom message element
   if (data.type === 'chat') {
     addMessageToDom(data.displayName, data.message);
@@ -98,9 +105,6 @@ const handleChannelMessage = async (messageData, MemberId) => {
 
     if (userIdInDisplayFrame.val === `user-container-${data.uid}`) {
       hideDisplayFrame();
-      // displayFrame.style.display = null;
-
-      // resetTheFrames();
     }
   }
 

@@ -1,7 +1,7 @@
 import { userData, rtm } from './room_rtc.js';
 
 let track;
-const startingMinutes = 0.1;
+const startingMinutes = 1;
 let time = startingMinutes * 60;
 let interval;
 

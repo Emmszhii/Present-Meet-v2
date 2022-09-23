@@ -11,7 +11,7 @@ router.get('/', ensureAuthenticated, (req, res) => {
 });
 
 // // fetch user information
-router.get('/getInfo', (req, res) => {
+router.get('/getInfo', async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       res.status(200).json({

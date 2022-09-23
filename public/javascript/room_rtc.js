@@ -8,6 +8,7 @@ const loader = document.getElementById('preloader');
 import { makeAttendance } from './room_face_recognition.js';
 
 import {
+  users,
   getMembers,
   handleChannelMessage,
   handleMemberJoin,
@@ -65,10 +66,13 @@ const rtm = {
 const remoteUsers = {};
 
 // player DOM element
-const player = (uid) => {
+const player = (uid, name) => {
   return `
     <div class="video__container" id="user-container-${uid}">
       <div class="video-player" id="user-${uid}">
+      </div>
+      <div class='name'>
+        <p>${name}</p>
       </div>
     </div>
     `;
@@ -141,7 +145,6 @@ const getTokens = async () => {
 
 // initializing the agora sdk for joining the room and validating the user token for security joining
 const joinRoomInit = async () => {
-  console.log(userData.type);
   if (userData.type === 'teacher' || userData.type === 'host') {
     makeAttendance();
   }
@@ -215,6 +218,9 @@ const handleUserPublished = async (user, mediaType) => {
   // set remote users as user
   remoteUsers[user.uid] = user;
 
+  console.log(users);
+  console.log(remoteUsers);
+
   // subscribe to the meeting
   await rtc.client.subscribe(user, mediaType);
 
@@ -222,10 +228,16 @@ const handleUserPublished = async (user, mediaType) => {
   const playerDom = document.getElementById(`user-container-${user.uid}`);
   // if player is null then run it
   if (playerDom === null) {
+    let name;
+    for (let i = 0; users.length > i; i++) {
+      if (users[i].rtcId === user.uid) {
+        name = users[i].name;
+      }
+    }
     // add player to the dom
     document
       .getElementById('streams__container')
-      .insertAdjacentHTML('beforeend', player(user.uid));
+      .insertAdjacentHTML('beforeend', player(user.uid, name));
     //onClick user will be able to expand it
     document
       .getElementById(`user-container-${user.uid}`)
@@ -314,7 +326,7 @@ const switchToCamera = async () => {
   // add the local user in the dom
   document
     .getElementById('streams__container')
-    .insertAdjacentHTML('beforeend', player(userData.rtcId));
+    .insertAdjacentHTML('beforeend', player(userData.rtcId, userData.fullName));
   document
     .getElementById(`user-container-${userData.rtcId}`)
     .addEventListener('click', expandVideoFrame);
@@ -393,7 +405,10 @@ const toggleScreen = async (e) => {
     displayFrame.style.display = ' block';
 
     // display in big frame the player dom
-    displayFrame.insertAdjacentHTML('beforeend', player(userData.rtcId));
+    displayFrame.insertAdjacentHTML(
+      'beforeend',
+      player(userData.rtcId, userData.fullName)
+    );
     document
       .getElementById(`user-container-${userData.rtcId}`)
       .addEventListener('click', expandVideoFrame);
@@ -459,20 +474,6 @@ AgoraRTC.onCameraChanged = async (changedDevice) => {
   }
 };
 
-const setDevices = () => {
-  if (device.localAudio) {
-    rtc.localTracks[0]
-      .setDevice(device.localAudio)
-      .catch((e) => console.log(e));
-  }
-
-  if (device.localVideo) {
-    rtc.localTracks[1]
-      .setDevice(device.localVideo)
-      .catch((e) => console.log(e));
-  }
-};
-
 // joining the stream
 const joinStream = async () => {
   // display loader
@@ -493,7 +494,7 @@ const joinStream = async () => {
   // add the player into the DOM
   document
     .getElementById('streams__container')
-    .insertAdjacentHTML('beforeend', player(userData.rtcId));
+    .insertAdjacentHTML('beforeend', player(userData.rtcId, userData.fullName));
   document
     .getElementById(`user-container-${userData.rtcId}`)
     .addEventListener('click', expandVideoFrame);
@@ -531,6 +532,13 @@ const joinStream = async () => {
       .publish([rtc.localTracks[0], rtc.localTracks[1]])
       .finally(() => {
         // loader done
+        rtm.channel.sendMessage({
+          text: JSON.stringify({
+            type: 'info',
+            rtcId: userData.rtcId,
+            name: userData.fullName,
+          }),
+        });
         loader.style.display = 'none';
       });
   }
@@ -606,7 +614,7 @@ const settings = async () => {
   if (!playerDom) {
     document
       .getElementById('video-settings')
-      .insertAdjacentHTML('beforeend', player(userData.rtcId));
+      .insertAdjacentHTML('beforeend', player(userData.rtcId, ''));
   }
 
   //

@@ -29,11 +29,15 @@ router.post('/descriptor', ensureAuthenticated, (req, res) => {
         return res.status(400).json({ err: 'Invalid Face' });
       // converting the split descriptor array to float32array
       // const data = new Float32Array(float);
-      User.updateOne({ id: req.user.id }, { descriptor: descriptor }, (err) => {
-        if (err) return console.log(err);
-        res.status(200).json({ msg: `Successfully save to database` });
-        console.log(`successfully updated the document`);
-      });
+      User.updateOne(
+        { _id: req.user.id },
+        { descriptor: descriptor },
+        (err) => {
+          if (err) return console.log(err);
+          res.status(200).json({ msg: `Successfully save to database` });
+          console.log(`successfully updated the document`);
+        }
+      );
     } else {
       return res.status(400).json({ err: 'Password is incorrect!' });
     }

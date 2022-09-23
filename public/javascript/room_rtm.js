@@ -8,6 +8,8 @@ import {
   hideDisplayFrame,
 } from './room.js';
 
+const users = [];
+
 // get members names and total and add it to the dom;
 // member joining handler
 const handleMemberJoin = async (MemberId) => {
@@ -78,6 +80,12 @@ const getMembers = async () => {
 const handleChannelMessage = async (messageData, MemberId) => {
   // Initialize data variable to parse the data
   const data = JSON.parse(messageData.text);
+
+  if (data.type === 'info') {
+    // console.log(data.name, data.rtcId);
+    users.push({ name: data.name, rtcId: data.rtcId });
+    console.log(users);
+  }
 
   // Add dom message element
   if (data.type === 'chat') {
@@ -214,6 +222,7 @@ const leaveChannel = async () => {
 };
 
 export {
+  users,
   sendMessage,
   getMembers,
   handleChannelMessage,

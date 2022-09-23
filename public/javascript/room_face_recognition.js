@@ -46,6 +46,7 @@ const stopTimer = () => {
   if (btn) {
     btn.classList.remove('active');
   }
+  time = startingMinutes * 60;
 };
 
 const startCamera = () => {
@@ -129,10 +130,20 @@ const faceRecognized = async () => {
     console.log(dist);
     if (dist <= 0.4) {
       console.log(`match`);
+      sendAttendance();
+      stopTimer();
     } else {
       console.log(`not match`);
     }
   }
+};
+
+const sendAttendance = async () => {
+  rtm.channel.sendMessage({
+    text: JSON.stringify({
+      attendance: userData.fullName,
+    }),
+  });
 };
 
 const faceRecognitionHandler = () => {
@@ -169,8 +180,6 @@ const makeAttendance = (e) => {
 
 const attendance = () => {
   const btn = document.getElementById('attendance-btn');
-
-  interval = setInterval(updateCountdown, 1000);
 
   if (btn.classList.contains('active')) {
     btn.classList.remove('active');

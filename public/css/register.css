@@ -1,0 +1,230 @@
+* {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+main {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+}
+
+.card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 30%;
+  margin: 10px;
+}
+
+#form {
+  background-color: black;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-size: 1.5rem;
+}
+
+#modal-confirm,
+#modal-password {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#messages {
+  text-align: center;
+}
+
+#msg {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: green;
+  font-size: 1.4rem;
+  color: white;
+  text-shadow: 4px 4px black;
+}
+
+#err {
+  border-radius: 5px;
+  padding: 10px 20px;
+  border: none;
+  background-color: red;
+  font-size: 1.4rem;
+  color: white;
+  text-shadow: 4px 4px black;
+}
+
+#modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  border-radius: 10px;
+  background-color: white;
+  width: 25%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 50%;
+}
+
+.input {
+  width: 80%;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid black;
+  outline: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+input:focus::placeholder {
+  color: transparent;
+}
+
+.form-group {
+  margin: 5px;
+}
+
+#user-type-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+input {
+  text-align: center;
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 1rem;
+}
+
+select {
+  font-size: 1rem;
+  padding: 5px 10px;
+  font-size: 1rem;
+  display: flex;
+  margin: 10px auto;
+}
+
+#submit-btn,
+#change-pw-btn {
+  background-color: #2aca3e;
+  font-size: 18px;
+  padding: 10px 15px;
+  border: none;
+  color: #fff;
+  text-shadow: 2px 2px black;
+  bottom: 0.9rem;
+  border-radius: 8px;
+  display: flex;
+  margin: 3% auto;
+  cursor: pointer;
+}
+
+#change-pw {
+  background-color: black;
+  font-size: 18px;
+  padding: 10px 15px;
+  border: none;
+  color: #fff;
+  /* text-shadow: 2px 2px black; */
+  bottom: 0.9rem;
+  border-radius: 8px;
+  display: flex;
+  margin: 3% auto;
+  cursor: pointer;
+}
+
+.footer {
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 1600px) {
+  main {
+    overflow: hidden;
+  }
+  #form {
+    width: 100vw;
+  }
+  #user-face {
+    width: 100%;
+  }
+  .card {
+    width: 40%;
+  }
+}
+@media (max-width: 1000px) {
+  main {
+    overflow: hidden;
+  }
+  #form {
+    width: 100vw;
+  }
+  #user-face {
+    width: 100%;
+  }
+  .card {
+    width: 50%;
+  }
+}
+@media (max-width: 768px) {
+  main {
+    overflow: hidden;
+  }
+  #form {
+    width: 100vw;
+  }
+  #user-face {
+    width: 100%;
+  }
+  .card {
+    width: 60%;
+  }
+}
+@media (max-width: 480px) {
+  main {
+    overflow: hidden;
+  }
+  #form {
+    width: 100vw;
+  }
+  #user-face {
+    width: 100%;
+  }
+  .card {
+    width: 70%;
+  }
+}

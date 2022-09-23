@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/room.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Present Meet</title>
+  </head>
+  <body>
+    <div id="preloader"></div>
+
+    <div class="videoCall">
+      <div class="streams">
+        <section id="stream__container">
+          <div id="stream__box"></div>
+          <div id="streams__container">
+            <!-- <div class="video__container" id="user-container-232">
+              <div class="video-player" id="user-12323">1</div>
+            </div> -->
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-message">
+        <section id="messages__container">
+          <div id="messages"></div>
+          <form id="message__form">
+            <input
+              type="text"
+              name="message"
+              placeholder="Send a message...."
+              autocomplete="off"
+            />
+          </form>
+        </section>
+      </div>
+
+      <section id="members__container" style="display: block">
+        <div id="members__header">
+          <p>Participants</p>
+          <strong id="members__count">0</strong>
+        </div>
+        <div id="member__list"></div>
+      </section>
+
+      <div class="footerBtn">
+        <div class="videoLink">
+          <!-- Button for copying the room ID -->
+          <button class="copy" id="link-btn" class="icon" type="button">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+          <!-- Left side for the ink of the room -->
+          <p class="link"></p>
+        </div>
+        <!-- Main Button at middle-->
+        <div class="middleBtn">
+          <button class="button" id="mic-btn">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button class="button" id="camera-btn">
+            <i class="fa-solid fa-video"></i>
+          </button>
+          <button class="button" id="screen-btn">
+            <i class="fa-solid fa-desktop"></i>
+          </button>
+          <!-- <button><i class="fa-solid fa-ellipsis-vertical"></i></button> -->
+          <button class="button" id="leave-btn">
+            <i class="fa-solid fa-phone"></i>
+          </button>
+        </div>
+        <!-- Right side button for messaging and the participants list -->
+        <div class="rightBtn">
+          <button class="button" id="settings-btn">
+            <i class="fa-solid fa-cog"></i>
+          </button>
+          <button class="button active" id="users-btn">
+            <i class="fa-solid fa-users"></i>
+          </button>
+          <button class="button" id="chat-btn">
+            <i class="fa-solid fa-envelope"></i>
+          </button>
+        </div>
+        <!-- Joining stream -->
+        <div class="mainBtn">
+          <button id="join-btn">Join Stream</button>
+          <!-- Leaving Stream -->
+          <form action="/quit">
+            <button type="submit" id="quit-btn">Quit Room</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Devices Settings -->
+      <div id="modal-settings" class="modal-settings" style="display: block">
+        <div class="settings-modal">
+          <span class="refresh" id="refresh"
+            ><i class="fa fa-refresh"></i
+          ></span>
+          <h3>Settings</h3>
+          <div id="video-settings"></div>
+          <div id="devices-settings"></div>
+          <span>Here's the devices available! in your setup</span>
+          <button type="button" id="setup-btn" style="display: none">
+            Done
+          </button>
+          <!-- <span class="close-settings-modal">X</span> -->
+        </div>
+      </div>
+    </div>
+
+    <script
+      type="text/javascript"
+      src="javascript/AgoraSDK/AgoraRTC_N-4.13.0.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="javascript/AgoraSDK/agora-rtm-sdk-1.5.0.js"
+    ></script>
+    <script src="javascript/FaceApi/face-api.js"></script>
+    <script src="javascript/FaceApi/face-api.min.js"></script>
+    <script type="module" src="javascript/room_controller.js"></script>
+  </body>
+</html>

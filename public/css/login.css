@@ -1,0 +1,114 @@
+* {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+main {
+  overflow: hidden;
+  display: flex;
+}
+
+#form {
+  background-color: black;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-size: 1.2rem;
+  flex-direction: column;
+}
+
+.card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 30%;
+  margin: 10px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  text-align: center;
+  border: none;
+  border-bottom: 2px solid black;
+}
+
+input:focus {
+  outline: none;
+}
+
+#login {
+  display: flex;
+  justify-content: center;
+}
+
+#login-btn {
+  background-color: #2aca3e;
+  font-size: 18px;
+  padding: 10px 15px;
+  border: none;
+  color: #fff;
+  text-shadow: 2px 2px black;
+  bottom: 0.9rem;
+  border-radius: 8px;
+  display: flex;
+  margin: 3% auto;
+  cursor: pointer;
+}
+
+#sign-up {
+  background-color: #dd4b39;
+  font-size: 18px;
+  padding: 10px 15px;
+  border: none;
+  color: #fff;
+  text-shadow: 2px 2px black;
+  bottom: 0.9rem;
+  border-radius: 8px;
+  display: flex;
+  margin: 3% auto;
+  cursor: pointer;
+}
+
+#login-btn:hover {
+  background-color: black;
+  color: white;
+  text-shadow: 2px 2px #dd4b39;
+}
+
+.fa-google {
+  background-color: #dd4b39;
+}
+
+#forgot-pw {
+  font-size: 1rem;
+}
+
+@media (max-width: 1600px) {
+  .login {
+    font-size: 1rem;
+  }
+  .card {
+    width: 40%;
+  }
+}
+@media (max-width: 1400px) {
+  .card {
+    width: 50%;
+  }
+}
+@media (max-width: 768px) {
+  .card {
+    width: 60%;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    width: 65%;
+  }
+}

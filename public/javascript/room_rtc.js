@@ -76,14 +76,14 @@ const player = (uid) => {
 
 // getting local user info
 const getInfo = async () => {
-  const url = `${AUTH_URL}/getInfo`;
+  const url = `/getInfo`;
   const res = await fetch(url, { method: 'GET' });
   const data = await res.json().catch((err) => console.log(err));
   return data;
 };
 
 const getRtc = async () => {
-  const url = `${AUTH_URL}/rtc/${meetingId}/publisher/uid/${userData.rtcId}`;
+  const url = `/rtc/${meetingId}/publisher/uid/${userData.rtcId}`;
   const res = await fetch(url, { method: 'GET' });
   const data = await res.json().catch((err) => {
     console.log(err);
@@ -92,7 +92,7 @@ const getRtc = async () => {
 };
 
 const getRtm = async () => {
-  const url = `${AUTH_URL}/rtm/${userData.rtmId}`;
+  const url = `/rtm/${userData.rtmId}`;
   const res = await fetch(url, { method: 'GET' });
   const data = await res.json().catch((err) => console.log(err));
   return data;

@@ -63,7 +63,6 @@ const removeMemberFromDom = async (MemberId) => {
   // removing remote users when they left
   for (let i = 0; users.length > i; i++) {
     if (users[i].MemberId === MemberId) {
-      console.log(`deleted`);
       users.splice(i, 1);
     }
   }
@@ -142,10 +141,10 @@ const handleChannelMessage = async (messageData, MemberId) => {
     // if a teacher or host decided to take attendance
     if (data.type === 'take_attendance') {
       faceRecognitionHandler();
-      console.log(`this run`);
+      console.log(`face recognition`);
     }
     if (data.type === 'take_attendance_off') {
-      console.log(`this also run`);
+      console.log(`off face recognition`);
       // stopTimer();
     }
   }

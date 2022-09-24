@@ -11,6 +11,10 @@ body {
   height: 100vh;
 }
 
+.text {
+  text-align: center;
+}
+
 .text > h2 {
   font-weight: 600;
   font-size: 30px;
@@ -117,6 +121,10 @@ input:focus::placeholder {
   border: 0;
 }
 
+.buttons {
+  margin: 10px;
+}
+
 @media (max-width: 768px) {
   body {
     overflow: hidden;
@@ -127,7 +135,7 @@ input:focus::placeholder {
   }
   .homepageMain {
     display: block;
-    width: 80%;
+    width: 90%;
     margin: auto;
     overflow: hidden;
   }
@@ -157,9 +165,9 @@ input:focus::placeholder {
   .roomsBtn {
     /* display: block; */
   }
-  .roomsBtn button {
+  /* .roomsBtn button {
     margin: 10px;
-  }
+  } */
 }
 
 @media (max-width: 1000px) {
@@ -172,7 +180,7 @@ input:focus::placeholder {
   }
   .homepageMain {
     /* display: block; */
-    width: 80%;
+    width: 90%;
     margin: auto;
     overflow: hidden;
   }
@@ -187,7 +195,7 @@ input:focus::placeholder {
   }
   .homepageFooter {
     /* justify-content: center; */
-    margin: 10%;
+    /* margin: 10%; */
   }
   .modalCreate-bg {
     width: 100vw;
@@ -202,7 +210,7 @@ input:focus::placeholder {
   .roomsBtn {
     /* display: block; */
   }
-  .roomsBtn button {
+  /* .roomsBtn button {
     margin: 10px;
-  }
+  } */
 }

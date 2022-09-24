@@ -9,6 +9,7 @@ const dom = () => {
   return `
     <div class='modal_face'>
       <div class='modal_face_content'>
+        <div id="msg"></div>
         <div id='countdown'>1:00</div>
         <div class='face_container'></div>
         <div class='buttons'>
@@ -19,6 +20,7 @@ const dom = () => {
     </div>
   `;
 };
+
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
   let seconds = time % 60;
@@ -28,8 +30,6 @@ const updateCountdown = () => {
     countdown.innerHTML = `${minutes}:${seconds}`;
   }
   time--;
-
-  console.log(time);
 
   if (time <= 0) {
     stopTimer();
@@ -111,20 +111,21 @@ const faceRecognized = async () => {
   if (!video) return console.log(`please start the camera first`);
   createCanvas();
   const canvas = document.querySelector('canvas');
+  const msg = document.getElementById('msg');
 
   const query = await faceapi
     .detectAllFaces(canvas)
     .withFaceLandmarks()
     .withFaceDescriptors();
 
-  if (!query || query.length > 1) {
-    return console.log(`Face must be contain 1 image`);
+  if (!query || query.length > 1 || query[0].descriptor) {
+    return (msg.textContent = 'Face not detected');
   }
   // convert string to float32array
   const float = userData.descriptor.split(',');
   const data = new Float32Array(float);
 
-  if (query) {
+  if (query[0].descriptor) {
     const dist = faceapi.euclideanDistance(data, query[0].descriptor);
 
     console.log(dist);
@@ -133,21 +134,24 @@ const faceRecognized = async () => {
       sendAttendance();
       stopTimer();
     } else {
-      console.log(`not match`);
+      msg.textContent = 'Invalid match';
     }
+  } else {
+    msg.textContent = 'Face does not recognized';
   }
 };
 
 const sendAttendance = async () => {
   rtm.channel.sendMessage({
     text: JSON.stringify({
+      type: 'attendance',
       attendance: userData.fullName,
     }),
   });
 };
 
 const faceRecognitionHandler = () => {
-  document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom);
+  document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
   startCamera();
 
   interval = setInterval(updateCountdown, 1000);

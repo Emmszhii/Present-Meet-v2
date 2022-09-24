@@ -40,6 +40,7 @@ main {
   font-size: 1.4rem;
   color: white;
   text-shadow: 4px 4px black;
+  text-align: center;
 }
 
 #err {
@@ -50,6 +51,7 @@ main {
   font-size: 1.4rem;
   color: white;
   text-shadow: 4px 4px black;
+  text-align: center;
 }
 
 /* face recognition buttons */
@@ -236,5 +238,22 @@ input:focus::placeholder {
   }
   #user-face {
     width: 100%;
+  }
+}
+
+@media (max-width: 1366) {
+  .buttons {
+    width: 70%;
+  }
+}
+
+@media (max-width: 768px) {
+  .buttons {
+    width: 80%;
+  }
+}
+@media (max-width: 480px) {
+  .buttons {
+    width: 90%;
   }
 }

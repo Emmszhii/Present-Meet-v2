@@ -1,6 +1,7 @@
 const preloader = document.getElementById('preloader');
 const camera = document.querySelector('.attendance-camera');
 let track;
+const useTinyModel = true;
 const refUser = [];
 
 // VIDEO HANDLER
@@ -59,7 +60,7 @@ const photoHandler = async () => {
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id)
-        .withFaceLandmarks()
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 
       // if no detection
@@ -129,7 +130,7 @@ const recognizeHandler = async () => {
     // face api detection
     const detection = await faceapi
       .detectAllFaces(id)
-      .withFaceLandmarks()
+      .withFaceLandmarks(useTinyModel)
       .withFaceDescriptors();
 
     // if no detection
@@ -141,10 +142,8 @@ const recognizeHandler = async () => {
     img2 = detection[0];
     stopVideo();
     // guard clause
-    if (!img1[0]) {
-      return errorHandler(`no image 1`);
-    }
-    if (!img2) return errorHandler(`no image 2`);
+    if (!img1[0]) return errorHandler(`Record your face first!`);
+    if (!img2) return errorHandler(`Face not recognize`);
     // comparing the 2 image
     comparePerson(img1[0], img2);
   } else {
@@ -199,15 +198,13 @@ const comparePerson = async (referenceImg, queryImg) => {
       queryImg.descriptor
     );
     if (dist <= 0.4) {
-      msgHandler(
-        `Image 1 and image 2 are match, you can retry recognizing it if you're satisfied then you can now save it!`
-      );
+      msgHandler(`Face are match!`);
       createPostButton();
     } else {
-      errorHandler('Image 1 and image 2 are NOT match Please Try again!');
+      errorHandler('Face does not Match!');
     }
   } else {
-    errorHandler('No face detected for recognizing the user!');
+    errorHandler('No face detected!');
   }
 };
 
@@ -220,22 +217,27 @@ const createPostButton = async () => {
 
   buttons.append(button);
   button.addEventListener('click', showConfirm);
-  // button.addEventListener('click', postToServer);
 };
 
 const showConfirm = () => {
   const modal = document.getElementById('modal-confirm');
   const confirmBtn = document.getElementById('confirm');
+  const cancelBtn = document.getElementById('cancel');
 
   modal.style.display = 'block';
 
+  cancelBtn.addEventListener('click', hideConfirm);
   confirmBtn.addEventListener('click', postToServer);
+};
+
+const hideConfirm = () => {
+  document.getElementById('modal-confirm').style.display = 'none';
+  document.getElementById('password').value = '';
 };
 
 const postToServer = async (e) => {
   e.preventDefault();
-  const password = document.getElementById('password').value;
-  document.getElementById('modal-confirm').style.display = 'none';
+  const password = document.getElementById('password');
   try {
     const id = refUser[0];
     const descriptor = id[0].descriptor.toString();
@@ -246,11 +248,12 @@ const postToServer = async (e) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ descriptor, password }),
+      body: JSON.stringify({
+        descriptor,
+        password: password.value,
+      }),
     });
     const data = await response.json();
-    console.log(response);
-    console.log(data);
     if (response.status === 200) {
       if (data.msg) {
         return msgHandler(data.msg);
@@ -262,6 +265,8 @@ const postToServer = async (e) => {
     }
   } catch (err) {
     return errorHandler(err);
+  } finally {
+    hideConfirm();
   }
 };
 
@@ -281,7 +286,7 @@ const drawCanvas = async (input) => {
   // display face landmarks
   const detectionWithLandmarks = await faceapi
     .detectSingleFace(input)
-    .withFaceLandmarks();
+    .withFaceLandmarks(useTinyModel);
 
   // resized the detected boxes and landmarks
   const resizedResults = faceapi.resizeResults(

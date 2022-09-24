@@ -207,12 +207,18 @@ body {
 .name {
   font-size: 18px;
   position: absolute;
-  text-shadow: 2px 2px black;
+  text-shadow: 4px 4px black;
   padding: 0;
   bottom: 0;
 }
 video {
   object-fit: fill !important;
+  width: 100%;
+  height: 100%;
+}
+canvas {
+  width: 100%;
+  height: 100%;
 }
 #stream__box {
   display: block;
@@ -467,6 +473,13 @@ video {
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+
+#msg {
+  text-align: center;
+  padding: 5px 10px;
+  background-color: black;
+  color: white;
 }
 
 /* responsiveness for mobile */

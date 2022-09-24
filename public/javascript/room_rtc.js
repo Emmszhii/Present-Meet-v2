@@ -221,9 +221,6 @@ const handleUserPublished = async (user, mediaType) => {
   // set remote users as user
   remoteUsers[user.uid] = user;
 
-  console.log(users);
-  console.log(remoteUsers);
-
   // subscribe to the meeting
   await rtc.client.subscribe(user, mediaType);
 

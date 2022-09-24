@@ -10,6 +10,16 @@ router.get('/face-recognition', ensureAuthenticated, (req, res) => {
   res.render('face_recognition');
 });
 
+router.get('/getDescriptor', ensureAuthenticated, (req, res) => {
+  if (req.user.descriptor) {
+    res.status(200).json({ descriptor: req.user.descriptor });
+  } else {
+    res
+      .status(400)
+      .json({ err: `User don't have a registered face in the database!` });
+  }
+});
+
 router.post('/descriptor', ensureAuthenticated, (req, res) => {
   const descriptor = req.body.descriptor;
   const password = req.body.password;

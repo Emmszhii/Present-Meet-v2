@@ -241,9 +241,14 @@ input:focus::placeholder {
   }
 }
 
-@media (max-width: 1366) {
+@media (max-width: 1366px) {
   .buttons {
     width: 70%;
+  }
+}
+@media (max-width: 1000px) {
+  .buttons {
+    width: 75%;
   }
 }
 
@@ -251,9 +256,17 @@ input:focus::placeholder {
   .buttons {
     width: 80%;
   }
+  .attendance-camera {
+    width: 500px;
+    height: 400px;
+  }
 }
 @media (max-width: 480px) {
   .buttons {
     width: 90%;
+  }
+  .attendance-camera {
+    width: 480px;
+    height: 300px;
   }
 }

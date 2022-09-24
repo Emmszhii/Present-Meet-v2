@@ -4,6 +4,22 @@ let track;
 const useTinyModel = true;
 const refUser = [];
 
+const fetchPrevDescriptor = async () => {
+  const res = await fetch('/getDescriptor', { method: 'get' });
+  const data = await res.json();
+  if (res.status === 200) {
+    if (data.descriptor) {
+      const split = data.descriptor.split(',');
+      const float32 = new Float32Array(split);
+      refUser.push([{ descriptor: float32 }]);
+      msgHandler('Previous face description is now added.');
+    }
+  }
+  if (res.status === 400) {
+    errorHandler(data.err);
+  }
+};
+
 // VIDEO HANDLER
 const startVideoHandler = async () => {
   preloader.style.display = 'block';
@@ -59,7 +75,7 @@ const photoHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(id)
+        .detectAllFaces(id, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 
@@ -82,8 +98,9 @@ const photoHandler = async () => {
     }
   } catch (err) {
     console.log(err);
+  } finally {
+    preloader.style.display = 'none';
   }
-  preloader.style.display = 'none';
 };
 
 // stop video when capturing
@@ -110,7 +127,7 @@ const recognizeHandler = async () => {
   if (refUser.length === 0) {
     return errorHandler('No Reference Image !');
   }
-  const img1 = refUser[0];
+  let img1 = refUser[0];
   let img2;
 
   // create Canvas
@@ -129,7 +146,7 @@ const recognizeHandler = async () => {
 
     // face api detection
     const detection = await faceapi
-      .detectAllFaces(id)
+      .detectAllFaces(id, new faceapi.TinyFaceDetectorOptions())
       .withFaceLandmarks(useTinyModel)
       .withFaceDescriptors();
 
@@ -140,12 +157,16 @@ const recognizeHandler = async () => {
     }
 
     img2 = detection[0];
+
     stopVideo();
     // guard clause
-    if (!img1[0]) return errorHandler(`Record your face first!`);
+    if (!img1) return errorHandler(`Record your face first!`);
     if (!img2) return errorHandler(`Face not recognize`);
+
+    img1 = img1[0].descriptor;
+    img2 = img2.descriptor;
     // comparing the 2 image
-    comparePerson(img1[0], img2);
+    comparePerson(img1, img2);
   } else {
     errorHandler('Start the camera first!');
   }
@@ -193,10 +214,7 @@ const comparePerson = async (referenceImg, queryImg) => {
   // if both are defined run the face recognition
   if (queryImg) {
     // matching B query
-    const dist = faceapi.euclideanDistance(
-      referenceImg.descriptor,
-      queryImg.descriptor
-    );
+    const dist = faceapi.euclideanDistance(referenceImg, queryImg);
     if (dist <= 0.4) {
       msgHandler(`Face are match!`);
       createPostButton();
@@ -339,6 +357,7 @@ export {
   camera,
   track,
   refUser,
+  fetchPrevDescriptor,
   startVideoHandler,
   photoHandler,
   stopVideo,

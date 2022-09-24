@@ -1,5 +1,6 @@
 import { userData, rtm } from './room_rtc.js';
 
+const useTinyModel = true;
 let track;
 const startingMinutes = 1;
 let time = startingMinutes * 60;

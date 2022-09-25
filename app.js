@@ -61,6 +61,7 @@ app.use('/', require('./routes/index'));
 app.use('/', require('./routes/users'));
 app.use('/', require('./routes/room'));
 app.use('/', require('./routes/face_recognition'));
+app.use('/', require('./routes/class_attendance'));
 
 // listen to the route
 app.listen(PORT, () => {

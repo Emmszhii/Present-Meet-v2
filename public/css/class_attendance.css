@@ -29,6 +29,15 @@ body {
 .content {
   display: flex;
   justify-content: space-evenly;
+  flex-direction: column;
+}
+
+.users {
+  margin: 10px auto;
+}
+
+input {
+  text-align: center;
 }
 
 .buttons {

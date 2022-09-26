@@ -79,10 +79,9 @@ const photoHandler = async () => {
       const id = document.getElementById('canvas');
 
       // face api detection
-      const detection = await faceapi
-        .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptors();
+      const detection = await faceapi.detectAllFaces(id, tinyFaceOption);
+      // .withFaceLandmarks(useTinyModel)
+      // .withFaceDescriptors();
       console.log(detection);
 
       // if no detection
@@ -93,10 +92,7 @@ const photoHandler = async () => {
       }
       // stop video play
       stopVideo();
-      // reset array
-      refUser.length = [];
-      // input user array
-      refUser.push(detection);
+
       // if face is detected
       await drawCanvas(canvas);
     } else {
@@ -112,7 +108,6 @@ const photoHandler = async () => {
 const drawCanvas = async (input) => {
   // preloader.style.display = 'block';
   const container = document.createElement('canvas');
-  container.style.position = 'absolute';
   container.id = 'overlay';
   document.querySelector('.attendance-camera').appendChild(container);
 
@@ -124,14 +119,22 @@ const drawCanvas = async (input) => {
   // display face landmarks
   const detectionWithLandmarks = await faceapi
     .detectSingleFace(input, tinyFaceOption)
-    .withFaceLandmarks(useTinyModel);
+    .withFaceLandmarks(useTinyModel)
+    .withFaceDescriptor();
+
+  // reset array
+  refUser.length = [];
+  // input user array
+  refUser.push(detectionWithLandmarks);
+
+  console.log(refUser);
 
   // resized the detected boxes and landmarks
   const resizedResults = faceapi.resizeResults(
-    // detectionWithFaceLandMarks,
     detectionWithLandmarks,
     displaySize
   );
+
   // draw the landmarks into the canvas
   faceapi.draw.drawFaceLandmarks(canvas_overlay, resizedResults);
 

@@ -25,6 +25,8 @@ const startVideoHandler = async () => {
   preloader.style.display = 'block';
   const vid = document.createElement('video');
   vid.id = 'video';
+  vid.width = '1920';
+  vid.height = '1080';
   vid.autoplay = false;
   vid.muted = true;
 
@@ -60,8 +62,8 @@ const photoHandler = async () => {
   const video = document.getElementById('video');
   const canvas = document.createElement('canvas');
   canvas.id = 'canvas';
-  canvas.width = '1920';
-  canvas.height = '1080';
+  canvas.width = video.width;
+  canvas.height = video.height;
   const context = canvas.getContext('2d');
   const canvasDom = document.getElementById('canvas');
   if (!canvasDom) camera.append(canvas);
@@ -74,15 +76,13 @@ const photoHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(
-          id,
-          new faceapi.TinyFaceDetectorOptions({ inputSize: 320 })
-        )
+        .detectAllFaces(id, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
+      console.log(detection);
 
       // if no detection
-      if (!detection || detection.length > 1) {
+      if (detection.length < 1 || detection.length > 1) {
         stopVideo();
         errorHandler('Image are invalid. Please Try again!');
         return startVideoHandler();
@@ -119,10 +119,7 @@ const drawCanvas = async (input) => {
 
   // display face landmarks
   const detectionWithLandmarks = await faceapi
-    .detectSingleFace(
-      input,
-      new faceapi.TinyFaceDetectorOptions({ inputSize: 320 })
-    )
+    .detectSingleFace(input, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks(useTinyModel);
 
   // resized the detected boxes and landmarks

@@ -115,8 +115,11 @@ const faceRecognized = async () => {
   const msg = document.getElementById('msg');
 
   const query = await faceapi
-    .detectAllFaces(canvas)
-    .withFaceLandmarks()
+    .detectAllFaces(
+      canvas,
+      new faceapi.TinyFaceDetectorOptions({ inputSize: 320 })
+    )
+    .withFaceLandmarks(useTinyModel)
     .withFaceDescriptors();
 
   if (!query || query.length > 1 || query[0].descriptor) {

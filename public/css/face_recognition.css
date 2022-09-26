@@ -257,8 +257,8 @@ input:focus::placeholder {
     width: 80%;
   }
   .attendance-camera {
-    width: 500px;
-    height: 400px;
+    width: 400px;
+    height: 300px;
   }
 }
 @media (max-width: 480px) {
@@ -266,7 +266,7 @@ input:focus::placeholder {
     width: 90%;
   }
   .attendance-camera {
-    width: 480px;
+    width: 400px;
     height: 300px;
   }
 }

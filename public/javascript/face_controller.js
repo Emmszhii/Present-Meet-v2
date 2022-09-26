@@ -17,6 +17,7 @@ document.getElementById('photo-btn').addEventListener('click', photoHandler);
 window.addEventListener('load', () => {
   Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
   ])

@@ -17,6 +17,7 @@ const fetchPrevDescriptor = async () => {
       const float32 = new Float32Array(split);
       refUser.push([{ descriptor: float32 }]);
       msgHandler('Previous face description is now added.');
+      console.log(refUser);
     }
   }
   if (res.status === 400) {
@@ -66,8 +67,8 @@ const photoHandler = async () => {
   const video = document.getElementById('video');
   const canvas = document.createElement('canvas');
   canvas.id = 'canvas';
-  canvas.width = '1280';
-  canvas.height = '720';
+  canvas.width = '1920';
+  canvas.height = '1080';
   const context = canvas.getContext('2d');
   const canvasDom = document.getElementById('canvas');
   if (!canvasDom) camera.append(canvas);
@@ -119,15 +120,13 @@ const drawCanvas = async (input) => {
   // display face landmarks
   const detectionWithLandmarks = await faceapi
     .detectSingleFace(input, tinyFaceOption)
-    .withFaceLandmarks(useTinyModel)
+    .withFaceLandmarks()
     .withFaceDescriptor();
 
   // reset array
   refUser.length = [];
   // input user array
-  refUser.push(detectionWithLandmarks);
-
-  console.log(refUser);
+  refUser.push([detectionWithLandmarks]);
 
   // resized the detected boxes and landmarks
   const resizedResults = faceapi.resizeResults(
@@ -146,25 +145,7 @@ const drawCanvas = async (input) => {
   // preloader.style.display = 'none';
 };
 
-// stop video when capturing
-const stopVideo = () => {
-  const video = document.getElementById('video');
-  if (video) {
-    track[0].stop();
-    video.remove();
-  } else {
-    startVideo();
-  }
-};
-
-const resetMessages = () => {
-  const err = document.getElementById('err');
-  const msg = document.getElementById('msg');
-  if (err) err.remove();
-  if (msg) msg.remove();
-};
-
-// recognize handler
+// RECOGNIZE HANDLER
 const recognizeHandler = async () => {
   preloader.style.display = 'block';
   const video = document.getElementById('video');
@@ -172,6 +153,7 @@ const recognizeHandler = async () => {
     return errorHandler('No Reference Image !');
   }
   let img1 = refUser[0];
+  console.log(refUser);
   let img2;
 
   // create Canvas
@@ -192,11 +174,11 @@ const recognizeHandler = async () => {
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks(useTinyModel)
+        .withFaceLandmarks()
         .withFaceDescriptors();
 
       // if no detection
-      if (!detection || detection.length > 1) {
+      if (detection.length < 1 || detection.length > 1) {
         stopVideo();
         return startVideoHandler();
       }
@@ -220,6 +202,44 @@ const recognizeHandler = async () => {
   } finally {
     preloader.style.display = 'none';
   }
+};
+
+// compare the person
+const comparePerson = async (referenceImg, queryImg) => {
+  // guard clause if input is null
+  if (!referenceImg) return errorHandler('Please register an image first');
+  if (!queryImg) return errorHandler('Query img is invalid');
+  // if both are defined run the face recognition
+  if (queryImg) {
+    // matching B query
+    const dist = faceapi.euclideanDistance(referenceImg, queryImg);
+    if (dist <= 0.4) {
+      msgHandler(`Face are match!`);
+      createPostButton();
+    } else {
+      errorHandler('Face does not Match!');
+    }
+  } else {
+    errorHandler('No face detected!');
+  }
+};
+
+// stop video when capturing
+const stopVideo = () => {
+  const video = document.getElementById('video');
+  if (video) {
+    track[0].stop();
+    video.remove();
+  } else {
+    startVideo();
+  }
+};
+
+const resetMessages = () => {
+  const err = document.getElementById('err');
+  const msg = document.getElementById('msg');
+  if (err) err.remove();
+  if (msg) msg.remove();
 };
 
 const errorHandler = (err) => {
@@ -253,26 +273,6 @@ const msgHandler = (msg) => {
     msgP.innerText = msg;
   } else {
     document.getElementById('messages').appendChild(p);
-  }
-};
-
-// compare the person
-const comparePerson = async (referenceImg, queryImg) => {
-  // guard clause if input is null
-  if (!referenceImg) return errorHandler('Please register an image first');
-  if (!queryImg) return errorHandler('Query img is invalid');
-  // if both are defined run the face recognition
-  if (queryImg) {
-    // matching B query
-    const dist = faceapi.euclideanDistance(referenceImg, queryImg);
-    if (dist <= 0.4) {
-      msgHandler(`Face are match!`);
-      createPostButton();
-    } else {
-      errorHandler('Face does not Match!');
-    }
-  } else {
-    errorHandler('No face detected!');
   }
 };
 

@@ -4,6 +4,10 @@ let track;
 const useTinyModel = true;
 const refUser = [];
 
+const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
+  inputSize: 416,
+});
+
 const fetchPrevDescriptor = async () => {
   const res = await fetch('/getDescriptor', { method: 'get' });
   const data = await res.json();
@@ -76,13 +80,7 @@ const photoHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(
-          id,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 320,
-            scoreThreshold: 0.5,
-          })
-        )
+        .detectAllFaces(id, tinyFaceOption)
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
       console.log(detection);
@@ -125,13 +123,7 @@ const drawCanvas = async (input) => {
 
   // display face landmarks
   const detectionWithLandmarks = await faceapi
-    .detectSingleFace(
-      input,
-      new faceapi.TinyFaceDetectorOptions({
-        inputSize: 320,
-        scoreThreshold: 0.5,
-      })
-    )
+    .detectSingleFace(input, tinyFaceOption)
     .withFaceLandmarks(useTinyModel);
 
   // resized the detected boxes and landmarks
@@ -196,13 +188,7 @@ const recognizeHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(
-          id,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 320,
-            scoreThreshold: 0.5,
-          })
-        )
+        .detectAllFaces(id, tinyFaceOption)
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 

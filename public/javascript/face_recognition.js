@@ -76,8 +76,14 @@ const photoHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(id)
-        .withFaceLandmarks()
+        .detectAllFaces(
+          id,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.5,
+          })
+        )
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
       console.log(detection);
 
@@ -119,8 +125,14 @@ const drawCanvas = async (input) => {
 
   // display face landmarks
   const detectionWithLandmarks = await faceapi
-    .detectSingleFace(input)
-    .withFaceLandmarks();
+    .detectSingleFace(
+      input,
+      new faceapi.TinyFaceDetectorOptions({
+        inputSize: 320,
+        scoreThreshold: 0.5,
+      })
+    )
+    .withFaceLandmarks(useTinyModel);
 
   // resized the detected boxes and landmarks
   const resizedResults = faceapi.resizeResults(
@@ -184,7 +196,13 @@ const recognizeHandler = async () => {
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(id, new faceapi.TinyFaceDetectorOptions())
+        .detectAllFaces(
+          id,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.5,
+          })
+        )
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 

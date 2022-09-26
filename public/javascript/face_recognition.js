@@ -62,8 +62,8 @@ const photoHandler = async () => {
   const video = document.getElementById('video');
   const canvas = document.createElement('canvas');
   canvas.id = 'canvas';
-  canvas.width = video.width;
-  canvas.height = video.height;
+  canvas.width = '1280';
+  canvas.height = '720';
   const context = canvas.getContext('2d');
   const canvasDom = document.getElementById('canvas');
   if (!canvasDom) camera.append(canvas);

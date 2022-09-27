@@ -180,6 +180,7 @@ const recognizeHandler = async () => {
       // if no detection
       if (detection.length < 1 || detection.length > 1) {
         stopVideo();
+        errorHandler('Face invalid, try again');
         return startVideoHandler();
       }
 

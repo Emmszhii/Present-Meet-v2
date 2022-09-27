@@ -23,7 +23,7 @@ window.addEventListener('load', () => {
     .then(() => {
       // faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
       // faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
-      console.log(faceapi.tf.getBackend(), faceapi.nets);
+      // faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
       fetchPrevDescriptor();
     })
     .catch((err) => {

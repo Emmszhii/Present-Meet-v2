@@ -6,7 +6,7 @@ const classListHandler = () => {
   const list = document.getElementById('add_list');
   if (list) {
     list.remove();
-    num = 0;
+    num = 1;
     addingUser.length = 0;
   } else {
     document

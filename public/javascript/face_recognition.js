@@ -27,37 +27,77 @@ const fetchPrevDescriptor = async () => {
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
+  const backend = faceapi.tf.getBackend();
   preloader.style.display = 'block';
   const vid = document.createElement('video');
   vid.id = 'video';
   vid.width = '1920';
   vid.height = '1080';
-  vid.autoplay = false;
+  vid.autoplay = true;
   vid.muted = true;
 
   const submit = document.getElementById('submit-btn');
-  if (submit) {
-    submit.remove();
-  }
+  if (submit) submit.remove();
+
   const overlay = document.getElementById('overlay');
-  if (overlay) {
-    overlay.remove();
-  }
+  if (overlay) overlay.remove();
+
   const canvas = document.getElementById('canvas');
-  if (canvas) {
-    canvas.remove();
-  }
+  if (canvas) canvas.remove();
+
   const video = document.getElementById('video');
-  if (!video) {
-    camera.insertBefore(vid, camera.firstChild);
-  }
-  navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-    const vid = document.getElementById('video');
-    vid.srcObject = stream;
-    vid.play();
-    track = stream.getTracks();
-    resetMessages();
-    preloader.style.display = 'none';
+  if (!video) camera.insertBefore(vid, camera.firstChild);
+
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then((stream) => {
+      vid.srcObject = stream;
+      if (backend === 'webgl') return faceDetection(100);
+      if (backend === 'cpu') return faceDetection(1000);
+      track = stream.getTracks();
+      resetMessages();
+    })
+    .catch((e) => {
+      console.log(e);
+    })
+    .finally(() => {
+      preloader.style.display = 'none';
+    });
+};
+
+const faceDetection = (ms) => {
+  const video = document.getElementById(`video`);
+  console.log(video);
+
+  const displaySize = { width: video.width, height: video.height };
+
+  video.addEventListener('click', () => {
+    console.log(`run`);
+  });
+
+  video.addEventListener('play', () => {
+    console.log(`run`);
+    const canvas = faceapi.createCanvasFromMedia(video);
+    camera.append(canvas);
+
+    faceapi.matchDimensions(canvas, displaySize);
+
+    // interval
+    setInterval(async () => {
+      console.log(`this run`);
+
+      const detections = await faceapi
+        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks();
+
+      const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+      faceapi.draw.drawDetections(canvas, resizedDetections);
+
+      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    }, ms);
   });
 };
 
@@ -105,6 +145,8 @@ const photoHandler = async () => {
     preloader.style.display = 'none';
   }
 };
+
+const drawCanvasGpu = async (input) => {};
 
 const drawCanvas = async (input) => {
   // preloader.style.display = 'block';

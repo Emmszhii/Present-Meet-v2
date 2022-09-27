@@ -1,5 +1,5 @@
 const addClassListBtn = document.getElementById('add_class_list');
-let num = 0;
+let num = 1;
 const addingUser = [];
 
 const classListHandler = () => {
@@ -25,10 +25,33 @@ const classListHandler = () => {
 
 const addUserHandler = () => {
   addingUser.length = 0;
-  num++;
+
+  let index = num++;
+  let sort = document.querySelector(`.users`).children;
+
+  for (let i = 1; num > i; i++) {
+    // get dom if dom is false then run
+    const dom = document.getElementById(`user_${i}`);
+    if (!dom) {
+      index = i;
+      sort = Array.prototype.slice.call(sort, 0);
+      sort.sort(function (a, b) {
+        const aord = +a.id.split('_')[1];
+        const bord = +b.id.split('_')[1];
+        return aord - bord;
+      });
+      const parent = document.querySelector('.users');
+      parent.innerHTML = '';
+
+      for (let i = 0, l = sort.length; i < l; i++) {
+        parent.appendChild(sort[i]);
+      }
+    }
+  }
+
   document
     .querySelector('.users')
-    .insertAdjacentHTML('beforeend', createInput(num));
+    .insertAdjacentHTML('beforeend', createInput(index));
 };
 
 const addClassList = () => {
@@ -68,6 +91,14 @@ const studentHandler = () => {
   }
 };
 
+const deleteDom = (id) => {
+  const dom = document.getElementById(`user_${id}`);
+  if (dom) {
+    dom.remove();
+    num--;
+  }
+};
+
 const postRequest = async (url, data) => {
   const resp = await fetch(url, {
     method: 'post',
@@ -87,10 +118,13 @@ const postRequest = async (url, data) => {
 
 const createInput = (num) => {
   return `
-    <div class="user">
+    <div id="user_${num}">
       <label>${num}</label>
-      <input id="user_firstName_${num}" placeholder="First Name"> 
-      <input id="user_lastName_${num}" placeholder="Last Name"> 
+      <input id="user_firstName_${num}" placeholder="First Name" min="3" autocomplete="off" required> 
+      <input id="user_lastName_${num}" placeholder="Last Name" min="3" autocomplete="off" required>
+      <button type="button" onclick="deleteDom(${num})">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
   `;
 };

@@ -24,6 +24,9 @@ body {
   background-color: #e5e5e5;
   margin: 5px 10px;
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .content {

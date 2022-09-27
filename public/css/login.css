@@ -5,6 +5,13 @@
   margin: 0px;
 }
 
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+
 main {
   overflow: hidden;
   display: flex;

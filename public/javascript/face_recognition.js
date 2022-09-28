@@ -89,6 +89,8 @@ const faceDetection = (ms) => {
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
       faceapi.draw.drawDetections(canvas, resizedDetections);
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      const landmarks = document.getElementById('face_landmarks');
+      if (landmarks) landmarks.remove();
     }, ms);
   });
 };
@@ -181,11 +183,11 @@ const recognizeHandler = async () => {
     if (video) {
       context.imageSmoothingEnabled = false;
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const id = document.getElementById('canvas');
+      // const id = document.getElementById('canvas');
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(id, tinyFaceOption)
+        .detectAllFaces(canvas, tinyFaceOption)
         .withFaceLandmarks()
         .withFaceDescriptors();
 

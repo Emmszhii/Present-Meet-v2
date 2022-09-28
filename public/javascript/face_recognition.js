@@ -169,7 +169,7 @@ const recognizeHandler = async () => {
   let img2;
 
   // create Canvas
-  const canvas = document.createElement('canvas');
+  const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = 'canvas';
   canvas.width = video.width;
   canvas.height = video.height;
@@ -229,6 +229,7 @@ const comparePerson = async (referenceImg, queryImg) => {
   if (queryImg) {
     // matching B query
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
+    console.log(dist);
     if (dist <= 0.4) {
       msgHandler(`Face are match!`);
       createPostButton();

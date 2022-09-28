@@ -3,6 +3,7 @@ const camera = document.querySelector('.attendance-camera');
 let track;
 const useTinyModel = true;
 const refUser = [];
+let intervalFace;
 
 const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
   inputSize: 416,
@@ -17,7 +18,6 @@ const fetchPrevDescriptor = async () => {
       const float32 = new Float32Array(split);
       refUser.push([{ descriptor: float32 }]);
       msgHandler('Previous face description is now added.');
-      console.log(refUser);
     }
   }
   if (res.status === 400) {
@@ -52,10 +52,10 @@ const startVideoHandler = async () => {
     .getUserMedia({ video: true })
     .then((stream) => {
       vid.srcObject = stream;
-      if (backend === 'webgl') return faceDetection(100);
-      if (backend === 'cpu') return faceDetection(1000);
       track = stream.getTracks();
       resetMessages();
+      if (backend === 'webgl') faceDetection(1000);
+      // if (backend === 'cpu') faceDetection(5000);
     })
     .catch((e) => {
       console.log(e);
@@ -71,19 +71,16 @@ const faceDetection = (ms) => {
 
   const displaySize = { width: video.width, height: video.height };
 
-  video.addEventListener('click', () => {
-    console.log(`run`);
-  });
-
   video.addEventListener('play', () => {
     console.log(`run`);
     const canvas = faceapi.createCanvasFromMedia(video);
+    canvas.id = 'face_landmarks';
     camera.append(canvas);
 
     faceapi.matchDimensions(canvas, displaySize);
 
     // interval
-    setInterval(async () => {
+    intervalFace = setInterval(async () => {
       console.log(`this run`);
 
       const detections = await faceapi
@@ -99,6 +96,12 @@ const faceDetection = (ms) => {
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     }, ms);
   });
+
+  // video.addEventListener('ended', () => {
+  //   stopVideo();
+  //   clearInterval(intervalFace);
+  //   console.log(`run`);
+  // });
 };
 
 // PHOTO HANDLER
@@ -120,10 +123,10 @@ const photoHandler = async () => {
       const id = document.getElementById('canvas');
 
       // face api detection
-      const detection = await faceapi.detectAllFaces(id, tinyFaceOption);
-      // .withFaceLandmarks(useTinyModel)
+      const detection = await faceapi
+        .detectAllFaces(id, tinyFaceOption)
+        .withFaceLandmarks();
       // .withFaceDescriptors();
-      console.log(detection);
 
       // if no detection
       if (detection.length < 1 || detection.length > 1) {
@@ -131,6 +134,7 @@ const photoHandler = async () => {
         errorHandler('Image are invalid. Please Try again!');
         return startVideoHandler();
       }
+
       // stop video play
       stopVideo();
 
@@ -145,8 +149,6 @@ const photoHandler = async () => {
     preloader.style.display = 'none';
   }
 };
-
-const drawCanvasGpu = async (input) => {};
 
 const drawCanvas = async (input) => {
   // preloader.style.display = 'block';
@@ -195,7 +197,6 @@ const recognizeHandler = async () => {
     return errorHandler('No Reference Image !');
   }
   let img1 = refUser[0];
-  console.log(refUser);
   let img2;
 
   // create Canvas
@@ -270,12 +271,13 @@ const comparePerson = async (referenceImg, queryImg) => {
 // stop video when capturing
 const stopVideo = () => {
   const video = document.getElementById('video');
+  const face_landmarks = document.getElementById('face_landmarks');
   if (video) {
     track[0].stop();
     video.remove();
-  } else {
-    startVideo();
   }
+  if (face_landmarks) face_landmarks.remove();
+  if (intervalFace) clearInterval(intervalFace);
 };
 
 const resetMessages = () => {

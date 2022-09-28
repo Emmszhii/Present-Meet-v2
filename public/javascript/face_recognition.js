@@ -17,6 +17,7 @@ const fetchPrevDescriptor = async () => {
       const split = data.descriptor.split(',');
       const float32 = new Float32Array(split);
       refUser.push([{ descriptor: float32 }]);
+      console.log(refUser);
       msgHandler('Previous face description is now added.');
     }
   }
@@ -69,12 +70,9 @@ const startVideoHandler = async () => {
 
 const faceDetection = (ms) => {
   const video = document.getElementById(`video`);
-  console.log(video);
-
   const displaySize = { width: video.width, height: video.height };
 
   video.addEventListener('play', () => {
-    console.log(`run`);
     const canvas = faceapi.createCanvasFromMedia(video);
     canvas.id = 'face_landmarks';
     camera.append(canvas);
@@ -83,18 +81,13 @@ const faceDetection = (ms) => {
 
     // interval
     intervalFace = setInterval(async () => {
-      console.log(`this run`);
-
       const detections = await faceapi
         .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks();
 
       const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
       faceapi.draw.drawDetections(canvas, resizedDetections);
-
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     }, ms);
   });
@@ -130,31 +123,31 @@ const photoHandler = async () => {
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks();
-      // .withFaceDescriptors();
+        .withFaceLandmarks()
+        .withFaceDescriptors();
 
-      // if no detection
+      // if no detection function done
       if (detection.length < 1 || detection.length > 1) {
         stopVideo();
         errorHandler('Image are invalid. Please Try again!');
         return startVideoHandler();
       }
-
+      // if face is detected
       // stop video play
       stopVideo();
-
-      // if face is detected
+      // display face landmarks
       faceapi.matchDimensions(canvas, displaySize);
-
       const resizedDetections = faceapi.resizeResults(detection, displaySize);
-
-      // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
       faceapi.draw.drawDetections(canvas, resizedDetections);
-
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-
-      // await drawCanvas(canvas);
+      // reset array
+      refUser.length = [];
+      // input user array
+      refUser.push(detection);
+      // msg
+      msgHandler(
+        'If you are satisfied with this photo try to recognize else retry'
+      );
     } else {
       errorHandler('Start the camera first!');
     }
@@ -163,45 +156,6 @@ const photoHandler = async () => {
   } finally {
     preloader.style.display = 'none';
   }
-};
-
-const drawCanvas = async (input) => {
-  // preloader.style.display = 'block';
-  const container = document.createElement('canvas');
-  container.id = 'overlay';
-  document.querySelector('.attendance-camera').appendChild(container);
-
-  // camera default size
-  const displaySize = { width: input.width, height: input.height };
-  const canvas_overlay = document.getElementById('overlay');
-  faceapi.matchDimensions(canvas_overlay, displaySize);
-
-  // display face landmarks
-  const detectionWithLandmarks = await faceapi
-    .detectSingleFace(input, tinyFaceOption)
-    .withFaceLandmarks()
-    .withFaceDescriptor();
-
-  // reset array
-  refUser.length = [];
-  // input user array
-  refUser.push([detectionWithLandmarks]);
-
-  // resized the detected boxes and landmarks
-  const resizedResults = faceapi.resizeResults(
-    detectionWithLandmarks,
-    displaySize
-  );
-
-  // draw the landmarks into the canvas
-  faceapi.draw.drawFaceLandmarks(canvas_overlay, resizedResults);
-
-  // draw detections points into canvas
-  faceapi.draw.drawDetections(canvas_overlay, resizedResults);
-  msgHandler(
-    'If you are satisfied with this photo try to recognize else retry'
-  );
-  // preloader.style.display = 'none';
 };
 
 // RECOGNIZE HANDLER
@@ -217,8 +171,8 @@ const recognizeHandler = async () => {
   // create Canvas
   const canvas = document.createElement('canvas');
   canvas.id = 'canvas';
-  canvas.width = '1920';
-  canvas.height = '1080';
+  canvas.width = video.width;
+  canvas.height = video.height;
   const context = canvas.getContext('2d');
   const canvasDom = document.getElementById('canvas');
   if (!canvasDom) camera.append(canvas);
@@ -249,8 +203,11 @@ const recognizeHandler = async () => {
       if (!img1) return errorHandler(`Record your face first!`);
       if (!img2) return errorHandler(`Face not recognize`);
 
+      console.log(refUser);
       img1 = img1[0].descriptor;
       img2 = img2.descriptor;
+      console.log(img1);
+
       // comparing the 2 image
       comparePerson(img1, img2);
     } else {
@@ -443,5 +400,4 @@ export {
   comparePerson,
   createPostButton,
   postToServer,
-  drawCanvas,
 };

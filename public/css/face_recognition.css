@@ -259,6 +259,9 @@ input:focus::placeholder {
     width: 400px;
     height: 600px;
   }
+  .modal-content {
+    width: 65%;
+  }
 }
 @media (max-width: 480px) {
   .buttons {
@@ -267,5 +270,8 @@ input:focus::placeholder {
   .attendance-camera {
     width: 400px;
     height: 600px;
+  }
+  .modal-content {
+    width: 70%;
   }
 }

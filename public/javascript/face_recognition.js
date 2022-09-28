@@ -36,6 +36,9 @@ const startVideoHandler = async () => {
   vid.autoplay = true;
   vid.muted = true;
 
+  const img = document.getElementById('img');
+  if (img) img.remove();
+
   const submit = document.getElementById('submit-btn');
   if (submit) submit.remove();
 
@@ -55,7 +58,6 @@ const startVideoHandler = async () => {
       track = stream.getTracks();
       resetMessages();
       if (backend === 'webgl') faceDetection(1000);
-      // if (backend === 'cpu') faceDetection(5000);
     })
     .catch((e) => {
       console.log(e);
@@ -96,30 +98,33 @@ const faceDetection = (ms) => {
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     }, ms);
   });
-
-  // video.addEventListener('ended', () => {
-  //   stopVideo();
-  //   clearInterval(intervalFace);
-  //   console.log(`run`);
-  // });
 };
 
 // PHOTO HANDLER
 const photoHandler = async () => {
   preloader.style.display = 'block';
   const video = document.getElementById('video');
-  const canvas = document.createElement('canvas');
-  canvas.id = 'canvas';
-  canvas.width = '1920';
-  canvas.height = '1080';
-  const context = canvas.getContext('2d');
-  const canvasDom = document.getElementById('canvas');
-  if (!canvasDom) camera.append(canvas);
+  const landmarks = document.getElementById('face_landmarks');
+  if (landmarks) landmarks.remove();
+  const img = document.createElement('canvas');
+  img.id = 'img';
+  img.width = video.width;
+  img.height = video.height;
+  const context = img.getContext('2d');
+  const imgDom = document.getElementById('img');
+  if (!imgDom) camera.append(img);
+
+  const displaySize = { width: video.width, height: video.height };
 
   try {
     if (video) {
       context.imageSmoothingEnabled = false;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      context.drawImage(video, 0, 0, video.width, video.height);
+
+      const canvas = faceapi.createCanvasFromMedia(video);
+      canvas.id = 'canvas';
+      camera.append(canvas);
+
       const id = document.getElementById('canvas');
 
       // face api detection
@@ -139,7 +144,17 @@ const photoHandler = async () => {
       stopVideo();
 
       // if face is detected
-      await drawCanvas(canvas);
+      faceapi.matchDimensions(canvas, displaySize);
+
+      const resizedDetections = faceapi.resizeResults(detection, displaySize);
+
+      // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+      faceapi.draw.drawDetections(canvas, resizedDetections);
+
+      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+      // await drawCanvas(canvas);
     } else {
       errorHandler('Start the camera first!');
     }

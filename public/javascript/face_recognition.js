@@ -171,25 +171,34 @@ const recognizeHandler = async () => {
   let img2;
 
   // create Canvas
-  const canvas = faceapi.createCanvasFromMedia(video);
-  canvas.id = 'canvas';
-  canvas.width = video.width;
-  canvas.height = video.height;
-  const context = canvas.getContext('2d');
-  const canvasDom = document.getElementById('canvas');
-  if (!canvasDom) camera.append(canvas);
+  // const img = document.createElement('canvas');
+  // img.id = 'img';
+  // img.width = video.width;
+  // img.height = video.height;
+  // const context = img.getContext('2d');
+  // const canvasDom = document.getElementById('img');
+  // if (!canvasDom) camera.append(img);
 
   try {
     if (video) {
-      context.imageSmoothingEnabled = false;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // const id = document.getElementById('canvas');
+      // context.imageSmoothingEnabled = false;
+      // context.drawImage(video, 0, 0, img.width, img.height);
+
+      const canvas = faceapi.createCanvasFromMedia(video);
+      canvas.id = 'canvas';
+      camera.append(canvas);
+      console.log(canvas);
+
+      const id = document.getElementById('canvas');
+      console.log(id);
 
       // face api detection
       const detection = await faceapi
-        .detectAllFaces(canvas, tinyFaceOption)
+        .detectAllFaces(id, tinyFaceOption)
         .withFaceLandmarks()
         .withFaceDescriptors();
+
+      console.log(detection);
 
       // if no detection
       if (detection.length < 1 || detection.length > 1) {

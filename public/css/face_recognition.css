@@ -239,7 +239,11 @@ input:focus::placeholder {
     width: 100%;
   }
 }
-
+@media (max-width: 1000px) {
+  #modal-content {
+    width: 60%;
+  }
+}
 @media (max-width: 1366px) {
   .buttons {
     width: 70%;
@@ -259,7 +263,7 @@ input:focus::placeholder {
     width: 400px;
     height: 600px;
   }
-  .modal-content {
+  #modal-content {
     width: 65%;
   }
 }
@@ -271,7 +275,7 @@ input:focus::placeholder {
     width: 400px;
     height: 600px;
   }
-  .modal-content {
+  #modal-content {
     width: 70%;
   }
 }

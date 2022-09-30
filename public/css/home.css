@@ -130,6 +130,20 @@ input:focus::placeholder {
   margin: 10px;
 }
 
+@media (max-width: 480px) {
+  .roomsBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .homepageFooter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
 @media (max-width: 768px) {
   body {
     overflow: hidden;
@@ -153,10 +167,6 @@ input:focus::placeholder {
   .homepageImg img {
     width: 100%;
   }
-  .homepageFooter {
-    /* justify-content: space-evenly; */
-    /* margin: 10%; */
-  }
   .modalCreate-bg {
     width: 100vw;
   }
@@ -167,12 +177,6 @@ input:focus::placeholder {
   .createModal {
     width: 80%;
   }
-  .roomsBtn {
-    /* display: block; */
-  }
-  /* .roomsBtn button {
-    margin: 10px;
-  } */
 }
 
 @media (max-width: 1000px) {
@@ -184,7 +188,6 @@ input:focus::placeholder {
     height: 100vh;
   }
   .homepageMain {
-    /* display: block; */
     width: 90%;
     margin: auto;
     overflow: hidden;
@@ -198,10 +201,6 @@ input:focus::placeholder {
   .homepageImg img {
     width: 100%;
   }
-  .homepageFooter {
-    /* justify-content: center; */
-    /* margin: 10%; */
-  }
   .modalCreate-bg {
     width: 100vw;
   }
@@ -212,10 +211,4 @@ input:focus::placeholder {
   .createModal {
     width: 80%;
   }
-  .roomsBtn {
-    /* display: block; */
-  }
-  /* .roomsBtn button {
-    margin: 10px;
-  } */
 }

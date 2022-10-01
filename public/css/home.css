@@ -131,17 +131,6 @@ input:focus::placeholder {
 }
 
 @media (max-width: 480px) {
-  .roomsBtn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .homepageFooter {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -157,9 +146,6 @@ input:focus::placeholder {
     width: 90%;
     margin: auto;
     overflow: hidden;
-  }
-  .text {
-    text-align: center;
   }
   .homepageImg {
     margin: auto;
@@ -177,9 +163,15 @@ input:focus::placeholder {
   .createModal {
     width: 80%;
   }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1336px) {
   body {
     overflow: hidden;
   }

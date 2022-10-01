@@ -173,6 +173,10 @@ select {
   font-size: 1.2rem;
 }
 
+a {
+  text-decoration: none;
+}
+
 @media (max-width: 1600px) {
   main {
     overflow: hidden;
@@ -187,7 +191,7 @@ select {
     width: 40%;
   }
 }
-@media (max-width: 1000px) {
+@media (max-width: 1366px) {
   main {
     overflow: hidden;
   }
@@ -198,7 +202,7 @@ select {
     width: 100%;
   }
   .card {
-    width: 50%;
+    width: 70%;
   }
 }
 @media (max-width: 768px) {
@@ -212,7 +216,7 @@ select {
     width: 100%;
   }
   .card {
-    width: 60%;
+    width: 90%;
   }
 }
 @media (max-width: 480px) {
@@ -224,8 +228,5 @@ select {
   }
   #user-face {
     width: 100%;
-  }
-  .card {
-    width: 70%;
   }
 }

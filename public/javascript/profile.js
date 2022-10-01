@@ -114,6 +114,7 @@ const closeModalChangePw = () => {
   const modal = document.getElementById('modal-password');
   modal.style.display = 'none';
 };
+
 // modals
 document.getElementById('submit-btn').addEventListener('click', openModal);
 document.getElementById('cancel').addEventListener('click', closeModal);

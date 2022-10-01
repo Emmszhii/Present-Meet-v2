@@ -52,7 +52,7 @@ input:focus::placeholder {
 .button {
   width: 150px;
   height: 35px;
-  border-radius: 10px;
+  border-radius: 3px;
   border: 1px solid black;
   cursor: pointer;
 }

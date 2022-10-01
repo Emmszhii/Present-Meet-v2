@@ -1,41 +1,23 @@
 <%- include('partials/header') %>
-
 <main>
-  <div id="form">
-    <div class="card">
-      <%- include('partials/messages') %>
-      <div id="login">
-        <form action="/login" id="user-login" method="post">
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value=""
-            autocomplete="off"
-          />
-          <label for="email">Email</label>
-          <input
-            type="password"
-            name="password"
-            id="password-input"
-            value=""
-            autocomplete="off"
-          />
-          <label for="password">Password</label>
-          <button type="submit" id="login-btn">Login</button>
-        </form>
-      </div>
-      <div class="footer">
-        <!-- <a href="#" id="forgot-pw"><p>Forgot password?</p></a> -->
-        <a href="/register">
-          <!-- <form action="/register" method="get"> -->
-          <button type="submit" id="sign-up">Sign up</button>
-          <!-- </form> -->
-        </a>
-        <p>No account? Sign up now!</p>
-      </div>
-    </div>
+  <div class="card">
+    <%- include('partials/messages') %>
+
+    <form action="/login" id="user-login" method="post">
+      <input type="email" name="email" id="email" value="" autocomplete="off" />
+      <label for="email">Email</label>
+      <input
+        type="password"
+        name="password"
+        id="password-input"
+        value=""
+        autocomplete="off"
+      />
+      <label for="password">Password</label>
+      <button type="submit" class="button">Login</button>
+    </form>
+
+    <p>No account? <a href="/register">Sign up</a> now!</p>
   </div>
-  <script></script>
 </main>
 <%- include('partials/footer') %>

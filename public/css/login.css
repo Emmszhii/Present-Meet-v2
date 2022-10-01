@@ -12,15 +12,16 @@ a:hover {
   text-decoration: none;
 }
 
-main {
+body {
   overflow: hidden;
   display: flex;
-}
-
-#form {
   background-color: black;
   width: 100vw;
   height: 100vh;
+}
+
+main {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +33,7 @@ main {
 .card {
   background-color: white;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 3px;
   width: 30%;
   margin: 10px;
   text-align: center;
@@ -68,54 +69,53 @@ input:focus {
   cursor: pointer;
 }
 
-#sign-up {
-  background-color: #dd4b39;
-  font-size: 18px;
-  padding: 10px 15px;
-  border: none;
-  color: #fff;
-  text-shadow: 2px 2px black;
-  bottom: 0.9rem;
-  border-radius: 8px;
+.button {
+  background-color: transparent;
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid black;
   display: flex;
   margin: 3% auto;
   cursor: pointer;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
-#login-btn:hover {
+.button:hover {
   background-color: black;
   color: white;
-  text-shadow: 2px 2px #dd4b39;
-}
-
-.fa-google {
-  background-color: #dd4b39;
-}
-
-#forgot-pw {
-  font-size: 1rem;
 }
 
 @media (max-width: 1600px) {
-  .login {
-    font-size: 1rem;
+  main {
+    font-size: 1.2rem;
   }
-  .card {
-    width: 40%;
-  }
-}
-@media (max-width: 1400px) {
   .card {
     width: 50%;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 1366px) {
+  main {
+    font-size: 1.3rem;
+  }
   .card {
     width: 60%;
   }
 }
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  main {
+    font-size: 1.4rem;
+  }
   .card {
-    width: 65%;
+    width: 70%;
+  }
+}
+@media (max-width: 480px) {
+  main {
+    font-size: 1.5rem;
+  }
+  .card {
+    width: 80%;
   }
 }

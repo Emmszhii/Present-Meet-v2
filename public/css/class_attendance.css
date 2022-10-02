@@ -40,14 +40,13 @@ body {
 }
 
 input {
-  /* width: 80%; */
   text-align: center;
   border: none;
   border-bottom: 1px solid black;
   outline: none;
-  /* margin-top: 10px;
-  margin-bottom: 10px; */
   text-align: center;
+  padding: 5px 10px;
+  background: transparent;
 }
 
 .buttons {
@@ -61,15 +60,15 @@ input {
 }
 
 .button {
-  border: none;
-  background-color: black;
-  color: white;
+  background-color: transparent;
+  border: 1px solid black;
+  color: black;
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: green;
-  /* color: black; */
+  background-color: black;
+  color: white;
 }

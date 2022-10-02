@@ -130,9 +130,6 @@ input:focus::placeholder {
   margin: 10px;
 }
 
-@media (max-width: 480px) {
-}
-
 @media (max-width: 768px) {
   body {
     overflow: hidden;

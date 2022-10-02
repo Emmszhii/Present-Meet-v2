@@ -118,7 +118,7 @@ input:focus::placeholder {
 }
 
 .form-group {
-  margin: 5px;
+  margin-top: 5px;
 }
 
 #user-type-div {
@@ -144,8 +144,29 @@ select {
 }
 
 #submit-btn,
-#change-pw-btn {
-  background-color: #2aca3e;
+#change-pw {
+  background-color: transparent;
+  font-size: 1rem;
+  padding: 10px 15px;
+  width: 100%;
+  border: 1px solid black;
+  color: black;
+  bottom: 0.9rem;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  margin: 3% auto;
+  cursor: pointer;
+}
+
+#submit-btn:hover,
+#change-pw:hover {
+  background-color: black;
+  color: white;
+}
+
+/* #change-pw {
+  background-color: black;
   font-size: 18px;
   padding: 10px 15px;
   border: none;
@@ -156,21 +177,7 @@ select {
   display: flex;
   margin: 3% auto;
   cursor: pointer;
-}
-
-#change-pw {
-  background-color: black;
-  font-size: 18px;
-  padding: 10px 15px;
-  border: none;
-  color: #fff;
-  /* text-shadow: 2px 2px black; */
-  bottom: 0.9rem;
-  border-radius: 8px;
-  display: flex;
-  margin: 3% auto;
-  cursor: pointer;
-}
+}  */
 
 .footer {
   text-align: center;

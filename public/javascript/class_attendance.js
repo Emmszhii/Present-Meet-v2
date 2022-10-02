@@ -135,9 +135,9 @@ const domAddClassList = () => {
       <div class='content'>
         <div class='main_content'>
           <label for="subject">Subject</label>
-          <input type="text" name="subject" id="subject">
+          <input type="text" name="subject" id="subject" autocomplete="off" required>
           <label for="section">Section</label>
-          <input type="text" name="section" id="section">
+          <input type="text" name="section" id="section" autocomplete="off" required>
           <button type='button' class="button" id="add_user_btn">Add a User </button>
           <button type='button' class="button" id="add_list_btn">Save</button>
         </div>

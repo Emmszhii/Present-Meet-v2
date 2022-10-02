@@ -106,18 +106,18 @@ const photoHandler = async () => {
   const video = document.getElementById('video');
   const landmarks = document.getElementById('face_landmarks');
   if (landmarks) landmarks.remove();
-  const img = document.createElement('canvas');
-  img.id = 'img';
-  img.width = video.width;
-  img.height = video.height;
-  const context = img.getContext('2d');
-  const imgDom = document.getElementById('img');
-  if (!imgDom) camera.append(img);
-
-  const displaySize = { width: video.width, height: video.height };
-
   try {
     if (video) {
+      const img = document.createElement('canvas');
+      img.id = 'img';
+      img.width = video.width;
+      img.height = video.height;
+      const context = img.getContext('2d');
+      const imgDom = document.getElementById('img');
+      if (!imgDom) camera.append(img);
+
+      const displaySize = { width: video.width, height: video.height };
+
       context.imageSmoothingEnabled = false;
       context.drawImage(video, 0, 0, video.width, video.height);
 
@@ -169,14 +169,14 @@ const photoHandler = async () => {
 const recognizeHandler = async () => {
   preloader.style.display = 'block';
   const video = document.getElementById('video');
-  if (refUser.length === 0) {
-    return errorHandler('No Reference Image !');
-  }
-  let img1 = refUser[0];
-  let img2;
-
   try {
     if (video) {
+      if (refUser.length === 0) {
+        return errorHandler('No Reference Image !');
+      }
+      let img1 = refUser[0];
+      let img2;
+
       const canvas = faceapi.createCanvasFromMedia(video);
       canvas.id = 'canvas';
       camera.append(canvas);

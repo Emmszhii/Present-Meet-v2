@@ -157,7 +157,7 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
   if (!first_name || !last_name || !birthday || !type || !password) {
     return res
       .status(400)
-      .json({ err: 'PLease fill in all the required fields' });
+      .json({ err: 'Please fill in all the required fields' });
   }
   // check if first_name is valid
   if (first_name < 3 || first_name.trim() === '') {
@@ -176,13 +176,7 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
     return res.status(400).json({ err: 'Must input a birthday' });
   }
   // check if type is not null
-  if (
-    type.trim() === '' &&
-    type !== 'student' &&
-    type !== 'teacher' &&
-    type !== 'audience' &&
-    type !== 'host'
-  ) {
+  if (type.trim() === '' && type !== 'student' && type !== 'teacher') {
     return res.status(400).json({ err: 'Please input a valid account type' });
   }
 

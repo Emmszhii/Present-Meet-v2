@@ -58,10 +58,17 @@ const startVideoHandler = async () => {
       vid.srcObject = stream;
       track = stream.getTracks();
       resetMessages();
-      if (backend === 'webgl') faceDetection(1000);
+      if (backend === 'webgl') faceDetection(500);
+
+      const text = document.getElementById('video_text');
+      if (!text) informationDom('video_text', `Video: Working`);
     })
     .catch((e) => {
-      console.log(e);
+      if (e.name === 'NotAllowedError') {
+        const dom = document.getElementById('video_error');
+        if (!dom)
+          informationDom(`video_error`, `Video: Permission Denied by user`);
+      }
     })
     .finally(() => {
       preloader.style.display = 'none';
@@ -83,14 +90,12 @@ const faceDetection = (ms) => {
     intervalFace = setInterval(async () => {
       const detections = await faceapi
         .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks();
+        .withFaceLandmarks(useTinyModel);
 
       const resizedDetections = faceapi.resizeResults(detections, displaySize);
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
       faceapi.draw.drawDetections(canvas, resizedDetections);
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-      const landmarks = document.getElementById('face_landmarks');
-      if (landmarks) landmarks.remove();
     }, ms);
   });
 };
@@ -125,7 +130,7 @@ const photoHandler = async () => {
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks()
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 
       // if no detection function done
@@ -170,20 +175,8 @@ const recognizeHandler = async () => {
   let img1 = refUser[0];
   let img2;
 
-  // create Canvas
-  // const img = document.createElement('canvas');
-  // img.id = 'img';
-  // img.width = video.width;
-  // img.height = video.height;
-  // const context = img.getContext('2d');
-  // const canvasDom = document.getElementById('img');
-  // if (!canvasDom) camera.append(img);
-
   try {
     if (video) {
-      // context.imageSmoothingEnabled = false;
-      // context.drawImage(video, 0, 0, img.width, img.height);
-
       const canvas = faceapi.createCanvasFromMedia(video);
       canvas.id = 'canvas';
       camera.append(canvas);
@@ -195,7 +188,7 @@ const recognizeHandler = async () => {
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks()
+        .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
 
       console.log(detection);
@@ -239,9 +232,9 @@ const comparePerson = async (referenceImg, queryImg) => {
   // if both are defined run the face recognition
   if (queryImg) {
     // matching B query
+    const distance = 0.4;
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
-    console.log(dist);
-    if (dist <= 0.4) {
+    if (dist <= distance) {
       msgHandler(`Face are match!`);
       createPostButton();
     } else {
@@ -250,6 +243,24 @@ const comparePerson = async (referenceImg, queryImg) => {
   } else {
     errorHandler('No face detected!');
   }
+};
+
+const informationDom = (id, text) => {
+  const dom = `
+  <p id='${id}'>${text}</p>
+  `;
+  return document.querySelector(`.text`).insertAdjacentHTML('beforeend', dom);
+};
+
+const informationHandler = () => {
+  const backend = faceapi.tf.getBackend();
+  // document
+  //   .querySelector(`.text`)
+  //   .insertAdjacentHTML(
+  //     'beforeend',
+  //     informationDom(`backend`, `Browser backend: ${backend}`)
+  //   );
+  informationDom(`backend`, `Browser backend: ${backend}`);
 };
 
 // stop video when capturing
@@ -412,4 +423,5 @@ export {
   comparePerson,
   createPostButton,
   postToServer,
+  informationHandler,
 };

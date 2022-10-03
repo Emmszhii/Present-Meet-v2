@@ -26,17 +26,6 @@ main {
   z-index: 100;
 }
 
-#home {
-  top: 10px;
-  right: 10px;
-  position: absolute;
-  cursor: pointer;
-  /* width: 4%; */
-}
-/* #home:hover {
-  background-color: black;
-  color: white;
-} */
 /* Messages */
 
 #msg {
@@ -62,17 +51,15 @@ main {
 }
 
 /* face recognition buttons */
+#home {
+  top: 10px;
+  right: 10px;
+  position: absolute;
+  cursor: pointer;
+}
 
 #attendance-btn {
   font-size: 1.1rem;
-}
-
-.photo-btn > button {
-  height: 70px;
-  width: 70px;
-  border-radius: 100%;
-  font-weight: 400;
-  font-size: 15px;
 }
 
 .buttons {
@@ -96,37 +83,11 @@ main {
   color: white;
 }
 
-/* Image upload section */
-
-#upload-img {
-  height: 100vh;
-  width: 50vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-#img-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
 /* face recognition section */
 .text {
   text-align: center;
   margin: 20px;
   font-size: 1.2rem;
-}
-
-.video-container {
-  border-radius: 5px;
-}
-
-.take-photo {
-  text-align: center;
 }
 
 #user-face {
@@ -146,20 +107,6 @@ main {
   border-radius: 5px;
   margin: auto;
   position: relative;
-}
-
-.photo-btn {
-  display: flex;
-  place-content: center;
-  place-items: center;
-  /* top: 28rem; */
-  /* left: 34rem; */
-  /* height: 100px; */
-  /* width: 100px; */
-  background-color: #000000;
-  border-radius: 100%;
-  margin: 0px auto;
-  /* margin-top: 20px; */
 }
 
 video {
@@ -214,7 +161,7 @@ canvas {
   flex-direction: column;
 }
 
-.input {
+input {
   width: 80%;
   text-align: center;
   border: none;

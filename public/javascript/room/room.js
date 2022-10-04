@@ -1,5 +1,4 @@
 import {
-  settings,
   userData,
   device,
   rtc,
@@ -7,7 +6,9 @@ import {
   audio_devices,
   video_devices,
   clearLocalTracks,
-} from './room_rtc.js';
+  player,
+  devices,
+} from './rtc.js';
 
 // For logging errors in agora set 3 for warnings and error to be log at console set 1 to log it all.
 AgoraRTC.setLogLevel(3);
@@ -98,26 +99,10 @@ const membersToggle = (e) => {
 
 const settingsToggle = () => {
   const btn = document.getElementById('settings-btn');
-  const z = document.getElementById('modal-settings');
-  if (z.style.display === 'block') {
-    // display none
-    btn.classList.remove('active');
-    z.style.display = 'none';
-    // reset local devices
-    localDevice.length = 0;
-    audio_devices.length = 0;
-    video_devices.length = 0;
-    // remove the player in the dom
-    document.getElementById(`user-container-${userData.rtcId}`).remove();
-    // clear local tracks
-    clearLocalTracks();
-  } else {
-    // run settings modal
-    // settings();
-    refreshDeviceModal();
-    // set active buttons and display it
+  const modal = document.getElementById('settings-modal');
+  if (!modal) {
+    settingsHandler();
     btn.classList.add('active');
-    z.style.display = 'block';
   }
 };
 
@@ -143,12 +128,13 @@ const createSelectElement = (name, val) => {
   device_settings.appendChild(label);
 
   device_settings.appendChild(select).addEventListener('change', (e) => {
-    if (name === 'Video') {
+    const select = ['Audio', 'Video'];
+    if (name === select[1]) {
       const dev = val.find((device) => device.label === e.target.value);
       rtc.localTracks[1].setDevice(dev.deviceId).catch((e) => console.log(e));
       device.localVideo = dev.deviceId;
     }
-    if (name === 'Audio') {
+    if (name === select[0]) {
       const dev = val.find((device) => device.label === e.target.value);
       rtc.localTracks[0].setDevice(dev.deviceId).catch((e) => console.log(e));
       device.localAudio = dev.deviceId;
@@ -163,21 +149,69 @@ const refreshDeviceModal = () => {
   localDevice.length = 0;
   audio_devices.length = 0;
   video_devices.length = 0;
-  document.getElementById('setup-btn').style.display = 'none';
+
+  const dom = document.querySelector(`#modal-settings`);
+  if (dom) dom.remove();
 
   clearLocalTracks();
+  settingsHandler();
+};
+
+const settings_dom = () => {
+  return `
+    <div id="modal-settings" class="modal-settings">
+      <div class="settings-modal">
+        <span class="refresh" id="refresh">
+          <i class="fa fa-refresh"></i>
+        </span>
+        <h3>Settings</h3>
+        <div id="video-settings"></div>
+        <div id="devices-settings"></div>
+        <span>Here's the devices available in your setup!</span>
+        <button class="button_box" type="button" id="setup-btn">Done</button>
+      </div>
+    </div>
+  `;
+};
+
+const settingsHandler = async () => {
+  const dom = document.querySelector(`.videoCall`);
+  dom.insertAdjacentHTML('beforeend', settings_dom());
 
   const playerDom = document.getElementById(`user-container-${userData.rtcId}`);
-  if (playerDom) playerDom.remove();
-  const video = document.getElementById('Video');
-  if (video) {
-    video.remove();
+  if (!playerDom) {
+    document
+      .getElementById('video-settings')
+      .insertAdjacentHTML('beforeend', player(userData.rtcId, ''));
+
+    document.querySelector('.video__container').style.cursor = 'auto';
   }
-  const audio = document.getElementById('Audio');
-  if (audio) {
-    audio.remove();
-  }
-  settings();
+  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+  rtc.localTracks[1].play(`user-${userData.rtcId}`);
+
+  devices().then(() => {
+    if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
+    if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
+
+    console.log(video_devices, audio_devices);
+    const videoDom = document.getElementById('Video');
+    const audioDom = document.getElementById('Audio');
+    if (!videoDom) {
+      createSelectElement('Video', video_devices);
+    }
+    if (!audioDom) {
+      createSelectElement('Audio', audio_devices);
+    }
+  });
+
+  document.getElementById('setup-btn').addEventListener('click', () => {
+    document.querySelector(`#modal-settings`).remove();
+    document.getElementById('settings-btn').classList.remove('active');
+  });
+
+  document
+    .getElementById('refresh')
+    .addEventListener('click', refreshDeviceModal);
 };
 
 export {
@@ -194,4 +228,5 @@ export {
   settingsToggle,
   createSelectElement,
   refreshDeviceModal,
+  settingsHandler,
 };

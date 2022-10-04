@@ -1,11 +1,10 @@
 // initializing the variables
 // const videoLink = document.querySelector('.link');
-const AUTH_URL = `http://localhost:3000`;
 const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
 const loader = document.getElementById('preloader');
 
-import { makeAttendance } from './room_face_recognition.js';
+import { makeAttendance } from './face_recognition.js';
 
 import {
   users,
@@ -14,7 +13,7 @@ import {
   handleMemberJoin,
   handleMemberLeft,
   addBotMessageToDom,
-} from './room_rtm.js';
+} from './rtm.js';
 
 import {
   meetingId,
@@ -23,6 +22,7 @@ import {
   expandVideoFrame,
   resetTheFrames,
   createSelectElement,
+  settingsHandler,
 } from './room.js';
 
 // User Local Data and Tokens
@@ -182,7 +182,7 @@ const joinRoomInit = async () => {
 
   // get all members in render it to the dom
   getMembers();
-  addBotMessageToDom(`Welcome to the room ${userData.fullName}! 🤗`);
+  // addBotMessageToDom(`Welcome to the room ${userData.fullName}! 🤗`);
 
   // initialize setting the rtc
   rtc.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
@@ -200,11 +200,9 @@ const joinRoomInit = async () => {
   rtc.client.on('user-left', handleUserLeft);
   rtc.client.on('token-privilege-will-expire', handleTokenExpire);
 
-  // join stream functions
-  // joinStream();
-
   // set the users camera and mic
-  settings();
+  settingsHandler();
+  // settings();
   // if All are loaded loader will be gone
   loader.style.display = 'none';
 };
@@ -261,7 +259,7 @@ const handleUserPublished = async (user, mediaType) => {
       user.audioTrack.play();
     }
   } catch (err) {
-    // console.log(err);
+    console.log(err);
   }
 };
 
@@ -283,7 +281,6 @@ const handleUserLeft = async (user) => {
   }
 };
 
-// Buttons
 // Camera function
 const toggleCamera = async (e) => {
   // button target
@@ -606,38 +603,6 @@ const devices = async () => {
   });
 };
 
-// settings modal user choosing their preferable device
-const settings = async () => {
-  devices();
-  // add local user to the dom
-  const playerDom = document.getElementById(`user-container-${userData.rtcId}`);
-  if (!playerDom) {
-    document
-      .getElementById('video-settings')
-      .insertAdjacentHTML('beforeend', player(userData.rtcId, ''));
-  }
-
-  //
-  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-  rtc.localTracks[1].play(`user-${userData.rtcId}`);
-
-  // storing devices
-  if (device.localVideo) {
-    device.localVideo = video_devices[0].deviceId;
-  }
-  if (device.localAudio) {
-    device.localAudio = audio_devices[0].deviceId;
-  }
-
-  const videoDom = document.getElementById('Video');
-  const audioDom = document.getElementById('Audio');
-  if (!videoDom) {
-    createSelectElement('Video', video_devices);
-  }
-  if (!audioDom) {
-    createSelectElement('Audio', audio_devices);
-  }
-};
 
 export {
   userData,
@@ -661,6 +626,6 @@ export {
   joinStream,
   leaveStream,
   player,
-  settings,
+
   devices,
 };

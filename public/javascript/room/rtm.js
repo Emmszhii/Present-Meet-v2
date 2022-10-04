@@ -1,5 +1,5 @@
-import { userData, rtm, player } from './room_rtc.js';
-import { faceRecognitionHandler } from './room_face_recognition.js';
+import { userData, rtm, player } from './rtc.js';
+import { faceRecognitionHandler } from './face_recognition.js';
 import {
   userIdInDisplayFrame,
   displayFrame,

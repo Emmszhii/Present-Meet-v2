@@ -1,7 +1,6 @@
 // For logging errors in agora set 3 for warnings and error to be log at console set 1 to log it all.
 AgoraRTC.setLogLevel(3);
 
-import { faceRecognitionHandler } from './room_face_recognition.js';
 import {
   getTokens,
   joinRoomInit,
@@ -10,8 +9,8 @@ import {
   toggleScreen,
   joinStream,
   leaveStream,
-} from './room_rtc.js';
-import { sendMessage, leaveChannel } from './room_rtm.js';
+} from './rtc.js';
+import { sendMessage, leaveChannel } from './rtm.js';
 import {
   meetingId,
   membersToggle,
@@ -24,9 +23,9 @@ import {
 
 // Event Listeners
 // refresh devices
-document
-  .getElementById('refresh')
-  .addEventListener('click', refreshDeviceModal);
+// document
+//   .getElementById('refresh')
+//   .addEventListener('click', refreshDeviceModal);
 // copy to clipboard
 document.getElementById('link-btn').addEventListener('click', copyClipboard);
 // messages toggle
@@ -48,7 +47,7 @@ document
   .getElementById('settings-btn')
   .addEventListener('click', settingsToggle);
 // close modal settings
-document.getElementById('setup-btn').addEventListener('click', settingsToggle);
+// document.getElementById('setup-btn').addEventListener('click', settingsToggle);
 // // User send message
 document
   .getElementById('message__form')

@@ -1,4 +1,4 @@
-import { userData, rtm } from './room_rtc.js';
+import { userData, rtm } from './rtc.js';
 
 const useTinyModel = true;
 let track;

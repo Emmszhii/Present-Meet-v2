@@ -17,7 +17,6 @@ const fetchPrevDescriptor = async () => {
       const split = data.descriptor.split(',');
       const float32 = new Float32Array(split);
       refUser.push([{ descriptor: float32 }]);
-      console.log(refUser);
       msgHandler('Previous face description is now added.');
     }
   }
@@ -180,18 +179,14 @@ const recognizeHandler = async () => {
       const canvas = faceapi.createCanvasFromMedia(video);
       canvas.id = 'canvas';
       camera.append(canvas);
-      console.log(canvas);
 
       const id = document.getElementById('canvas');
-      console.log(id);
 
       // face api detection
       const detection = await faceapi
         .detectAllFaces(id, tinyFaceOption)
         .withFaceLandmarks(useTinyModel)
         .withFaceDescriptors();
-
-      console.log(detection);
 
       // if no detection
       if (detection.length < 1 || detection.length > 1) {
@@ -207,10 +202,8 @@ const recognizeHandler = async () => {
       if (!img1) return errorHandler(`Record your face first!`);
       if (!img2) return errorHandler(`Face not recognize`);
 
-      console.log(refUser);
       img1 = img1[0].descriptor;
       img2 = img2.descriptor;
-      console.log(img1);
 
       // comparing the 2 image
       comparePerson(img1, img2);

@@ -182,8 +182,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #494949;
-  border-radius: 20px;
+  border: 1px solid #494949;
+  border-radius: 3px;
   cursor: pointer;
   overflow: hidden;
   width: 300px;
@@ -202,7 +202,7 @@ body {
 .video-player video {
   display: block;
   position: absolute;
-  border-radius: 20px;
+  border-radius: 3px;
 }
 .name {
   font-size: 18px;
@@ -230,8 +230,8 @@ canvas {
   display: none;
 }
 #stream__box .video__container {
-  border: 2px solid white;
-  border-radius: 10px;
+  border: 1px solid white;
+  border-radius: 3px;
   width: 100% !important;
   height: 100% !important;
 }

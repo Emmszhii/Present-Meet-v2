@@ -430,6 +430,7 @@ canvas {
 
 #devices-settings {
   display: flex;
+  flex-direction: column;
 }
 
 .refresh {
@@ -438,11 +439,9 @@ canvas {
   right: 10px;
   cursor: pointer;
 }
-/* settings label */
 
-#Video,
-#Audio {
-  margin: 10px;
+select {
+  padding: 5px;
 }
 
 /* Face recognition */
@@ -488,7 +487,7 @@ canvas {
     width: 40%;
   }
 }
-@media (max-width: 1400px) {
+@media (max-width: 1366px) {
   .middleBtn {
     width: 40%;
     left: 30%;
@@ -521,6 +520,9 @@ canvas {
   }
   .settings-modal {
     width: 80%;
+  }
+  #screen-btn {
+    display: none;
   }
 }
 @media (max-width: 480px) {

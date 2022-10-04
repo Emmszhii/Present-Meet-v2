@@ -123,7 +123,8 @@ const settingsToggle = () => {
 
 // create dropdown selected DOM
 const createSelectElement = (name, val) => {
-  // dynamic select
+  const device_settings = document.getElementById('devices-settings');
+
   const select = document.createElement('select');
   select.name = name;
   select.id = name;
@@ -139,22 +140,20 @@ const createSelectElement = (name, val) => {
   label.innerHTML = name;
   label.htmlFor = name;
 
-  document
-    .getElementById('devices-settings')
-    .appendChild(label)
-    .appendChild(select)
-    .addEventListener('change', (e) => {
-      if (name === 'Video') {
-        const dev = val.find((device) => device.label === e.target.value);
-        rtc.localTracks[1].setDevice(dev.deviceId).catch((e) => console.log(e));
-        device.localVideo = dev.deviceId;
-      }
-      if (name === 'Audio') {
-        const dev = val.find((device) => device.label === e.target.value);
-        rtc.localTracks[0].setDevice(dev.deviceId).catch((e) => console.log(e));
-        device.localAudio = dev.deviceId;
-      }
-    });
+  device_settings.appendChild(label);
+
+  device_settings.appendChild(select).addEventListener('change', (e) => {
+    if (name === 'Video') {
+      const dev = val.find((device) => device.label === e.target.value);
+      rtc.localTracks[1].setDevice(dev.deviceId).catch((e) => console.log(e));
+      device.localVideo = dev.deviceId;
+    }
+    if (name === 'Audio') {
+      const dev = val.find((device) => device.label === e.target.value);
+      rtc.localTracks[0].setDevice(dev.deviceId).catch((e) => console.log(e));
+      device.localAudio = dev.deviceId;
+    }
+  });
 
   // after settings are displayed then display the button to exit
   document.getElementById('setup-btn').style.display = 'block';

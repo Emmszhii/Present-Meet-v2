@@ -110,6 +110,8 @@ const getTokens = async () => {
       const type = user.user.type;
       userData.type = type;
       userData.APP_ID = user.AGORA_APP_ID;
+      userData.firstName = user.user.firstName;
+      userData.lastName = user.user.lastName;
       userData.fullName = `${user.user.firstName} ${user.user.lastName}`;
       userData.id = user.user._id;
       userData.rtcId = user.user._id.slice(-4);
@@ -603,7 +605,6 @@ const devices = async () => {
   });
 };
 
-
 export {
   userData,
   rtc,
@@ -626,6 +627,5 @@ export {
   joinStream,
   leaveStream,
   player,
-
   devices,
 };

@@ -101,6 +101,7 @@ const settingsToggle = () => {
   const btn = document.getElementById('settings-btn');
   const modal = document.getElementById('settings-modal');
   if (!modal) {
+    resetDevices();
     settingsHandler();
     btn.classList.add('active');
   }
@@ -145,10 +146,14 @@ const createSelectElement = (name, val) => {
   document.getElementById('setup-btn').style.display = 'block';
 };
 
-const refreshDeviceModal = () => {
+const resetDevices = () => {
   localDevice.length = 0;
   audio_devices.length = 0;
   video_devices.length = 0;
+};
+
+const refreshDeviceModal = () => {
+  resetDevices();
 
   const dom = document.querySelector(`#modal-settings`);
   if (dom) dom.remove();

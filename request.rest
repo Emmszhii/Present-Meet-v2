@@ -1,1 +1,1 @@
-GET http://localhost:3000/getInfo
+GET http://localhost:3000/tokens/asdhajks

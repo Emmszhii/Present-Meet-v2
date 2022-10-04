@@ -67,6 +67,11 @@ const startCamera = () => {
   });
 };
 
+const face_detection = () => {
+  const backend = faceapi.tf.getBackend();
+  console.log(backend);
+};
+
 const resetCamera = () => {
   const video = document.getElementById('video');
   const canvas = document.querySelector('canvas');

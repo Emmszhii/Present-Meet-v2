@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require('../config/auth');
 // tokens
 const { nocache, generateRTCToken } = require('../tokens/rtcToken');
 const { generateRTMToken } = require('../tokens/rtmToken');
+const { token } = require('../tokens/token');
 
 // User model
 const User = require('../models/User');
@@ -14,10 +15,25 @@ router.get('/room', ensureAuthenticated, (req, res) => {
 });
 
 // // fetch rtc token
-router.get('/rtc/:channel/:role/:tokentype/:id', nocache, generateRTCToken);
+router.get(
+  '/rtc/:channel/:role/:tokentype/:id',
+  ensureAuthenticated,
+  nocache,
+  generateRTCToken
+);
+
+router.get('/tokens/:channel', nocache, (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const channel = req.params.channel;
+  console.log(channel);
+  const id = `klahsdkljhajksk12h31kl`;
+  token(channel, id);
+  console.log(data);
+  // return res.json({ data });
+});
 
 // // fetch rtm token
-router.get('/rtm/:uid', nocache, generateRTMToken);
+router.get('/rtm/:uid', ensureAuthenticated, nocache, generateRTMToken);
 
 // quit the room
 router.get('/quit', (req, res) => {

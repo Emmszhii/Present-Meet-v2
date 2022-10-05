@@ -8,11 +8,8 @@ const postRequest = async (url, input) => {
     body: JSON.stringify(input),
   });
   const data = await resp.json();
-  if (resp.ok) {
-    return data;
-  } else {
-    console.log(data);
-  }
+  console.log(data);
+  return data;
 };
 
 const getRequest = async (url) => {
@@ -20,11 +17,8 @@ const getRequest = async (url) => {
     method: 'get',
   });
   const data = await resp.json();
-  if (resp.ok) {
-    return data;
-  } else {
-    console.log(data);
-  }
+  console.log(data);
+  return data;
 };
 
 export { postRequest, getRequest };

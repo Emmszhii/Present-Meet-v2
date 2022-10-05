@@ -102,6 +102,7 @@ const openModal = () => {
 
 const closeModal = () => {
   const modal = document.getElementById('modal-confirm');
+  document.getElementById('password').value = '';
   modal.style.display = 'none';
 };
 
@@ -113,6 +114,9 @@ const openModalChangePw = () => {
 const closeModalChangePw = () => {
   const modal = document.getElementById('modal-password');
   modal.style.display = 'none';
+  document.getElementById('change_password').value = '';
+  document.getElementById('change_password1').value = '';
+  document.getElementById('change_password2').value = '';
 };
 
 export {

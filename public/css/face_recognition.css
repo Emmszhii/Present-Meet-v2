@@ -35,7 +35,7 @@ main {
   background-color: green;
   font-size: 1.4rem;
   color: white;
-  text-shadow: 4px 4px black;
+  text-shadow: 1px 1px black;
   text-align: center;
 }
 
@@ -46,7 +46,7 @@ main {
   background-color: red;
   font-size: 1.4rem;
   color: white;
-  text-shadow: 4px 4px black;
+  text-shadow: 1px 1px black;
   text-align: center;
 }
 

@@ -1,9 +1,12 @@
 import { userData, rtm } from './rtc.js';
+import { getRequest } from '../helpers/helpers.js';
 
 const useTinyModel = true;
 let track;
 const startingMinutes = 1;
-let time = startingMinutes * 60;
+const startingSeconds = 60;
+let time = startingMinutes * startingSeconds;
+const end_time = 0;
 let interval;
 
 const dom = () => {
@@ -22,6 +25,15 @@ const dom = () => {
   `;
 };
 
+const classListDom = () => {
+  return `
+    <div id='class_list'>
+      <div class='card' id='class_list'>
+      </div>
+    </div>
+  `;
+};
+
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
   let seconds = time % 60;
@@ -32,7 +44,7 @@ const updateCountdown = () => {
   }
   time--;
 
-  if (time <= 0) {
+  if (time <= end_time) {
     stopTimer();
   }
 };
@@ -47,10 +59,12 @@ const stopTimer = () => {
   if (btn) {
     btn.classList.remove('active');
   }
-  time = startingMinutes * 60;
+  time = startingMinutes * startingSeconds;
 };
 
 const startCamera = () => {
+  const backend = faceapi.tf.getBackend();
+  console.log(backend);
   const video = document.createElement('video');
   video.width = '720';
   video.height = '480';
@@ -62,13 +76,12 @@ const startCamera = () => {
 
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
     video.srcObject = stream;
-    video.play();
+    if (backend === 'webgl') face_detection();
     track = stream.getTracks();
   });
 };
 
 const face_detection = () => {
-  const backend = faceapi.tf.getBackend();
   console.log(backend);
 };
 
@@ -104,6 +117,8 @@ const createCanvas = () => {
     context.imageSmoothingEnabled = false;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+    const canvas = faceapi.createCanvasFromMedia(video);
+    canvas.id = 'canvas';
     document.querySelector('.face_container').append(canvas);
 
     stopCamera();
@@ -113,6 +128,8 @@ const createCanvas = () => {
 };
 
 const faceRecognized = async () => {
+  if (!userData.descriptor) return;
+
   const video = document.getElementById('video');
   if (!video) return console.log(`please start the camera first`);
   createCanvas();
@@ -120,25 +137,24 @@ const faceRecognized = async () => {
   const msg = document.getElementById('msg');
 
   const query = await faceapi
-    .detectAllFaces(
-      canvas,
-      new faceapi.TinyFaceDetectorOptions({ inputSize: 320 })
-    )
+    .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks(useTinyModel)
     .withFaceDescriptors();
 
   if (!query || query.length > 1 || query[0].descriptor) {
     return (msg.textContent = 'Face not detected');
   }
+  // if user not register their face description
+
   // convert string to float32array
   const float = userData.descriptor.split(',');
   const data = new Float32Array(float);
 
   if (query[0].descriptor) {
     const dist = faceapi.euclideanDistance(data, query[0].descriptor);
-
     console.log(dist);
-    if (dist <= 0.4) {
+    const threshold = 0.4;
+    if (dist <= threshold) {
       console.log(`match`);
       sendAttendance();
       stopTimer();
@@ -150,11 +166,19 @@ const faceRecognized = async () => {
   }
 };
 
+const get_descriptor = async () => {
+  const url = '/getDescriptor';
+  const data = await postRequest(url);
+  console.log(data);
+  return data;
+};
+
 const sendAttendance = async () => {
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance',
-      attendance: userData.fullName,
+      first_name: userData.firstName,
+      last_name: userData.lastName,
     }),
   });
 };

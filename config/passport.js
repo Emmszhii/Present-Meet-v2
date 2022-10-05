@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 // Load User Model
-const User = require('../models/User');
+const { Account, User } = require('../models/User');
 
 module.exports = function (passport) {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       // Match User
-      User.findOne({ email: email })
+      Account.findOne({ email: email })
         .then((user) => {
           // up line is the user in the database
           // if user not found
@@ -45,7 +45,7 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
+    User.findOne({ account_id: id }, (err, user) => {
       done(err, user);
     });
   });

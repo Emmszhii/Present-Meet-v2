@@ -2,10 +2,10 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
+const { capitalize } = require('./helpers/functions');
 
-// User model
-const User = require('../models/User');
-const Class = require('../models/Class');
+// mongoose model
+const { Classroom } = require('../models/Class');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
   res.render('class_attendance');
@@ -13,6 +13,7 @@ router.get('/class-attendance', ensureAuthenticated, (req, res) => {
 
 router.post('/add_list', ensureAuthenticated, (req, res) => {
   const { subject, section, students } = req.body;
+  const newStudentsArr = [];
   let err = false;
   let index;
   if (!subject || !section)
@@ -25,40 +26,58 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
     return res
       .status(400)
       .json({ err: `Section must contain 3 or more letters` });
-  students.forEach((item, i) => {
-    if (item.firstName.length < 3 || item.lastName.length < 3) {
-      console.log(i);
-      console.log(item);
+  students.forEach((_, i, item) => {
+    console.log(item);
+    if (
+      item[i].firstName.trim().length < 3 ||
+      item[i].lastName.trim().length < 3
+    ) {
       index = i;
       err = true;
     }
+
+    const to_lower_fname = item[i].firstName.toLowerCase();
+    const to_lower_lname = item[i].lastName.toLowerCase();
+    newStudentsArr.push({
+      firstName: capitalize(to_lower_fname),
+      lastName: capitalize(to_lower_lname),
+    });
   });
+  console.log(newStudentsArr);
   if (err)
     return res.status(400).json({
-      err: `user number ${index} must contain a name with 3 or more letters`,
+      err: `User number ${index} must contain a name with 3 or more letters`,
     });
 
-  Class.create({
+  const class_room = new Classroom({
+    teacher_id: req.user.account_id,
     subject,
     section,
-    students,
-  })
-    .then((data) => {
-      const id = data.id;
-      User.updateOne(
-        { _id: req.user.id },
-        { $push: { classID: id } },
-        (err, result) => {
-          if (err) return console.log(err);
-          if (result) {
-            res.status(200).json({ msg: 'Successfully save to database', id });
-          }
-        }
-      );
+    students: newStudentsArr,
+  });
+
+  class_room
+    .save()
+    .then(() => {
+      res.status(200).json({ msg: `Successfully saved to database` });
     })
-    .catch((e) => {
-      console.log(e);
-    });
+    .catch((e) => res.status(400).json({ e }));
+  // .then((data) => {
+  //   const id = data.id;
+  //   User.updateOne(
+  //     { _id: req.user.account_id },
+  //     { $push: { classID: id } },
+  //     (err, result) => {
+  //       if (err) return console.log(err);
+  //       if (result) {
+  //         res.status(200).json({ msg: 'Successfully save to database', id });
+  //       }
+  //     }
+  //   );
+  // })
+  // .catch((e) => {
+  //   console.log(e);
+  // });
 });
 
 module.exports = router;

@@ -76,15 +76,15 @@ const addClassList = () => {
       students: addingUser,
     };
 
-    // postRequest('/add_list', data).then((res) => {
-    //   console.log(res);
-    //   if (res) {
-    //     num = 1;
-    //     addingUser.length = 0;
-    //     const list = document.getElementById('add_list');
-    //     if (list) list.remove();
-    //   }
-    // });
+    postRequest('/add_list', data).then((res) => {
+      console.log(res);
+      if (res) {
+        num = 1;
+        addingUser.length = 0;
+        const list = document.getElementById('add_list');
+        if (list) list.remove();
+      }
+    });
   }
 };
 

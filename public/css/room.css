@@ -100,7 +100,7 @@ body {
   padding: 15px 25px;
   border: none;
   color: #fff;
-  text-shadow: 2px 2px black;
+  text-shadow: 1px 1px black;
   bottom: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
@@ -112,7 +112,7 @@ body {
   padding: 15px 25px;
   border: none;
   color: #fff;
-  text-shadow: 2px 2px black;
+  text-shadow: 1px 1px black;
   bottom: 0.9rem;
   border-radius: 8px;
   cursor: pointer;

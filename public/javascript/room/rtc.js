@@ -107,18 +107,16 @@ const getTokens = async () => {
   // User Information 1st
   try {
     getInfo().then(async (user) => {
+      console.log(user);
       const type = user.user.type;
       userData.type = type;
       userData.APP_ID = user.AGORA_APP_ID;
-      userData.firstName = user.user.firstName;
-      userData.lastName = user.user.lastName;
-      userData.fullName = `${user.user.firstName} ${user.user.lastName}`;
+      userData.firstName = user.user.first_name;
+      userData.lastName = user.user.last_name;
+      userData.fullName = `${user.user.first_name} ${user.user.last_name}`;
       userData.id = user.user._id;
       userData.rtcId = user.user._id.slice(-4);
       userData.rtmId = user.user._id.slice(-9);
-      if (type === 'student') {
-        userData.descriptor = user.user.descriptor;
-      }
       // then Rtc Token
       getRtc()
         .then(async (data) => {

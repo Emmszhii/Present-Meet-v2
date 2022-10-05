@@ -58,7 +58,7 @@ main {
   background-color: green;
   font-size: 1.4rem;
   color: white;
-  text-shadow: 4px 4px black;
+  text-shadow: 1px 1px black;
 }
 
 #err {
@@ -68,7 +68,7 @@ main {
   background-color: red;
   font-size: 1.4rem;
   color: white;
-  text-shadow: 4px 4px black;
+  text-shadow: 1px 1px black;
 }
 
 #modal-content {
@@ -135,6 +135,7 @@ input {
 }
 
 select {
+  text-align: center;
   font-size: 1rem;
   padding: 5px 10px;
   font-size: 1rem;

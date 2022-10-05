@@ -4,9 +4,10 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { isEmail } = require('validator');
 const { ensureAuthenticated } = require('../config/auth');
+const { capitalize } = require('./helpers/functions');
 
 // User model
-const User = require('../models/User');
+const { Account, User, Student, Teacher } = require('../models/User');
 
 router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
@@ -20,10 +21,6 @@ router.get('/login', (req, res) => {
 router.get('/register', (req, res) => {
   res.render('register');
 });
-
-const capitalize = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 // Register Handle
 router.post('/register', (req, res) => {
@@ -41,7 +38,7 @@ router.post('/register', (req, res) => {
     !password ||
     !password2
   ) {
-    errors.push({ msg: 'PLease fill in all fields' });
+    errors.push({ msg: 'Please fill in all fields' });
   }
   // check if first_name is valid
   if (first_name < 3 || first_name.trim() === '') {
@@ -90,7 +87,7 @@ router.post('/register', (req, res) => {
     });
   } else {
     // Validation Pass
-    User.findOne({ email: email }).then((user) => {
+    Account.findOne({ email: email }).then((user) => {
       if (user) {
         // User Exist
         errors.push({ msg: `Email is already registered` });
@@ -108,29 +105,37 @@ router.post('/register', (req, res) => {
         const fname = capitalize(first_name);
         const lname = capitalize(last_name);
         // Hash password
-        bcrypt.genSalt(10, (err, salt) =>
+        const salt = 10;
+        bcrypt.genSalt(salt, (err, salt) =>
           bcrypt.hash(password, salt, (err, hash) => {
             if (err) throw err;
             // set password to hash
-            const newUser = new User({
-              firstName: fname,
-              lastName: lname,
-              birthday,
-              type,
+            const new_account = new Account({
               email,
               password: hash,
             });
 
-            // newUser.password = hash;
-            // save user
-            newUser
+            new_account
               .save()
               .then((user) => {
-                req.flash(
-                  'success_msg',
-                  'You are now Registered and can log in'
-                );
-                res.redirect('/login');
+                const new_user = new User({
+                  account_id: user.id,
+                  first_name: fname,
+                  last_name: lname,
+                  birthday,
+                  type,
+                });
+
+                new_user
+                  .save()
+                  .then((data) => {
+                    req.flash(
+                      'success_msg',
+                      'You are now Registered and can log in'
+                    );
+                    res.redirect('/login');
+                  })
+                  .catch((e) => console.log(e));
               })
               .catch((err) => console.log(err));
           })
@@ -142,12 +147,7 @@ router.post('/register', (req, res) => {
 
 // profile get request
 router.get('/profile', ensureAuthenticated, (req, res) => {
-  const {
-    firstName: first_name,
-    lastName: last_name,
-    birthday,
-    type,
-  } = req.user;
+  const { first_name, last_name, birthday, type } = req.user;
   res.render('profile', { first_name, last_name, birthday, type });
 });
 
@@ -179,28 +179,37 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
   if (type.trim() === '' && type !== 'student' && type !== 'teacher') {
     return res.status(400).json({ err: 'Please input a valid account type' });
   }
+  Account.findOne({ _id: req.user.account_id }, (err, data) => {
+    if (err) res.status(400).json({ err });
+    bcrypt.compare(password, data.password, (err, result) => {
+      if (err) return res.status(200).json({ err: err });
+      if (result) {
+        const data = {
+          first_name: capitalize(first_name),
+          last_name: capitalize(last_name),
+          birthday: birthday,
+          type: type,
+        };
 
-  bcrypt.compare(password, req.user.password, (err, result) => {
-    if (err) return console.log(err);
-    if (result) {
-      const data = {
-        firstName: first_name,
-        lastName: last_name,
-        birthday: birthday,
-        type: type,
-      };
-      User.updateOne({ _id: req.user.id }, data, (error, result) => {
-        if (error) return res.status(200).json({ err: error });
-        console.log(result.acknowledged);
-        if (result.acknowledged) {
-          return res.status(200).json({ msg: 'User info has been updated' });
-        } else {
-          return res.status(400).json({ err: 'Something gone wrong' });
-        }
-      });
-    } else {
-      return res.status(400).json({ err: 'Invalid Password' });
-    }
+        User.updateOne(
+          { account_id: req.user.account_id },
+          data,
+          (error, result) => {
+            if (error) return res.status(200).json({ err: error });
+            console.log(result.acknowledged);
+            if (result.acknowledged) {
+              return res
+                .status(200)
+                .json({ msg: 'User info has been updated' });
+            } else {
+              return res.status(400).json({ err: 'Something gone wrong' });
+            }
+          }
+        );
+      } else {
+        return res.status(400).json({ err: 'Invalid Password' });
+      }
+    });
   });
 });
 
@@ -210,6 +219,9 @@ router.post('/password', ensureAuthenticated, (req, res) => {
     newPassword: newPw,
     newPassword1: newPw1,
   } = req.body;
+
+  console.log(req.body);
+  console.log(req.user);
 
   if (!oldPw || !newPw || !newPw1)
     return res
@@ -226,31 +238,38 @@ router.post('/password', ensureAuthenticated, (req, res) => {
       .status(400)
       .json({ err: 'New Password and confirm password is not the same!' });
 
-  bcrypt.compare(oldPw, req.user.password, (err, result) => {
-    if (err) return res.status(400).json({ err: 'Old Password is incorrect' });
-    if (result) {
-      bcrypt.genSalt(10, (err, salt) => {
-        if (err) return res.status(400).json({ err: 'Something gone wrong' });
-        bcrypt.hash(newPw, salt, (err, hash) => {
+  Account.findOne({ _id: req.user.account_id }, (err, data) => {
+    if (err) res.status(400).json({ err });
+    console.log(data);
+
+    bcrypt.compare(oldPw, data.password, (err, result) => {
+      if (err)
+        return res.status(400).json({ err: 'Old Password is incorrect' });
+
+      if (result) {
+        bcrypt.genSalt(10, (err, salt) => {
           if (err) return res.status(400).json({ err: 'Something gone wrong' });
+          bcrypt.hash(newPw, salt, (err, hash) => {
+            if (err)
+              return res.status(400).json({ err: 'Something gone wrong' });
 
-          User.updateOne(
-            { _id: req.user.id },
-            { password: hash },
-            (error, result) => {
-              if (error)
-                return res.status(400).json({ err: 'Something gone wrong' });
-
-              if (result) {
-                return res
-                  .status(200)
-                  .json({ msg: 'Password have been changed!' });
+            Account.updateOne(
+              { _id: req.user.account_id },
+              { password: hash },
+              (error, result) => {
+                if (error)
+                  return res.status(400).json({ err: 'Something gone wrong' });
+                if (result) {
+                  return res
+                    .status(200)
+                    .json({ msg: 'Password have been changed!' });
+                }
               }
-            }
-          );
+            );
+          });
         });
-      });
-    }
+      }
+    });
   });
 });
 

@@ -247,12 +247,6 @@ const informationDom = (id, text) => {
 
 const informationHandler = () => {
   const backend = faceapi.tf.getBackend();
-  // document
-  //   .querySelector(`.text`)
-  //   .insertAdjacentHTML(
-  //     'beforeend',
-  //     informationDom(`backend`, `Browser backend: ${backend}`)
-  //   );
   informationDom(`backend`, `Browser backend: ${backend}`);
 };
 

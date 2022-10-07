@@ -24,9 +24,9 @@ body {
   background-color: #e5e5e5;
   margin: 5px 10px;
   border-radius: 5px;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
 }
 
 .content {
@@ -35,8 +35,17 @@ body {
   flex-direction: column;
 }
 
+.add_content {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
 .users {
   margin: 10px auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 input {
@@ -47,6 +56,17 @@ input {
   text-align: center;
   padding: 5px 10px;
   background: transparent;
+  text-transform: capitalize;
+}
+
+.list_content {
+  display: flex;
+  justify-content: space-around;
+}
+
+#subject,
+#section {
+  text-transform: uppercase;
 }
 
 .buttons {

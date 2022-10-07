@@ -1,28 +1,40 @@
 const mongoose = require('mongoose');
 
-const accountSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-});
+const accountSchema = new mongoose.Schema(
+  {
+    email: String,
+    password: String,
+  },
+  { timestamps: true }
+);
 
-const userSchema = new mongoose.Schema({
-  account_id: String,
-  first_name: String,
-  last_name: String,
-  birthday: String,
-  type: String,
-});
+const userSchema = new mongoose.Schema(
+  {
+    account_id: String,
+    first_name: String,
+    last_name: String,
+    birthday: String,
+    type: String,
+  },
+  { timestamps: true }
+);
 
-const studentSchema = new mongoose.Schema({
-  account_id: String,
-  descriptor: String,
-});
+const studentSchema = new mongoose.Schema(
+  {
+    account_id: String,
+    descriptor: String,
+  },
+  { timestamps: true }
+);
 
-const teacherSchema = new mongoose.Schema({
-  account_id: String,
-  class_Id: String,
-  section: String,
-});
+const teacherSchema = new mongoose.Schema(
+  {
+    account_id: String,
+    class_Id: String,
+    section: String,
+  },
+  { timestamps: true }
+);
 
 const Account = mongoose.model('Account', accountSchema);
 const User = mongoose.model('User', userSchema);

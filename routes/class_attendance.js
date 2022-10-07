@@ -14,8 +14,7 @@ router.get('/class-attendance', ensureAuthenticated, (req, res) => {
 router.post('/add_list', ensureAuthenticated, (req, res) => {
   const { subject, section, students } = req.body;
   const newStudentsArr = [];
-  let err = false;
-  let index;
+  const err = [];
   if (!subject || !section)
     return res.status(400).json({ err: `Fields are required` });
   if (subject.length < 3)
@@ -27,14 +26,17 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
       .status(400)
       .json({ err: `Section must contain 3 or more letters` });
   students.forEach((_, i, item) => {
-    console.log(item);
     if (
       item[i].firstName.trim().length < 3 ||
       item[i].lastName.trim().length < 3
-    ) {
-      index = i;
-      err = true;
-    }
+    )
+      err.push(
+        `User number ${i + 1} must contain a name with 3 or more letters.`
+      );
+    if (item[i].firstName.trim() === '' && item[i].firstName.trim() === '')
+      err.push(`User number ${i + 1} is empty!`);
+    const valid_last_name = item[i].lastName.split(' ');
+    if (valid_last_name.length > 1) err.push(`User number ${i + 1} is invalid`);
 
     const to_lower_fname = item[i].firstName.toLowerCase();
     const to_lower_lname = item[i].lastName.toLowerCase();
@@ -44,15 +46,15 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
     });
   });
   console.log(newStudentsArr);
-  if (err)
+  if (err.length > 0)
     return res.status(400).json({
-      err: `User number ${index} must contain a name with 3 or more letters`,
+      err,
     });
 
   const class_room = new Classroom({
     teacher_id: req.user.account_id,
-    subject,
-    section,
+    subject: subject.toUpperCase(),
+    section: section.toUpperCase(),
     students: newStudentsArr,
   });
 
@@ -62,22 +64,16 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
       res.status(200).json({ msg: `Successfully saved to database` });
     })
     .catch((e) => res.status(400).json({ e }));
-  // .then((data) => {
-  //   const id = data.id;
-  //   User.updateOne(
-  //     { _id: req.user.account_id },
-  //     { $push: { classID: id } },
-  //     (err, result) => {
-  //       if (err) return console.log(err);
-  //       if (result) {
-  //         res.status(200).json({ msg: 'Successfully save to database', id });
-  //       }
-  //     }
-  //   );
-  // })
-  // .catch((e) => {
-  //   console.log(e);
-  // });
 });
+
+router.get(`/get_classroom`, ensureAuthenticated, (req, res) => [
+  Classroom.find({ teacher_id: req.user.account_id }, (err, data) => {
+    if (err) return res.status(400).json({ err: `No data found` });
+    if (data) {
+      console.log(data);
+      res.status(200).json({ data });
+    }
+  }),
+]);
 
 module.exports = router;

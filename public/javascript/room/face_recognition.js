@@ -168,7 +168,7 @@ const faceRecognized = async () => {
 
 const get_descriptor = async () => {
   const url = '/getDescriptor';
-  const data = await postRequest(url);
+  const data = await getRequest(url);
   console.log(data);
   return data;
 };

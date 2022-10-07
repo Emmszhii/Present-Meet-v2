@@ -1,6 +1,6 @@
 import { postRequest, getRequest } from '../helpers/helpers.js';
 
-// const addClassListBtn = document.getElementById('add_class_list');
+const teacher_data = [];
 let num = 1;
 const addingUser = [];
 
@@ -77,12 +77,14 @@ const addClassList = () => {
     };
 
     postRequest('/add_list', data).then((res) => {
-      console.log(res);
-      if (res) {
+      const list = document.getElementById('add_list');
+      if (res.msg) {
         num = 1;
         addingUser.length = 0;
-        const list = document.getElementById('add_list');
         if (list) list.remove();
+      }
+      if (res.err) {
+        console.log(res);
       }
     });
   }
@@ -92,8 +94,6 @@ const studentHandler = () => {
   for (let i = 1; num > i; i++) {
     const fname = document.getElementById(`user_firstName_${i}`);
     const lname = document.getElementById(`user_lastName_${i}`);
-    console.log(fname);
-    console.log(lname);
     // if (fname.value.length < 3 || lname.value.length < 3) return;
     addingUser.push({
       firstName: fname.value,
@@ -103,34 +103,59 @@ const studentHandler = () => {
   console.log(addingUser);
 };
 
-// const postRequest = async (url, data) => {
-//   const resp = await fetch(url, {
-//     method: 'post',
-//     headers: {
-//       Accept: 'application/json',
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(data),
-//   });
-//   const data = await resp.json();
-//   if (resp.ok) {
-//     return data;
-//   } else {
-//     console.log(data);
-//   }
-// };
+const getClassroomHandler = async () => {
+  teacher_data.length = 0;
 
-// const getRequest = async (url) => {
-//   const resp = await fetch(url, {
-//     method: 'get',
-//   });
-//   const data = await resp.json();
-//   if (resp.ok) {
-//     return data;
-//   } else {
-//     console.log(data);
-//   }
-// };
+  getRequest('/get_classroom')
+    .then((data) => {
+      console.log(data);
+      if (data.data) {
+        teacher_data.push(data.data);
+        console.log(teacher_data);
+        listToDom();
+      } else {
+        console.log(data);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
+const listToDom = () => {
+  const data = teacher_data[0];
+  console.log(data);
+  for (let i = 0; data.length > i; i++) {
+    console.log(data[i]);
+    document
+      .querySelector('.class_list')
+      .insertAdjacentHTML(
+        'beforeend',
+        domClassList(
+          data[i]._id,
+          data[i].attendance_id,
+          data[i].subject,
+          data[i].section
+        )
+      );
+  }
+};
+
+const domClassList = (list_id, attendance_id, subject, section) => {
+  return `
+    <div class="card">
+      <div class="content">
+        <div id="msg_content"></div>
+        <div id="room_${list_id}" class="list_content">
+          <h5 id="list_id">Class ID: ${list_id}</h5>
+          <h5 id="attendance_id">Attendance ID: ${attendance_id}</h5>
+          <h5 id="subject">Subject: ${subject}</h5>
+          <h5 id="section">Section: ${section}</h5>
+        </div>
+      </div>
+    </div>
+  `;
+};
 
 const createInput = (num) => {
   return `
@@ -149,7 +174,9 @@ const domAddClassList = () => {
   return `
     <div class="card" id="add_list">
       <div class='content'>
-        <div class='main_content'>
+        <div id="message_content">
+        </div>
+        <div class='add_content'>
           <label for="subject">Subject</label>
           <input type="text" name="subject" id="subject" autocomplete="off" required>
           <label for="section">Section</label>
@@ -165,4 +192,4 @@ const domAddClassList = () => {
 };
 
 // addClassListBtn.addEventListener('click', classListHandler);
-export { classListHandler };
+export { classListHandler, getClassroomHandler };

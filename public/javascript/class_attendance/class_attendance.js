@@ -31,6 +31,8 @@ const addUserHandler = () => {
   let index = num++;
   let sort = document.querySelector(`.users`).children;
 
+  console.log(sort);
+
   for (let i = 1; num > i; i++) {
     // get dom if dom is false then run
     const dom = document.getElementById(`user_${i}`);

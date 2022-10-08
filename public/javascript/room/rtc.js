@@ -1,11 +1,9 @@
 // initializing the variables
-// const videoLink = document.querySelector('.link');
 const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
 const loader = document.getElementById('preloader');
 
 import { makeAttendance } from './face_recognition.js';
-import { postRequest, getRequest } from '../helpers/helpers.js';
 
 import {
   users,
@@ -472,23 +470,16 @@ const joinStream = async () => {
 
   try {
     if (device.localAudio) {
-      rtc.localTracks[0]
-        .setDevice(device.localAudio)
-        .then(() => {
-          rtc.localTracks[0].setMuted(true);
-        })
-        .catch((e) => console.log(e));
+      rtc.localTracks[0].setDevice(device.localAudio);
+
+      rtc.localTracks[0].setMuted(true);
     } else {
       rtc.localTracks[0].setMuted(true);
     }
 
     if (device.localVideo) {
-      rtc.localTracks[1]
-        .setDevice(device.localVideo)
-        .then(() => {
-          rtc.localTracks[1].setMuted(true);
-        })
-        .catch((e) => console.log(e));
+      rtc.localTracks[1].setDevice(device.localVideo);
+      rtc.localTracks[1].setMuted(true);
     } else {
       rtc.localTracks[1].setMuted(true);
     }
@@ -503,13 +494,6 @@ const joinStream = async () => {
       .publish([rtc.localTracks[0], rtc.localTracks[1]])
       .finally(() => {
         // loader done
-        rtm.channel.sendMessage({
-          text: JSON.stringify({
-            type: 'info',
-            rtcId: userData.rtcId,
-            name: userData.fullName,
-          }),
-        });
         loader.style.display = 'none';
       });
   }

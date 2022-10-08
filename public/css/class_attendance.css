@@ -28,34 +28,33 @@ body {
 }
 
 .container {
-  width: 80%;
-  margin: auto;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
 .add_class {
-  width: 50%;
-  margin: auto;
+  width: 80%;
+  height: 93vh;
+  float: right;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .card {
   padding: 10px 15px;
   background-color: #e5e5e5;
   margin: 5px 10px;
-  border-radius: 5px;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
+  border-radius: 3px;
 }
 
 .class_list {
-  width: 25%;
+  width: 20vw;
   overflow-y: auto;
   overflow-x: hidden;
   font-size: 1.3rem;
   position: relative;
-  height: 85vh;
+  height: 93vh;
 }
 
 .content {
@@ -71,7 +70,7 @@ body {
 }
 
 .users {
-  margin: 10px auto;
+  margin: 20px auto;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -104,17 +103,52 @@ input {
   align-items: center;
 }
 
-.head_controller {
-  margin-top: 20px;
-}
-
 .button {
   background-color: transparent;
-  border: 1px solid black;
-  color: black;
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.nav_bar {
+  background-color: black;
+  /* border: 2px solid black; */
+  width: 100vw;
+  height: 7vh;
+}
+
+.left_navbar {
+  float: left;
+  height: 100%;
+}
+
+.right_navbar {
+  float: right;
+  height: 100%;
+}
+
+.right_navbar > button {
+  height: 100%;
+}
+.left_navbar > button {
+  height: 100%;
+}
+
+#add_class_list,
+#home {
+  /* border: 1px solid white; */
+  color: white;
+}
+
+.left_navbar > button:hover,
+.right_navbar > button:hover {
+  background: gray;
+  color: black;
+}
+
+#home {
+  padding: 0px 20px;
+  font-size: 1.2rem;
 }
 
 .button:hover {

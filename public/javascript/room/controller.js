@@ -70,11 +70,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// // webpage on load
 window.addEventListener('load', () => {
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
-  // get tokens and user info
   // load faces
   Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),

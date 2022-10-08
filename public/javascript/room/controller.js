@@ -2,13 +2,12 @@
 AgoraRTC.setLogLevel(3);
 
 import {
-  getTokens,
-  joinRoomInit,
   toggleCamera,
   toggleMic,
   toggleScreen,
   joinStream,
   leaveStream,
+  data_init,
 } from './rtc.js';
 import { sendMessage, leaveChannel } from './rtm.js';
 import {
@@ -18,14 +17,10 @@ import {
   copyClipboard,
   hideDisplayFrame,
   settingsToggle,
-  refreshDeviceModal,
 } from './room.js';
+import { get_descriptor } from './face_recognition.js';
 
 // Event Listeners
-// refresh devices
-// document
-//   .getElementById('refresh')
-//   .addEventListener('click', refreshDeviceModal);
 // copy to clipboard
 document.getElementById('link-btn').addEventListener('click', copyClipboard);
 // messages toggle
@@ -46,8 +41,6 @@ document.getElementById('join-btn').addEventListener('click', joinStream);
 document
   .getElementById('settings-btn')
   .addEventListener('click', settingsToggle);
-// close modal settings
-// document.getElementById('setup-btn').addEventListener('click', settingsToggle);
 // // User send message
 document
   .getElementById('message__form')
@@ -95,13 +88,6 @@ window.addEventListener('load', () => {
       console.log(err);
     });
 
-  getTokens()
-    .then(() => {
-      console.log(`data success`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  // faceRecognitionHandler();
+  data_init();
+  get_descriptor;
 });

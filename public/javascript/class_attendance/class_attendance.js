@@ -1,4 +1,4 @@
-import { postRequest, getRequest } from '../helpers/helpers.js';
+import { postRequest, getRequest, randDarkColor } from '../helpers/helpers.js';
 
 const teacher_data = [];
 let num = 1;
@@ -78,10 +78,13 @@ const addClassList = () => {
 
     postRequest('/add_list', data).then((res) => {
       const list = document.getElementById('add_list');
+      const dom_list = document.querySelector('.class_list');
       if (res.msg) {
         num = 1;
         addingUser.length = 0;
         if (list) list.remove();
+        if (dom_list) dom_list.innerHTML = ``;
+        getClassroomHandler();
       }
       if (res.err) {
         console.log(res);
@@ -100,18 +103,16 @@ const studentHandler = () => {
       lastName: lname.value,
     });
   }
-  console.log(addingUser);
 };
 
 const getClassroomHandler = async () => {
   teacher_data.length = 0;
-
+  console.log(teacher_data);
   getRequest('/get_classroom')
     .then((data) => {
       console.log(data);
       if (data.data) {
         teacher_data.push(data.data);
-        console.log(teacher_data);
         listToDom();
       } else {
         console.log(data);
@@ -125,32 +126,29 @@ const getClassroomHandler = async () => {
 const listToDom = () => {
   const data = teacher_data[0];
   console.log(data);
+
   for (let i = 0; data.length > i; i++) {
-    console.log(data[i]);
+    const color = randDarkColor();
     document
       .querySelector('.class_list')
       .insertAdjacentHTML(
         'beforeend',
-        domClassList(
-          data[i]._id,
-          data[i].attendance_id,
-          data[i].subject,
-          data[i].section
-        )
+        domClassList(data[i]._id, data[i].subject, data[i].section)
       );
+    document.getElementById(`room_${data[i]._id}`).style.backgroundColor =
+      color;
   }
 };
 
-const domClassList = (list_id, attendance_id, subject, section) => {
+const domClassList = (list_id, subject, section) => {
   return `
-    <div class="card">
+    <div class="card" id="room_${list_id}">
       <div class="content">
         <div id="msg_content"></div>
-        <div id="room_${list_id}" class="list_content">
+        <div class="list_content" >
           <h5 id="list_id">Class ID: ${list_id}</h5>
-          <h5 id="attendance_id">Attendance ID: ${attendance_id}</h5>
-          <h5 id="subject">Subject: ${subject}</h5>
-          <h5 id="section">Section: ${section}</h5>
+          <h5 id="class_subject">Subject: ${subject}</h5>
+          <h5 id="class_section">Section: ${section}</h5>
         </div>
       </div>
     </div>

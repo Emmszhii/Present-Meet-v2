@@ -212,6 +212,7 @@ const settingsHandler = async () => {
   document.getElementById('setup-btn').addEventListener('click', () => {
     document.querySelector(`#modal-settings`).remove();
     document.getElementById('settings-btn').classList.remove('active');
+    clearLocalTracks();
   });
 
   document

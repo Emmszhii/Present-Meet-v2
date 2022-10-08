@@ -10,4 +10,6 @@ const capitalize = (string) => {
   return name.join(' ').trim();
 };
 
-module.exports = { capitalize };
+module.exports = {
+  capitalize,
+};

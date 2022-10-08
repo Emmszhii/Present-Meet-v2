@@ -147,6 +147,7 @@ const faceRecognized = async () => {
   // if user not register their face description
 
   // convert string to float32array
+
   const float = userData.descriptor.split(',');
   const data = new Float32Array(float);
 
@@ -231,4 +232,4 @@ const attendance = () => {
   }
 };
 
-export { faceRecognitionHandler, makeAttendance };
+export { faceRecognitionHandler, makeAttendance, get_descriptor };

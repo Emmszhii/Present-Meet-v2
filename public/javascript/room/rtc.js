@@ -5,6 +5,7 @@ const screenBtn = document.getElementById('screen-btn');
 const loader = document.getElementById('preloader');
 
 import { makeAttendance } from './face_recognition.js';
+import { postRequest, getRequest } from '../helpers/helpers.js';
 
 import {
   users,
@@ -78,66 +79,39 @@ const player = (uid, name) => {
     `;
 };
 
-// getting local user info
-const getInfo = async () => {
-  const url = `/getInfo`;
-  const res = await fetch(url, { method: 'GET' });
-  const data = await res.json().catch((err) => console.log(err));
-  return data;
-};
-
-const getRtc = async () => {
-  const url = `/rtc/${meetingId}/publisher/uid/${userData.rtcId}`;
-  const res = await fetch(url, { method: 'GET' });
-  const data = await res.json().catch((err) => {
-    console.log(err);
-  });
-  return data;
-};
-
-const getRtm = async () => {
-  const url = `/rtm/${userData.rtmId}`;
-  const res = await fetch(url, { method: 'GET' });
-  const data = await res.json().catch((err) => console.log(err));
-  return data;
-};
-
-// getting token and storing it in the userData
-const getTokens = async () => {
-  // User Information 1st
+const data_init = async () => {
   try {
-    getInfo().then(async (user) => {
-      console.log(user);
-      const type = user.user.type;
-      userData.type = type;
-      userData.APP_ID = user.AGORA_APP_ID;
-      userData.firstName = user.user.first_name;
-      userData.lastName = user.user.last_name;
-      userData.fullName = `${user.user.first_name} ${user.user.last_name}`;
-      userData.id = user.user._id;
-      userData.rtcId = user.user._id.slice(-4);
-      userData.rtmId = user.user._id.slice(-9);
-      // then Rtc Token
-      getRtc()
-        .then(async (data) => {
-          userData.rtcToken = data.rtcToken;
-          // then Rtm Token
-          getRtm()
-            .then((data) => {
-              userData.rtmToken = data.rtmToken;
-            })
-            .catch((e) => {
-              console.log(e);
-            })
-            // when all data needed are loaded
-            .finally(() => {
-              joinRoomInit();
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    });
+    fetch('/getInfo')
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((data) => {
+        userData.type = data.user.type;
+        userData.APP_ID = data.AGORA_APP_ID;
+        userData.firstName = data.user.first_name;
+        userData.lastName = data.user.last_name;
+        userData.fullName = `${data.user.first_name} ${data.user.last_name}`;
+        userData.id = data.user._id;
+        userData.rtcId = data.user._id.slice(-4);
+        userData.rtmId = data.user._id.slice(-9);
+        return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
+      })
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((data) => {
+        userData.rtcToken = data.rtcToken;
+        return fetch(`/rtm/${userData.rtmId}`);
+      })
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((data) => {
+        userData.rtmToken = data.rtmToken;
+      })
+      .finally(() => {
+        joinRoomInit();
+      });
   } catch (e) {
     console.log(e);
   }
@@ -551,9 +525,9 @@ const leaveStream = async (e) => {
   document.getElementsByClassName('middleBtn')[0].style.display = 'none';
   document.getElementById('settings-btn').style.display = 'block';
 
-  clearLocalTracks();
-
   await rtc.client.unpublish([rtc.localTracks[0], rtc.localTracks[1]]);
+
+  clearLocalTracks();
 
   if (rtc.localScreenTracks) {
     await rtc.client.unpublish([rtc.localScreenTracks]);
@@ -613,7 +587,7 @@ export {
   video_devices,
   clearLocalTracks,
   joinRoomInit,
-  getTokens,
+  data_init,
   handleMemberJoin,
   handleUserLeft,
   handleUserPublished,

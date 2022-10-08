@@ -9,9 +9,29 @@ body {
   background-color: #e8ecef;
 }
 
+/* Scrollbar */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .container {
   width: 80%;
   margin: auto;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .add_class {
@@ -27,6 +47,15 @@ body {
   /* display: flex;
   justify-content: center;
   align-items: center; */
+}
+
+.class_list {
+  width: 25%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 1.3rem;
+  position: relative;
+  height: 85vh;
 }
 
 .content {
@@ -60,8 +89,8 @@ input {
 }
 
 .list_content {
-  display: flex;
-  justify-content: space-around;
+  color: white;
+  text-shadow: 1px 1px black;
 }
 
 #subject,

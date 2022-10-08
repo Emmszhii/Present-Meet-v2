@@ -30,14 +30,14 @@ const addUserHandler = () => {
 
   let index = num++;
   let sort = document.querySelector(`.users`).children;
-
-  console.log(sort);
+  const numArr = [];
 
   for (let i = 1; num > i; i++) {
     // get dom if dom is false then run
     const dom = document.getElementById(`user_${i}`);
     if (!dom) {
-      index = i;
+      console.log(dom, i);
+      numArr.push(i);
       sort = Array.prototype.slice.call(sort, 0);
       sort.sort(function (a, b) {
         const aord = +a.id.split('_')[1];
@@ -53,17 +53,28 @@ const addUserHandler = () => {
     }
   }
 
+  console.log(numArr[0]);
+
   document
     .querySelector('.users')
-    .insertAdjacentHTML('beforeend', createInput(index));
+    .insertAdjacentHTML('beforeend', createInput(numArr[0]));
 
-  document.getElementById(`remove_${index}`).addEventListener('click', () => {
-    const dom = document.getElementById(`user_${index}`);
-    if (dom) {
-      dom.remove();
-      num--;
-    }
-  });
+  document
+    .getElementById(`remove_${numArr[0]}`)
+    .addEventListener('click', (e) => {
+      const target = e.currentTarget;
+      const parentNode = target.parentNode;
+      const dom = parentNode;
+      console.log(e.currentTarget);
+      console.log(parentNode);
+      if (dom) {
+        num--;
+        dom.remove();
+      }
+    });
+
+  console.log();
+  numArr.length = 0;
 };
 
 const addClassList = () => {

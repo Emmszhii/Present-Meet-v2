@@ -65,8 +65,6 @@ const addUserHandler = () => {
       const target = e.currentTarget;
       const parentNode = target.parentNode;
       const dom = parentNode;
-      console.log(e.currentTarget);
-      console.log(parentNode);
       if (dom) {
         num--;
         dom.remove();

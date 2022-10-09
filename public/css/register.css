@@ -134,6 +134,12 @@ input {
   font-size: 1rem;
 }
 
+#first_name,
+#middle_name,
+#last_name {
+  text-transform: capitalize;
+}
+
 select {
   text-align: center;
   font-size: 1rem;

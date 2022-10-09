@@ -25,6 +25,17 @@
               />
             </div>
             <div class="form-group">
+              <label for="middle_name">Middle Name</label>
+              <input
+                type="text"
+                name="middle_name"
+                id="middle_name"
+                value="<%= typeof middle_name != 'undefined' ? first_name : '' %>"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
               <label for="last_name">Last Name</label>
               <input
                 type="text"

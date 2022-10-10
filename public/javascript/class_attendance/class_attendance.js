@@ -30,7 +30,8 @@ const classListHandler = () => {
 const addUserHandler = () => {
   addingUser.length = 0;
 
-  let index = num++;
+  // let index = num++;
+  num++;
   let sort = document.querySelector(`.users`).children;
   const numArr = [];
 
@@ -50,10 +51,14 @@ const addUserHandler = () => {
       parent.innerHTML = '';
 
       for (let i = 0, l = sort.length; i < l; i++) {
+        console.log(i, l);
         parent.appendChild(sort[i]);
       }
     }
   }
+
+  if (!numArr[0]) numArr[0] = num;
+  console.log(numArr[0], num);
 
   document
     .querySelector('.users')
@@ -63,7 +68,7 @@ const addUserHandler = () => {
     .getElementById(`remove_${numArr[0]}`)
     .addEventListener('click', removeStudent);
 
-  console.log();
+  console.log(numArr);
   numArr.length = 0;
 };
 
@@ -82,10 +87,12 @@ const addClassList = () => {
   addingUser.length = 0;
   const subject = document.getElementById(`subject`);
   const section = document.getElementById(`section`);
+  const year = document.getElementById('year_level');
   if (subject.value && section.value) {
     studentHandler();
     const data = {
       subject: subject.value,
+      year_level: year.value,
       section: section.value,
       students: addingUser,
     };
@@ -110,9 +117,11 @@ const addClassList = () => {
 const studentHandler = () => {
   for (let i = 1; num > i; i++) {
     const fname = document.getElementById(`user_firstName_${i}`);
+    const mname = document.getElementById(`user_middleName_${i}`);
     const lname = document.getElementById(`user_lastName_${i}`);
     addingUser.push({
       firstName: fname.value,
+      middleName: mname.value,
       lastName: lname.value,
     });
   }
@@ -151,10 +160,7 @@ const listToDom = () => {
 
     document
       .querySelector('.class_list')
-      .insertAdjacentHTML(
-        'beforeend',
-        domClassList(data[i]._id, data[i].subject, data[i].section)
-      );
+      .insertAdjacentHTML('beforeend', domClassList(data[i]));
 
     const room = document.getElementById(`room_${data[i]._id}`);
     room.style.backgroundColor = color;
@@ -171,19 +177,42 @@ const getStudentsHandler = async (e) => {
 
   const data = await getRequest(`/get_students/${value}`);
   num = data.students.length;
+  console.log(num);
   console.log(data.students);
   domEl.insertAdjacentHTML('beforeend', domMainClass(data));
   domEl.insertAdjacentHTML('beforeend', studentsDom(data.students));
+
+  document
+    .getElementById('add_user_btn')
+    .addEventListener('click', addUserHandler);
 };
 
 const domMainClass = (data) => {
+  const { subject, year_level, section } = data;
+  console.log(year_level);
+
   return `
     <div class="card" id="main_class">
-        <label for="subject">Subject</label>
-        <input type="text" name="subject" id="subject" value="${data.subject}" autocomplete="off" required>
-        <label for="section">Section</label>
-        <input type="text" name="section" id="section" value="${data.section}"autocomplete="off" required>
-      <div id="student_list"></div>
+      <div class="form-group">
+        <label for="subject">Subject : </label>
+        <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required>
+
+        <label for="year_level">Year level : </label>
+        <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required>
+
+        <label for="section">Section : </label>
+        <input type="text" name="section" id="section" value="${section}"autocomplete="off" required>
+          
+      </div>
+      <div class='container_group'>
+        <div class='users' id="student_list"></div>
+        <div class="group_buttons">
+          <div class="container_buttons">
+            <button type='button' class="button" id="add_user_btn">Add a User </button>
+            <button type='button' class="button" id="update_list_btn">Update</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 };
@@ -197,6 +226,9 @@ const studentsDom = (students) => {
     document.getElementById(`user_firstName_${i + 1}`).value =
       students[i].firstName;
 
+    document.getElementById(`user_middleName_${i + 1}`).value =
+      students[i].middleName;
+
     document.getElementById(`user_lastName_${i + 1}`).value =
       students[i].lastName;
 
@@ -205,43 +237,18 @@ const studentsDom = (students) => {
       .addEventListener('click', removeStudent);
   }
   return ``;
-  // students.forEach((student, i, _) => {
-  //   console.log(i, student.firstName, student.lastName);
-  //   document
-  //     .getElementById('student_list')
-  //     .insertAdjacentHTML('beforeend', createInput(i + 1));
-
-  //   document.getElementById(`user_firstName_${i + 1}`).value =
-  //     students.firstName;
-
-  //   document.getElementById(`user_lastName_${i + 1}`).value = students.lastName;
-
-  //   document
-  //     .getElementById(`remove_${i + 1}`)
-  //     .addEventListener('click', removeStudent);
-  // });
-
-  // return students.map((_, index, student) => {
-  //   document
-  //     .getElementById('student_list')
-  //     .insertAdjacentHTML('beforeend', createInput(index + 1));
-  //   document.getElementById(`user_firstName_${index + 1}`).value =
-  //     student[index].firstName;
-  //   document.getElementById(`user_lastName_${index + 1}`).value =
-  //     student[index].lastName;
-  //   document
-  //     .getElementById(`user_${index + 1}`)
-  //     .addEventListener('click', removeStudent);
-  // });
 };
 
-const domClassList = (list_id, subject, section) => {
+const domClassList = (data) => {
+  console.log(data);
+  const { _id, subject, year_level, section } = data;
   return `
-    <div class="card" id="room_${list_id}" data-value="${list_id}">
+    <div class="card card__clickable" id="room_${_id}" data-value="${_id}">
       <div class="content">
         <div class="list_content">
-          <h5 id="list_id"">Class ID : ${list_id}</h5>
+          <h5 id="list_id"">Class ID : ${_id}</h5>
           <h5 id="class_subject">Subject : ${subject}</h5>
+          <h5 id="class_year_level">Year Level : ${year_level}</h5>
           <h5 id="class_section">Section : ${section}</h5>
         </div>
       </div>
@@ -251,11 +258,12 @@ const domClassList = (list_id, subject, section) => {
 
 const createInput = (num) => {
   return `
-    <div id="user_${num}">
+    <div class="user" id="user_${num}">
       <label>${num}</label>
       <input id="user_firstName_${num}" placeholder="First Name" min="3" autocomplete="off" required> 
+      <input id="user_middleName_${num}" placeholder="Middle Name" min="3" autocomplete="off" required> 
       <input id="user_lastName_${num}" placeholder="Last Name" min="3" autocomplete="off" required>
-      <button type="button" id="remove_${num}">
+      <button class="close" type="button" id="remove_${num}">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -269,15 +277,23 @@ const domAddClassList = () => {
         <div id="message_content">
         </div>
         <div class='add_content'>
-          <label for="subject">Subject</label>
+          <label for="subject">Subject: </label>
           <input type="text" name="subject" id="subject" autocomplete="off" required>
-          <label for="section">Section</label>
+          <label for="year">Year level: </label>
+          <input type="text" name="year" id="year_level" autocomplete="off" required>
+          <label for="section">Section: </label>
           <input type="text" name="section" id="section" autocomplete="off" required>
-          <button type='button' class="button" id="add_user_btn">Add a User </button>
-          <button type='button' class="button" id="add_list_btn">Save</button>
         </div>
-        <div class="users">
+        <div class='container_group'>
+          <div class="users"></div>
+          <div class="group_buttons">
+            <div class="container_buttons">
+              <button type='button' class="button" id="add_user_btn">Add a User </button>
+              <button type='button' class="button" id="add_list_btn">Save</button>
+            </div>
+          </div>
         </div>
+        
       </div>
     </div>
   `;

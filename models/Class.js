@@ -17,6 +17,7 @@ const classroomSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
     ],
     subject: String,
+    year_level: String,
     section: String,
     students: Array,
   },

@@ -35,10 +35,16 @@ body {
 
 .container_class {
   width: 80%;
-  height: 93vh;
+  height: 100vh;
   float: right;
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+#main_class {
+  width: 50%;
+  height: 91%;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .card {
@@ -46,6 +52,10 @@ body {
   background-color: #e5e5e5;
   margin: 5px 10px;
   border-radius: 3px;
+}
+
+.card__clickable {
+  cursor: pointer;
 }
 
 .class_list {
@@ -77,9 +87,47 @@ body {
 }
 
 .users {
-  margin: 20px auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  width: 85%;
+  float: left;
+  gap: 5px;
+}
+
+.user {
+  padding: 5px 10px;
+}
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.container_buttons {
+  margin-top: 10px;
+}
+
+.container_buttons > button {
+  width: 100%;
+  margin: 5px 0px;
+}
+
+#student_list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.group_buttons {
+  width: 15%;
+  float: right;
+  display: flex;
   flex-direction: column;
 }
 
@@ -100,8 +148,24 @@ input {
 }
 
 #subject,
+#year_level,
 #section {
   text-transform: uppercase;
+}
+
+.close {
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 5px;
+  color: black;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.close:hover {
+  background-color: black;
+  color: white;
 }
 
 .buttons {
@@ -143,8 +207,15 @@ input {
 
 #add_class_list,
 #home {
-  /* border: 1px solid white; */
   color: white;
+}
+
+#add_list {
+  width: 50%;
+  height: 91vh;
+  float: right;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .left_navbar > button:hover,

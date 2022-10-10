@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
-const { capitalize } = require('./helpers/functions');
+const { capitalize, validateName } = require('./helpers/functions');
 
 // mongoose model
 const { Teacher, Classroom, Attendance } = require('../models/Class');
@@ -21,11 +21,11 @@ router.get('/class-attendance', ensureAuthenticated, (req, res) => {
 });
 
 router.post('/add_list', ensureAuthenticated, async (req, res) => {
-  const { subject, section, students } = req.body;
+  const { subject, year_level, section, students } = req.body;
   const newStudentsArr = [];
   const err = [];
-  if (!subject || !section)
-    return res.status(400).json({ err: `Fields are required` });
+  if (!subject || !section || !year_level)
+    return res.status(400).json({ err: `All Fields are required` });
   if (subject.length < 3)
     return res
       .status(400)
@@ -37,20 +37,40 @@ router.post('/add_list', ensureAuthenticated, async (req, res) => {
   students.forEach((_, i, item) => {
     if (
       item[i].firstName.trim().length < 3 ||
+      item[i].middleName.trim().length < 3 ||
       item[i].lastName.trim().length < 3
     )
       err.push(
         `User number ${i + 1} must contain a name with 3 or more letters.`
       );
-    if (item[i].firstName.trim() === '' && item[i].firstName.trim() === '')
+
+    if (
+      item[i].firstName.trim() === '' &&
+      item[i].firstName.trim() === '' &&
+      item[i].middleName.trim() === ''
+    )
       err.push(`User number ${i + 1} is empty!`);
+
     const valid_last_name = item[i].lastName.split(' ');
-    if (valid_last_name.length > 1) err.push(`User number ${i + 1} is invalid`);
+    if (valid_last_name.length > 1)
+      err.push(`User number ${i + 1} last name is invalid`);
+    const valid_middle_name = item[i].middleName.split(' ');
+    if (valid_middle_name.length > 1)
+      err.push(`User number ${i + 1} middle name is invalid`);
+
+    if (
+      validateName(item[i].firstName) ||
+      validateName(item[i].middleName) ||
+      validateName(item[i].lastName)
+    )
+      err.push(`User number ${i + 1} name is invalid`);
 
     const to_lower_fname = item[i].firstName.toLowerCase();
+    const to_lower_mname = item[i].middleName.toLowerCase();
     const to_lower_lname = item[i].lastName.toLowerCase();
     newStudentsArr.push({
       firstName: capitalize(to_lower_fname),
+      middleName: capitalize(to_lower_mname),
       lastName: capitalize(to_lower_lname),
     });
   });
@@ -63,6 +83,7 @@ router.post('/add_list', ensureAuthenticated, async (req, res) => {
   const class_room = new Classroom({
     teacher_id: req.user.account_id,
     subject: subject.toUpperCase(),
+    year_level: year_level.toUpperCase(),
     section: section.toUpperCase(),
     students: newStudentsArr,
   });
@@ -100,8 +121,8 @@ router.get('/get_students/:id', ensureAuthenticated, (req, res) => {
   try {
     Classroom.findOne({ _id: id }).then((data) => {
       if (!data) return res.status(400).json({ err: 'Invalid request' });
-      const { _id, subject, section, students } = data;
-      res.status(200).json({ _id, subject, section, students });
+      const { _id, subject, year_level, section, students } = data;
+      res.status(200).json({ _id, subject, year_level, section, students });
     });
   } catch (e) {
     res.status(400).json({ e });

@@ -10,6 +10,17 @@ const capitalize = (string) => {
   return name.join(' ').trim();
 };
 
+const validateName = (name) => {
+  const regName = /^[a-zA-Z]+( [a-zA-Z]+)+$/;
+
+  if (!regName.test(name)) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 module.exports = {
   capitalize,
+  validateName,
 };

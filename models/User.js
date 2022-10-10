@@ -28,18 +28,8 @@ const studentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const teacherSchema = new mongoose.Schema(
-  {
-    account_id: String,
-    class_Id: String,
-    section: String,
-  },
-  { timestamps: true }
-);
-
 const Account = mongoose.model('Account', accountSchema);
 const User = mongoose.model('User', userSchema);
 const Student = mongoose.model('Student', studentSchema);
-const Teacher = mongoose.model('teacher', teacherSchema);
 
-module.exports = { Account, User, Student, Teacher };
+module.exports = { Account, User, Student };

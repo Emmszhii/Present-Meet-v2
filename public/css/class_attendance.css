@@ -33,7 +33,7 @@ body {
   overflow: hidden;
 }
 
-.add_class {
+.container_class {
   width: 80%;
   height: 93vh;
   float: right;
@@ -55,6 +55,13 @@ body {
   font-size: 1.3rem;
   position: relative;
   height: 93vh;
+}
+
+#msg_class_list {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
 }
 
 .content {
@@ -149,6 +156,11 @@ input {
 #home {
   padding: 0px 20px;
   font-size: 1.2rem;
+}
+
+#main {
+  position: relative;
+  display: flex;
 }
 
 .button:hover {

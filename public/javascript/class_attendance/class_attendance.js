@@ -6,23 +6,25 @@ const addingUser = [];
 
 const classListHandler = () => {
   const list = document.getElementById('add_list');
+  const containerListEl = document.getElementById('main_class');
+  if (containerListEl) containerListEl.remove();
   if (list) {
     list.remove();
     num = 1;
     addingUser.length = 0;
-  } else {
-    document
-      .querySelector('.add_class')
-      .insertAdjacentHTML('beforeend', domAddClassList());
-
-    document
-      .getElementById(`add_list_btn`)
-      .addEventListener('click', addClassList);
-
-    document
-      .getElementById('add_user_btn')
-      .addEventListener('click', addUserHandler);
+    return;
   }
+  document
+    .querySelector('.container_class')
+    .insertAdjacentHTML('beforeend', domAddClassList());
+
+  document
+    .getElementById(`add_list_btn`)
+    .addEventListener('click', addClassList);
+
+  document
+    .getElementById('add_user_btn')
+    .addEventListener('click', addUserHandler);
 };
 
 const addUserHandler = () => {
@@ -53,26 +55,27 @@ const addUserHandler = () => {
     }
   }
 
-  console.log(numArr[0]);
-
   document
     .querySelector('.users')
     .insertAdjacentHTML('beforeend', createInput(numArr[0]));
 
   document
     .getElementById(`remove_${numArr[0]}`)
-    .addEventListener('click', (e) => {
-      const target = e.currentTarget;
-      const parentNode = target.parentNode;
-      const dom = parentNode;
-      if (dom) {
-        num--;
-        dom.remove();
-      }
-    });
+    .addEventListener('click', removeStudent);
 
   console.log();
   numArr.length = 0;
+};
+
+const removeStudent = (e) => {
+  const target = e.currentTarget;
+  const parentNode = target.parentNode;
+  const dom = parentNode;
+  console.log(dom);
+  if (dom) {
+    num--;
+    dom.remove();
+  }
 };
 
 const addClassList = () => {
@@ -108,7 +111,6 @@ const studentHandler = () => {
   for (let i = 1; num > i; i++) {
     const fname = document.getElementById(`user_firstName_${i}`);
     const lname = document.getElementById(`user_lastName_${i}`);
-    // if (fname.value.length < 3 || lname.value.length < 3) return;
     addingUser.push({
       firstName: fname.value,
       lastName: lname.value,
@@ -121,7 +123,8 @@ const getClassroomHandler = async () => {
   console.log(teacher_data);
   getRequest('/get_classroom')
     .then((data) => {
-      console.log(data);
+      if (data.msg) return noListDom(data.msg);
+
       if (data.data) {
         teacher_data.push(data.data);
         listToDom();
@@ -134,32 +137,112 @@ const getClassroomHandler = async () => {
     });
 };
 
+const noListDom = (msg) => {
+  const dom = document.querySelector('.class_list');
+  dom.insertAdjacentHTML('beforeend', `<p id="msg_class_list">${msg}</p>`);
+};
+
 const listToDom = () => {
   const data = teacher_data[0];
   console.log(data);
 
   for (let i = 0; data.length > i; i++) {
     const color = randDarkColor();
+
     document
       .querySelector('.class_list')
       .insertAdjacentHTML(
         'beforeend',
         domClassList(data[i]._id, data[i].subject, data[i].section)
       );
-    document.getElementById(`room_${data[i]._id}`).style.backgroundColor =
-      color;
+
+    const room = document.getElementById(`room_${data[i]._id}`);
+    room.style.backgroundColor = color;
+    room.addEventListener('click', getStudentsHandler);
   }
+};
+
+const getStudentsHandler = async (e) => {
+  const domEl = document.querySelector('.container_class');
+  if (domEl) domEl.innerHTML = ``;
+  const value = e.currentTarget.dataset.value;
+  const add_list = document.getElementById('add_list');
+  if (add_list) add_list.remove();
+
+  const data = await getRequest(`/get_students/${value}`);
+  num = data.students.length;
+  console.log(data.students);
+  domEl.insertAdjacentHTML('beforeend', domMainClass(data));
+  domEl.insertAdjacentHTML('beforeend', studentsDom(data.students));
+};
+
+const domMainClass = (data) => {
+  return `
+    <div class="card" id="main_class">
+        <label for="subject">Subject</label>
+        <input type="text" name="subject" id="subject" value="${data.subject}" autocomplete="off" required>
+        <label for="section">Section</label>
+        <input type="text" name="section" id="section" value="${data.section}"autocomplete="off" required>
+      <div id="student_list"></div>
+    </div>
+  `;
+};
+
+const studentsDom = (students) => {
+  for (let i = 0; students.length > i; i++) {
+    document
+      .getElementById('student_list')
+      .insertAdjacentHTML('beforeend', createInput(i + 1));
+
+    document.getElementById(`user_firstName_${i + 1}`).value =
+      students[i].firstName;
+
+    document.getElementById(`user_lastName_${i + 1}`).value =
+      students[i].lastName;
+
+    document
+      .getElementById(`remove_${i + 1}`)
+      .addEventListener('click', removeStudent);
+  }
+  return ``;
+  // students.forEach((student, i, _) => {
+  //   console.log(i, student.firstName, student.lastName);
+  //   document
+  //     .getElementById('student_list')
+  //     .insertAdjacentHTML('beforeend', createInput(i + 1));
+
+  //   document.getElementById(`user_firstName_${i + 1}`).value =
+  //     students.firstName;
+
+  //   document.getElementById(`user_lastName_${i + 1}`).value = students.lastName;
+
+  //   document
+  //     .getElementById(`remove_${i + 1}`)
+  //     .addEventListener('click', removeStudent);
+  // });
+
+  // return students.map((_, index, student) => {
+  //   document
+  //     .getElementById('student_list')
+  //     .insertAdjacentHTML('beforeend', createInput(index + 1));
+  //   document.getElementById(`user_firstName_${index + 1}`).value =
+  //     student[index].firstName;
+  //   document.getElementById(`user_lastName_${index + 1}`).value =
+  //     student[index].lastName;
+  //   document
+  //     .getElementById(`user_${index + 1}`)
+  //     .addEventListener('click', removeStudent);
+  // });
 };
 
 const domClassList = (list_id, subject, section) => {
   return `
-    <div class="card" id="room_${list_id}">
+    <div class="card" id="room_${list_id}" data-value="${list_id}">
       <div class="content">
-        <div id="msg_content"></div>
-        <div class="list_content" >
-          <h5 id="list_id">Class ID: ${list_id}</h5>
-          <h5 id="class_subject">Subject: ${subject}</h5>
-          <h5 id="class_section">Section: ${section}</h5>
+        <div class="list_content">
+          <h5 id="list_id"">Class ID : ${list_id}</h5>
+          <h5 id="class_subject">Subject : ${subject}</h5>
+          <h5 id="class_section">Section : ${section}</h5>
         </div>
       </div>
     </div>
@@ -200,5 +283,4 @@ const domAddClassList = () => {
   `;
 };
 
-// addClassListBtn.addEventListener('click', classListHandler);
 export { classListHandler, getClassroomHandler };

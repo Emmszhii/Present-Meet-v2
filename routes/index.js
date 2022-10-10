@@ -19,6 +19,7 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
       user: {
         _id,
         first_name,
+        middle_name,
         last_name,
         type,
       },

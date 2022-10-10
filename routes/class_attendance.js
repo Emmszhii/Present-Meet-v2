@@ -5,13 +5,22 @@ const { ensureAuthenticated } = require('../config/auth');
 const { capitalize } = require('./helpers/functions');
 
 // mongoose model
-const { Classroom } = require('../models/Class');
+const { Teacher, Classroom, Attendance } = require('../models/Class');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
+  Teacher.findOneAndUpdate(
+    { teacher_id: req.user.account_id },
+    { teacher_id: req.user.account_id },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  ).then((err, result) => {
+    // if (err) console.log(err);
+    // if (result) console.log(result);
+  });
+
   res.render('class_attendance');
 });
 
-router.post('/add_list', ensureAuthenticated, (req, res) => {
+router.post('/add_list', ensureAuthenticated, async (req, res) => {
   const { subject, section, students } = req.body;
   const newStudentsArr = [];
   const err = [];
@@ -45,7 +54,7 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
       lastName: capitalize(to_lower_lname),
     });
   });
-  console.log(newStudentsArr);
+
   if (err.length > 0)
     return res.status(400).json({
       err,
@@ -58,22 +67,76 @@ router.post('/add_list', ensureAuthenticated, (req, res) => {
     students: newStudentsArr,
   });
 
-  class_room
-    .save()
-    .then(() => {
+  try {
+    class_room.save().then(() => {
       res.status(200).json({ msg: `Successfully saved to database` });
-    })
-    .catch((e) => res.status(400).json({ e }));
+    });
+    const teacher = await Teacher.findOne({
+      teacher_id: req.user.account_id,
+    });
+    teacher.classroom_id.push(class_room._id);
+    await teacher.save();
+  } catch (e) {
+    return res.status(400).json({ e });
+  }
 });
 
-router.get(`/get_classroom`, ensureAuthenticated, (req, res) => [
-  Classroom.find({ teacher_id: req.user.account_id }, (err, data) => {
-    if (err) return res.status(400).json({ err: `No data found` });
-    if (data) {
-      console.log(data);
-      res.status(200).json({ data });
-    }
-  }),
-]);
+router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
+  Teacher.findOne({ teacher_id: req.user.account_id })
+    .populate({ path: 'classroom_id' })
+    .then((data) => {
+      const info = data.classroom_id;
+      info.map((item) => console.log(item.students));
+      if (info.length < 1)
+        return res.status(200).json({ msg: `Class is empty` });
+      if (info.length > 0) return res.status(200).json({ data: info });
+    });
+});
+
+router.get('/get_students/:id', ensureAuthenticated, (req, res) => {
+  const id = req.params.id;
+  if (!id) return res.status(400).json({ INVALID_REQUEST: 'Request is empty' });
+
+  try {
+    Classroom.findOne({ _id: id }).then((data) => {
+      if (!data) return res.status(400).json({ err: 'Invalid request' });
+      const { _id, subject, section, students } = data;
+      res.status(200).json({ _id, subject, section, students });
+    });
+  } catch (e) {
+    res.status(400).json({ e });
+  }
+});
+
+// TEST
+
+router.get(`/test`, async (req, res) => {
+  const class_room = new Classroom({
+    subject: `jajkahsdja`,
+    section: `kajsdkahsjdh`,
+    students: [
+      { first_name: 'hel', lastName: 'heas' },
+      { first_name: 'hello', lastName: 'hea' },
+    ],
+  });
+
+  await class_room.save();
+  res.json({ class_room });
+});
+
+router.get(`/test1`, async (req, res) => {
+  const attendance = new Attendance({
+    date: Date.now(),
+  });
+  attendance.save();
+
+  const class_room = await Classroom.findOne({
+    subject: `jajkahsdja`,
+  });
+  class_room.attendance_id.push(attendance._id);
+  class_room.save();
+  console.log(class_room.populated('attendance_id'));
+  res.json({ attendance, class_room });
+});
 
 module.exports = router;

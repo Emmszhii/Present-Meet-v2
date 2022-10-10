@@ -1,9 +1,21 @@
 const mongoose = require('mongoose');
 
+const teacherSchema = new mongoose.Schema(
+  {
+    teacher_id: String,
+    classroom_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' }],
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const classroomSchema = new mongoose.Schema(
   {
     teacher_id: String,
-    attendance_id: Array,
+    attendance_id: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
+    ],
     subject: String,
     section: String,
     students: Array,
@@ -13,7 +25,7 @@ const classroomSchema = new mongoose.Schema(
 
 const attendanceSchema = new mongoose.Schema(
   {
-    class_id: String,
+    class_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' },
     date: Date,
     present: Array,
     absent: Array,
@@ -21,7 +33,8 @@ const attendanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const Teacher = mongoose.model('Teacher', teacherSchema);
 const Classroom = mongoose.model('Classroom', classroomSchema);
 const Attendance = mongoose.model('Attendance', attendanceSchema);
 
-module.exports = { Classroom, Attendance };
+module.exports = { Teacher, Classroom, Attendance };

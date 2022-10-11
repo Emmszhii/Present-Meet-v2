@@ -9,6 +9,14 @@ body {
   background-color: #e8ecef;
 }
 
+#adding_class_text {
+  text-align: center;
+}
+
+#message_main {
+  text-align: center;
+}
+
 /* Scrollbar */
 /* width */
 ::-webkit-scrollbar {
@@ -34,6 +42,7 @@ body {
 }
 
 .container_class {
+  display: flex;
   width: 80%;
   height: 100vh;
   float: right;
@@ -65,6 +74,7 @@ body {
   font-size: 1.3rem;
   position: relative;
   height: 93vh;
+  border-right: 1px solid black;
 }
 
 #msg_class_list {
@@ -86,12 +96,20 @@ body {
   align-items: center;
 }
 
+#add_user {
+  width: 50%;
+}
+
+#add_user_content {
+  position: relative;
+}
+
 .users {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 85%;
+  width: 83%;
   float: left;
   gap: 5px;
 }
@@ -100,11 +118,17 @@ body {
   padding: 5px 10px;
 }
 
-.form-group {
+form {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 10px;
+  flex-direction: column;
+}
+
+.input {
+  width: 100%;
+}
+
+.form-group {
+  padding: 10px 0px;
 }
 
 .container_buttons {
@@ -142,6 +166,23 @@ input {
   text-transform: capitalize;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 5px;
+}
+
+td,
+th {
+  border: 1px solid black;
+  padding: 5px;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
 .list_content {
   color: white;
   text-shadow: 1px 1px black;
@@ -154,10 +195,12 @@ input {
 }
 
 .close {
+  position: absolute;
+  top: 0;
+  right: 0px;
   background: transparent;
   border: none;
-  border-radius: 3px;
-  padding: 3px 5px;
+  border-radius: 1px;
   color: black;
   font-size: 1.4rem;
   cursor: pointer;
@@ -213,7 +256,7 @@ input {
 #add_list {
   width: 50%;
   height: 91vh;
-  float: right;
+  float: left;
   overflow-x: hidden;
   overflow-y: auto;
 }

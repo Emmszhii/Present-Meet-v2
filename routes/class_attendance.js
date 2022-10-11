@@ -2,10 +2,16 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
-const { capitalize, validateName } = require('./helpers/functions');
+const {
+  capitalize,
+  validateName,
+  validateNameEmpty,
+} = require('./helpers/functions');
 
 // mongoose model
 const { Teacher, Classroom, Attendance } = require('../models/Class');
+
+const students = [];
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
   Teacher.findOneAndUpdate(
@@ -13,17 +19,16 @@ router.get('/class-attendance', ensureAuthenticated, (req, res) => {
     { teacher_id: req.user.account_id },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   ).then((err, result) => {
-    // if (err) console.log(err);
-    // if (result) console.log(result);
+    if (err) console.log(err);
+    if (result) console.log(result);
   });
 
   res.render('class_attendance');
 });
 
 router.post('/add_list', ensureAuthenticated, async (req, res) => {
-  const { subject, year_level, section, students } = req.body;
-  const newStudentsArr = [];
-  const err = [];
+  const { subject, year_level, section } = req.body;
+
   if (!subject || !section || !year_level)
     return res.status(400).json({ err: `All Fields are required` });
   if (subject.length < 3)
@@ -34,58 +39,13 @@ router.post('/add_list', ensureAuthenticated, async (req, res) => {
     return res
       .status(400)
       .json({ err: `Section must contain 3 or more letters` });
-  students.forEach((_, i, item) => {
-    if (
-      item[i].firstName.trim().length < 3 ||
-      item[i].middleName.trim().length < 3 ||
-      item[i].lastName.trim().length < 3
-    )
-      err.push(
-        `User number ${i + 1} must contain a name with 3 or more letters.`
-      );
-
-    if (
-      item[i].firstName.trim() === '' &&
-      item[i].firstName.trim() === '' &&
-      item[i].middleName.trim() === ''
-    )
-      err.push(`User number ${i + 1} is empty!`);
-
-    const valid_last_name = item[i].lastName.split(' ');
-    if (valid_last_name.length > 1)
-      err.push(`User number ${i + 1} last name is invalid`);
-    const valid_middle_name = item[i].middleName.split(' ');
-    if (valid_middle_name.length > 1)
-      err.push(`User number ${i + 1} middle name is invalid`);
-
-    if (
-      validateName(item[i].firstName) ||
-      validateName(item[i].middleName) ||
-      validateName(item[i].lastName)
-    )
-      err.push(`User number ${i + 1} name is invalid`);
-
-    const to_lower_fname = item[i].firstName.toLowerCase();
-    const to_lower_mname = item[i].middleName.toLowerCase();
-    const to_lower_lname = item[i].lastName.toLowerCase();
-    newStudentsArr.push({
-      firstName: capitalize(to_lower_fname),
-      middleName: capitalize(to_lower_mname),
-      lastName: capitalize(to_lower_lname),
-    });
-  });
-
-  if (err.length > 0)
-    return res.status(400).json({
-      err,
-    });
 
   const class_room = new Classroom({
     teacher_id: req.user.account_id,
     subject: subject.toUpperCase(),
     year_level: year_level.toUpperCase(),
     section: section.toUpperCase(),
-    students: newStudentsArr,
+    students,
   });
 
   try {
@@ -107,7 +67,7 @@ router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
     .populate({ path: 'classroom_id' })
     .then((data) => {
       const info = data.classroom_id;
-      info.map((item) => console.log(item.students));
+      // info.map((item) => console.log(item.students));
       if (info.length < 1)
         return res.status(200).json({ msg: `Class is empty` });
       if (info.length > 0) return res.status(200).json({ data: info });
@@ -129,6 +89,50 @@ router.get('/get_students/:id', ensureAuthenticated, (req, res) => {
   }
 });
 
+router.post('/add-student', ensureAuthenticated, (req, res) => {
+  const { first_name, middle_name, last_name } = req.body;
+
+  if (!first_name || first_name.trim() === '')
+    return res.status(400).json({ err: `First Name is empty` });
+  if (!last_name || last_name.trim() === '')
+    return res.status(400).json({ err: `Last Name is empty` });
+
+  const capitalize_firstName = capitalize(first_name);
+  const capitalize_middleName = capitalize(middle_name);
+  const capitalize_lastName = capitalize(last_name);
+
+  students.push({
+    first_name: capitalize_firstName,
+    middle_name: capitalize_middleName,
+    last_name: capitalize_lastName,
+  });
+  // console.log(students);
+  res.status(200).json({ students });
+});
+
+router.post('/update-student', ensureAuthenticated, (req, res) => {
+  const { first_name, middle_name, last_name, value } = req.body;
+  const n = parseInt(value);
+  const valid = typeof n === 'number';
+  if (validateNameEmpty(first_name))
+    return res.status(400).json({ err: 'Invalid first name' });
+  // if (validateNameEmpty(middle_name))
+  //   return res.status(400).json({ err: 'Invalid middle name' });
+  if (validateNameEmpty(last_name))
+    return res.status(400).json({ err: 'Invalid last name' });
+  // console.log(!n, !value, !valid);
+  if (!value || !valid) return res.status(400).json({ err: 'Invalid request' });
+
+  for (const [index, student] of students.entries()) {
+    if (n === index) {
+      student.first_name = capitalize(first_name);
+      student.middle_name = capitalize(middle_name);
+      student.last_name = capitalize(last_name);
+      return res.status(200).json({ students, msg: `Updated successfully` });
+    }
+  }
+  res.status(400).json({ err: `Something Went Wrong!` });
+});
 // TEST
 
 router.get(`/test`, async (req, res) => {

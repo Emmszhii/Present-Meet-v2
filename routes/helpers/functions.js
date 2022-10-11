@@ -20,7 +20,13 @@ const validateName = (name) => {
   }
 };
 
+const validateNameEmpty = (name) => {
+  if (name.length < 3 || name.trim() === ``) return true;
+  return false;
+};
+
 module.exports = {
   capitalize,
   validateName,
+  validateNameEmpty,
 };

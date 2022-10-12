@@ -12,6 +12,7 @@ const { Account, User, Student, Teacher } = require('../models/User');
 router.get('/login', (req, res) => {
   if (req.isAuthenticated()) {
     res.redirect('/');
+    console.log(req.user);
   } else {
     res.render('login');
   }
@@ -142,6 +143,7 @@ router.post('/register', (req, res) => {
                 });
 
                 new_user.save().then((data) => {
+                  console.log(data);
                   req.flash(
                     'success_msg',
                     'You are now Registered and can log in'

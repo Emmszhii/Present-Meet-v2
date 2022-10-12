@@ -144,7 +144,9 @@ const getClassHandler = (e) => {
   ).textContent = `Year Level: ${data.year_level}`;
   document.getElementById('section').textContent = `Section: ${data.section}`;
 
-  document.getElementById('edit_class').addEventListener('click', editClass);
+  document
+    .getElementById('edit_class')
+    .addEventListener('click', editClassHandler);
   document
     .getElementById('remove_class')
     .addEventListener('click', deleteClassListHandler);
@@ -173,7 +175,7 @@ const getClassDom = () => {
   `;
 };
 
-const editClass = () => {
+const editClassHandler = () => {
   const id = document.getElementById('main_list').dataset.value;
 
   removeChildElement();
@@ -183,7 +185,6 @@ const editClass = () => {
     .insertAdjacentHTML('beforeend', domAddClassList());
 
   const data = searchDataInArr(id);
-  console.log(data);
 
   document.querySelector('.close').addEventListener('click', closeParentNode);
 
@@ -200,6 +201,7 @@ const editClass = () => {
 };
 
 const classSaved = () => {
+  loaderHandler();
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
@@ -210,10 +212,20 @@ const classSaved = () => {
   const url = `/update-class`;
   postRequest(url, { id, subject, year_level, section })
     .then((data) => {
-      console.log(data);
+      if (data.data) {
+        teacher_data.push(data.data);
+        listToDomHandler();
+        removeChildElement();
+      } else {
+        console.log(data);
+      }
     })
     .catch((e) => {
       console.log(e);
+    })
+    .finally(() => {
+      removedOnConfirm();
+      loaderHandler();
     });
 };
 
@@ -419,7 +431,7 @@ const deleteClassList = () => {
   const url = `/delete-class-list`;
   postRequest(url, { id, password })
     .then((data) => {
-      if (data) {
+      if (data.data) {
         const classroom = data.data;
         teacher_data.push(classroom);
         listToDomHandler();

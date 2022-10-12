@@ -1,14 +1,12 @@
 import { postRequest, getRequest, randDarkColor } from '../helpers/helpers.js';
 
 const teacher_data = [];
-let num = 1;
-const users = [];
-let students;
 
+// Class List
 const getClassroomHandler = async () => {
-  teacher_data.length = 0;
-  console.log(teacher_data);
-  getRequest('/get_classroom')
+  loaderHandler();
+  const url = '/get_classroom';
+  getRequest(url)
     .then((data) => {
       if (data.msg) return noListDom(data.msg);
 
@@ -21,177 +19,75 @@ const getClassroomHandler = async () => {
     })
     .catch((e) => {
       console.log(e);
+    })
+    .finally(() => {
+      loaderHandler();
     });
 };
 
 const classListHandler = () => {
   const list = document.getElementById('add_list');
-  const addUserDom = document.getElementById('add_user');
-  const containerListEl = document.getElementById('main_class');
-  if (containerListEl) containerListEl.remove();
-  if (addUserDom) addUserDom.remove();
-  if (list) {
-    list.remove();
-    num = 1;
-    users.length = 0;
-    return;
-  }
+  if (list) return list.remove();
+  removeChildElement();
 
   document
     .querySelector('.container_class')
     .insertAdjacentHTML('beforeend', domAddClassList());
 
+  document.querySelector('.close').addEventListener('click', closeParentNode);
+
   document
-    .getElementById(`save_list_btn`)
+    .getElementById(`save_class_btn`)
     .addEventListener('click', saveClassList);
-
-  document.getElementById('table').insertAdjacentHTML('beforeend', addTable());
-
-  document
-    .getElementById('add_user_btn')
-    .addEventListener('click', addUserHandler);
 };
 
-const addUserHandler = (event) => {
-  const userDom = document.getElementById(`add_user`);
-  const userContent = document.getElementById('add_user_content');
-  const btn = event.currentTarget;
+const saveClassList = () => {
+  document.body.insertAdjacentHTML('beforeend', onConfirm());
 
-  if (!userContent) {
-    userDom.insertAdjacentHTML('afterbegin', createInput());
-    btn.textContent = 'Close';
-  } else {
-    userContent.remove();
-    btn.textContent = 'Add Student';
-  }
+  document.getElementById('cancel').addEventListener('click', removedOnConfirm);
 
-  const add_student_btn = document.getElementById('add_student');
-  if (add_student_btn) {
-    add_student_btn.addEventListener('click', addStudent);
-    document.querySelector('.close').addEventListener('click', closeParentNode);
-  }
+  document
+    .getElementById('confirm')
+    .addEventListener('click', savedNewClassList);
+};
+
+const savedNewClassList = () => {
+  loaderHandler();
+  const subject = document.getElementById('subject').value;
+  const year_level = document.getElementById('year_level').value;
+  const section = document.getElementById('section').value;
+
+  const password = document.getElementById('password').value;
+  const data = {
+    subject,
+    year_level,
+    section,
+    password,
+  };
+  const url = '/add-class-list';
+  postRequest(url, data)
+    .then((data) => {
+      if (data.data) {
+        teacher_data.push(data.data);
+        listToDomHandler();
+        removeChildElement();
+      }
+      if (data.err) {
+        console.log(data.err);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    })
+    .finally(() => {
+      removedOnConfirm();
+      loaderHandler();
+    });
 };
 
 const closeParentNode = (e) => {
   const dom = e.currentTarget.parentNode;
-  const addStudentBtn = document.getElementById('add_user_btn');
-  if (addStudentBtn) addStudentBtn.textContent = `Add Student`;
   if (dom) dom.remove();
-};
-
-const addStudent = async (event) => {
-  const parentDom = event.currentTarget.parentNode;
-  const primaryBtn = document.getElementById('add_user_btn');
-  const first_name = document.getElementById('first_name');
-  const middle_name = document.getElementById('middle_name');
-  const last_name = document.getElementById('last_name');
-
-  const input = {
-    first_name: first_name.value,
-    middle_name: middle_name.value,
-    last_name: last_name.value,
-  };
-
-  postRequest('/add-student', input).then((data) => {
-    if (data.students) {
-      parentDom.remove();
-      primaryBtn.textContent = 'Add Student';
-      students = data.students;
-      studentTableData(students);
-    }
-  });
-};
-
-const editStudent = (e) => {
-  const btn = e.currentTarget;
-  let first_name, middle_name, last_name;
-  let n;
-  const dom = document.getElementById('add_user_content');
-
-  if (!dom) {
-    document
-      .getElementById('add_user')
-      .insertAdjacentHTML('afterbegin', createInput());
-
-    document.querySelector('.close').addEventListener('click', closeParentNode);
-  }
-
-  for (const [index, val] of students.entries()) {
-    const num = +btn.value;
-    if (num === index) {
-      first_name = val.first_name;
-      middle_name = val.middle_name;
-      last_name = val.last_name;
-      n = index;
-    }
-  }
-
-  document.getElementById('first_name').value = first_name;
-  document.getElementById('middle_name').value = middle_name;
-  document.getElementById('last_name').value = last_name;
-
-  const updateBtn = document.getElementById('add_student');
-  updateBtn.textContent = 'Update User';
-  updateBtn.value = n;
-
-  updateBtn.addEventListener('click', updateStudentArr);
-};
-
-const updateStudentArr = (e) => {
-  const first_name = document.getElementById('first_name');
-  const middle_name = document.getElementById('middle_name');
-  const last_name = document.getElementById('last_name');
-
-  const value = e.currentTarget.value;
-
-  const data = {
-    first_name: first_name.value,
-    middle_name: middle_name.value,
-    last_name: last_name.value,
-    value,
-  };
-
-  postRequest('/update-student', data)
-    .then((data) => {
-      console.log(data.msg);
-      console.log(data.students);
-      if (!data.msg || !data.students) return;
-      students = data.students;
-      studentTableData(students);
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-};
-
-const saveClassList = () => {
-  users.length = 0;
-  const subject = document.getElementById(`subject`);
-  const section = document.getElementById(`section`);
-  const year = document.getElementById('year_level');
-
-  // studentHandler();
-  const data = {
-    subject: subject.value,
-    year_level: year.value,
-    section: section.value,
-  };
-
-  postRequest('/add_list', data).then((res) => {
-    const list = document.getElementById('add_list');
-    const addUserDom = document.getElementById('add_user');
-    const dom_list = document.querySelector('.class_list');
-    if (res.msg) {
-      num = 1;
-      if (list) list.remove();
-      if (addUserDom) addUserDom.remove();
-      if (dom_list) dom_list.innerHTML = ``;
-      getClassroomHandler();
-    }
-    if (res.err) {
-      console.log(res);
-    }
-  });
 };
 
 const noListDom = (msg) => {
@@ -200,8 +96,9 @@ const noListDom = (msg) => {
 };
 
 const listToDomHandler = () => {
+  resetClassList();
+  if (teacher_data.length > 1) teacher_data.shift();
   const data = teacher_data[0];
-  console.log(data);
 
   for (let i = 0; data.length > i; i++) {
     const color = randDarkColor();
@@ -212,38 +109,122 @@ const listToDomHandler = () => {
 
     const room = document.getElementById(`room_${data[i]._id}`);
     room.style.backgroundColor = color;
-    room.addEventListener('click', getStudentsHandler);
+    room.addEventListener('click', getClassHandler);
   }
 };
 
-const getStudentsHandler = async (e) => {
-  const domEl = document.querySelector('.container_class');
-  if (domEl) domEl.innerHTML = ``;
-  const value = e.currentTarget.dataset.value;
-  const add_list = document.getElementById('add_list');
-  if (add_list) add_list.remove();
+const resetClassList = () => {
+  const dom = document.querySelector('.class_list');
+  if (dom.hasChildNodes) dom.innerHTML = ``;
+};
 
-  const data = await getRequest(`/get_students/${value}`);
-  num = data.students.length;
-  // console.log(num);
-  // console.log(data.students);
-  domEl.insertAdjacentHTML('beforeend', domMainClass(data));
+const removeChildElement = () => {
+  const dom = document.querySelector('.container_class');
+  if (dom.hasChildNodes) dom.innerHTML = ``;
+};
 
-  const tableDom = document.getElementById('table');
-  if (tableDom) {
-    tableDom.insertAdjacentHTML('beforeend', addTable());
-    studentTableData(data.students);
-  }
-
-  // domEl.insertAdjacentHTML('beforeend', studentsDom(data.students));
+const getClassHandler = (e) => {
+  const id = e.currentTarget.dataset.value;
+  removeChildElement();
 
   document
-    .getElementById('add_user_btn')
-    .addEventListener('click', addUserHandler);
+    .querySelector('.container_class')
+    .insertAdjacentHTML('beforeend', getClassDom());
 
-  // document
-  //   .getElementById('update_list_btn')
-  //   .addEventListener('click', updateListHandler);
+  document.querySelector('.close').addEventListener('click', closeParentNode);
+
+  // class info
+  const data = searchDataInArr(id);
+
+  document.getElementById('main_list').dataset.value = data._id;
+  document.getElementById('class_id').textContent = `Class ID: ${data._id}`;
+  document.getElementById('subject').textContent = `Subject: ${data.subject}`;
+  document.getElementById(
+    'year_level'
+  ).textContent = `Year Level: ${data.year_level}`;
+  document.getElementById('section').textContent = `Section: ${data.section}`;
+
+  document.getElementById('edit_class').addEventListener('click', editClass);
+  document
+    .getElementById('remove_class')
+    .addEventListener('click', deleteClassListHandler);
+};
+
+const getClassDom = () => {
+  return `
+    <div class="card" id="main_list" data-value="">
+      <button class="button close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="content">
+        <div id="class_info">
+          <h5 id="class_id"></h5>
+          <h5 id="subject"></h5>
+          <h5 id="year_level"></h5>
+          <h5 id="section"></h5>
+        </div>
+        <div class="settings">
+          <button class='button' id="edit_class">Edit Class</button>
+          <button class='button' id="remove_class">Remove Class</button>
+        </div>
+        <div id="students_table"></div>
+      </div>
+    </div>
+  `;
+};
+
+const editClass = () => {
+  const id = document.getElementById('main_list').dataset.value;
+
+  removeChildElement();
+
+  document
+    .querySelector('.container_class')
+    .insertAdjacentHTML('beforeend', domAddClassList());
+
+  const data = searchDataInArr(id);
+  console.log(data);
+
+  document.querySelector('.close').addEventListener('click', closeParentNode);
+
+  document.getElementById('add_list').dataset.value = id;
+
+  document.getElementById('class_text').textContent = `Edit a CLass List`;
+  document.getElementById('subject').value = data.subject;
+  document.getElementById('year_level').value = data.year_level;
+  document.getElementById('section').value = data.section;
+
+  document
+    .getElementById('save_class_btn')
+    .addEventListener('click', classSaved);
+};
+
+const classSaved = () => {
+  const subject = document.getElementById('subject').value;
+  const year_level = document.getElementById('year_level').value;
+  const section = document.getElementById('section').value;
+  const id = document.getElementById('add_list').dataset.value;
+
+  console.log(id, subject, year_level, section);
+
+  const url = `/update-class`;
+  postRequest(url, { id, subject, year_level, section })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
+const searchDataInArr = (id) => {
+  const data = teacher_data[0];
+  for (let i = 0; data.length > i; i++) {
+    if (id === data[i]._id) {
+      return data[i];
+    }
+  }
+  return;
 };
 
 const domMainClass = (data) => {
@@ -252,35 +233,32 @@ const domMainClass = (data) => {
   return `
     <div class="card" id="main_class">
       <div id="message_main">
-        <p id="main_msg">Class ID: ${_id}</p>
+        <p id="class_id" data-id="${_id}">Class ID: ${_id}</p>
       </div>
       <div class="form-group">
         <label for="subject">Subject : </label>
-        <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required>
+        <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required/>
 
         <label for="year_level">Year level : </label>
-        <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required>
+        <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required/>
 
         <label for="section">Section : </label>
-        <input type="text" name="section" id="section" value="${section}"autocomplete="off" required>
-          
+        <input type="text" name="section" id="section" value="${section}" autocomplete="off" required/>
       </div>
+
       <div class='container_group'>
-        <div class='users' id="table"></div>
         <div class="group_buttons">
           <div class="container_buttons">
-            <button type='button' class="button" id="add_user_btn">Add a User </button>
+            // <button type='button' class="button" id="add_user_btn">Add a User </button>
             <button type='button' class="button" id="update_list_btn">Update</button>
           </div>
         </div>
       </div>
     </div>
-    <div id="add_user"></div>
   `;
 };
 
 const domClassList = (data) => {
-  console.log(data);
   const { _id, subject, year_level, section } = data;
   return `
     <div class="card card__clickable" id="room_${_id}" data-value="${_id}">
@@ -296,61 +274,36 @@ const domClassList = (data) => {
   `;
 };
 
-const createInput = () => {
-  return `
-    <div class="card" id="add_user_content">
-      <button class="close" type="button" id="remove">
-        <span aria-hidden="true">&times;</span>
-      </button>
-        <div class='form-group'>
-          <label for="firstName">First Name : </label>
-          <input class='input' name="firstName" id="first_name" min="3" autocomplete="off" required> 
-        </div>
-        
-        <div class='form-group input'>
-          <label for="middleName">Middle Name : </label>
-          <input class='input' name="middleName" id="middle_name" min="3" autocomplete="off" required> 
-        </div>
-
-        <div class='form-group input'>
-          <label for="lastName">Last Name : </label>
-          <input class='input' name="middleName" id="last_name" min="3" autocomplete="off" required>
-        </div>
-
-        <button class="button" id="add_student" type="button">Add Student</button>
-    </div>
-  `;
-};
-
 const domAddClassList = () => {
   return `
     <div class="card" id="add_list">
+      <button class='button close'>&times;</button>
       <div class='content'>
         <div id="message_content">
-          <p id="adding_class_text">Add a Class List</p>
+          <p id="class_text">Add a Class List</p>
         </div>
+
         <div class='add_content'>
-          <label for="subject">Subject: </label>
-          <input type="text" name="subject" id="subject" autocomplete="off" required>
+          <div class='form-group'>
+            <label for="subject">Subject: </label>
+            <input type="text" name="subject" id="subject" autocomplete="off" required>
+          </div>
+          <div class='form-group'>
           <label for="year">Year level: </label>
           <input type="text" name="year" id="year_level" autocomplete="off" required>
-          <label for="section">Section: </label>
-          <input type="text" name="section" id="section" autocomplete="off" required>
+          </div>
+          <div class='form-group'>
+            <label for="section">Section: </label>
+            <input type="text" name="section" id="section" autocomplete="off" required>
+          </div>
         </div>
-        <div class='container_group'>
-          <div class="users" id="table">
-          
-          </div>
-          <div class="group_buttons">
-            <div class="container_buttons">
-              <button type='button' class="button" id="add_user_btn">Add Student</button>
-              <button type='button' class="button" id="save_list_btn">Save</button>
-            </div>
-          </div>
+
+        <div class="group_buttons">
+          <button type='button' class="button" id="save_class_btn">Save</button>
+        </div>
+
         </div>
       </div>
-    </div>
-    <div id="add_user">
     </div>
   `;
 };
@@ -363,7 +316,7 @@ const addTable = () => {
           <th>First Name</th>
           <th>Middle Name</th>
           <th>Last Name</th>
-          <th>Options</th>
+          <th class="no_border"></th>
         </tr>
       </thead>
       <tbody id="tableData"></tbody>
@@ -384,9 +337,13 @@ const studentTableData = (data) => {
       <td>${student.first_name}</td>
       <td>${student.middle_name}</td>
       <td>${student.last_name}</td>
-      <td>
+      <td class="no_border">
       <button class='button' id="edit_${index}" value="${index}">
         <i class='fa-solid fa-pen-to-square'>
+        </i>
+      </button>
+      <button class='button' id="delete_${index}" value="${index}">
+        <i class='fa-solid fa-x'>
         </i>
       </button>
       </td>
@@ -397,7 +354,84 @@ const studentTableData = (data) => {
   students = data;
   for (let i = 0; n > i; i++) {
     document.getElementById(`edit_${i}`).addEventListener('click', editStudent);
+
+    document
+      .getElementById(`delete_${i}`)
+      .addEventListener('click', deleteStudent);
   }
+};
+
+const onConfirm = () => {
+  return `
+    <div class="overlay"></div>
+    <div class="modal">
+      <div class="card">
+        <div class="content">
+          <div class='form-group'>
+            <label for='password'>Password</label>
+            <input name="password" type="password" id="password" autocomplete="off" required />
+          </div>
+          <div class="buttons">
+            <button class='button' id="cancel">Cancel</button>
+            <button class='button' id="confirm">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+const removedOnConfirm = () => {
+  const overlay = document.querySelector('.overlay');
+  const modal = document.querySelector('.modal');
+  if (overlay) overlay.remove();
+  if (modal) modal.remove();
+};
+
+const loaderHandler = () => {
+  const dom = document.getElementById('preloader');
+  if (!dom) {
+    document.body.insertAdjacentHTML('afterbegin', loaderDom());
+  } else {
+    dom.remove();
+  }
+};
+
+const loaderDom = () => {
+  return `
+  <div id="preloader">
+  </div>
+`;
+};
+
+const deleteClassListHandler = () => {
+  document.body.insertAdjacentHTML('beforeend', onConfirm());
+
+  document.getElementById('cancel').addEventListener('click', removedOnConfirm);
+
+  document.getElementById('confirm').addEventListener('click', deleteClassList);
+};
+
+const deleteClassList = () => {
+  loaderHandler();
+  const id = document.getElementById('main_list').dataset.value;
+  const password = document.getElementById('password').value;
+  const url = `/delete-class-list`;
+  postRequest(url, { id, password })
+    .then((data) => {
+      if (data) {
+        const classroom = data.data;
+        teacher_data.push(classroom);
+        listToDomHandler();
+      } else {
+        console.log(data);
+      }
+    })
+    .catch((e) => console.log(e))
+    .finally(() => {
+      removedOnConfirm();
+      loaderHandler();
+    });
 };
 
 export { classListHandler, getClassroomHandler };

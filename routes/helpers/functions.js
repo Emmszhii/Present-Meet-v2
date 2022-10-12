@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const capitalize = (string) => {
   const name = string.toLowerCase().split(' ');
 
@@ -25,8 +27,24 @@ const validateNameEmpty = (name) => {
   return false;
 };
 
+const validateEmpty = (str) => {
+  if (!str || str.trim() === '') return true;
+  return false;
+};
+
+const comparePassword = async (password, hash) => {
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch (e) {
+    console.log(e);
+  }
+  return false;
+};
+
 module.exports = {
   capitalize,
   validateName,
   validateNameEmpty,
+  validateEmpty,
+  comparePassword,
 };

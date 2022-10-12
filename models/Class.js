@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const teacherSchema = new mongoose.Schema(
   {
-    teacher_id: String,
+    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     classroom_id: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' }],
   },
   {
@@ -12,21 +12,20 @@ const teacherSchema = new mongoose.Schema(
 
 const classroomSchema = new mongoose.Schema(
   {
-    teacher_id: String,
     attendance_id: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
     ],
     subject: String,
     year_level: String,
     section: String,
-    students: Array,
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );
 
 const attendanceSchema = new mongoose.Schema(
   {
-    class_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' },
+    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' },
     date: Date,
     present: Array,
     absent: Array,

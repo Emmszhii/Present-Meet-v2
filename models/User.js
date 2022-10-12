@@ -10,7 +10,7 @@ const accountSchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
-    account_id: String,
+    _id: { type: mongoose.Types.ObjectId, ref: 'Account' },
     first_name: String,
     middle_name: String,
     last_name: String,
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
 
 const studentSchema = new mongoose.Schema(
   {
-    account_id: String,
+    _id: { type: mongoose.Types.ObjectId, ref: 'Account' },
     descriptor: String,
   },
   { timestamps: true }

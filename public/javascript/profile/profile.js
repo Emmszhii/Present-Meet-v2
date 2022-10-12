@@ -1,11 +1,13 @@
 const updateUser = async () => {
   const firstName = document.getElementById('first_name').value;
+  const middleName = document.getElementById('middle_name').value;
   const lastName = document.getElementById('last_name').value;
   const birthday = document.getElementById('birthday').value;
   const type = document.getElementById('user-type').value;
   const password = document.getElementById('password');
   const info = {
     first_name: firstName,
+    middle_name: middleName,
     last_name: lastName,
     birthday,
     type,

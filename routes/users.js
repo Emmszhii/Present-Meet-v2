@@ -106,6 +106,7 @@ router.post('/register', (req, res) => {
         res.render('register', {
           errors,
           first_name,
+          middle_name,
           last_name,
           birthday,
           type,
@@ -132,7 +133,7 @@ router.post('/register', (req, res) => {
               .save()
               .then((user) => {
                 const new_user = new User({
-                  account_id: user.id,
+                  _id: user._id,
                   first_name: fname,
                   middle_name: mname,
                   last_name: lname,
@@ -158,7 +159,7 @@ router.post('/register', (req, res) => {
 
 // profile get request
 router.get('/profile', ensureAuthenticated, (req, res) => {
-  const { first_name, last_name, birthday, type } = req.user;
+  const { first_name, middle_name, last_name, birthday, type } = req.user;
   res.render('profile', {
     first_name,
     middle_name,
@@ -170,6 +171,7 @@ router.get('/profile', ensureAuthenticated, (req, res) => {
 
 // profile post request
 router.post('/profile', ensureAuthenticated, (req, res) => {
+  console.log(req.body);
   const { first_name, middle_name, last_name, birthday, type, password } =
     req.body;
   if (
@@ -211,7 +213,7 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
   if (type.trim() === '' && type !== 'student' && type !== 'teacher')
     return res.status(400).json({ err: 'Please input a valid account type' });
 
-  Account.findOne({ _id: req.user.account_id }, (err, data) => {
+  Account.findOne({ _id: req.user._id }, (err, data) => {
     if (err) res.status(400).json({ err });
     bcrypt.compare(password, data.password, (err, result) => {
       if (err) return res.status(200).json({ err: err });
@@ -224,21 +226,15 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
           type: type,
         };
 
-        User.updateOne(
-          { account_id: req.user.account_id },
-          data,
-          (error, result) => {
-            if (error) return res.status(200).json({ err: error });
-            console.log(result.acknowledged);
-            if (result.acknowledged) {
-              return res
-                .status(200)
-                .json({ msg: 'User info has been updated' });
-            } else {
-              return res.status(400).json({ err: 'Something gone wrong' });
-            }
+        User.updateOne({ _id: req.user._id }, data, (error, result) => {
+          if (error) return res.status(200).json({ err: error });
+          console.log(result.acknowledged);
+          if (result.acknowledged) {
+            return res.status(200).json({ msg: 'User info has been updated' });
+          } else {
+            return res.status(400).json({ err: 'Something gone wrong' });
           }
-        );
+        });
       } else {
         return res.status(400).json({ err: 'Invalid Password' });
       }
@@ -271,7 +267,7 @@ router.post('/password', ensureAuthenticated, (req, res) => {
       .status(400)
       .json({ err: 'New Password and confirm password is not the same!' });
 
-  Account.findOne({ _id: req.user.account_id }, (err, data) => {
+  Account.findOne({ _id: req.user._id }, (err, data) => {
     if (err) res.status(400).json({ err });
     console.log(data);
 
@@ -287,7 +283,7 @@ router.post('/password', ensureAuthenticated, (req, res) => {
               return res.status(400).json({ err: 'Something gone wrong' });
 
             Account.updateOne(
-              { _id: req.user.account_id },
+              { _id: req.user._id },
               { password: hash },
               (error, result) => {
                 if (error)

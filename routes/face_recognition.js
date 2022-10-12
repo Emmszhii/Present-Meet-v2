@@ -11,7 +11,7 @@ router.get('/face-recognition', ensureAuthenticated, (req, res) => {
 });
 
 router.get('/getDescriptor', ensureAuthenticated, (req, res) => {
-  Student.findOne({ account_id: req.user.account_id }, (err, data) => {
+  Student.findOne({ _id: req.user._id }, (err, data) => {
     console.log(data);
     if (err) return res.status(400).json({ err: err });
     if (!data)
@@ -42,15 +42,15 @@ router.post('/descriptor', ensureAuthenticated, (req, res) => {
   if (float.length !== 128)
     return res.status(400).json({ err: 'Invalid Face' });
 
-  Account.findOne({ _id: req.user.account_id }, (err, data) => {
+  Account.findOne({ _id: req.user._id }, (err, data) => {
     if (err) return res.status(400).json({ err: err });
     bcrypt.compare(password, data.password, (err, result) => {
       if (err) return res.status(400).json({ err: 'Password is incorrect!' });
       if (result) {
         Student.updateOne(
-          { account_id: req.user.account_id },
+          { _id: req.user._id },
           {
-            account_id: req.user.account_id,
+            _id: req.user._id,
             descriptor: descriptor,
           },
           { upsert: true },

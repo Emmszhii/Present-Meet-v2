@@ -38,40 +38,38 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
     section,
   });
 
-  console.log(req.user._id);
+  try {
+    const account = await Account.findOne({ _id: req.user._id }).exec();
+    console.log(account);
+    if (!account) throw `Account not found!`;
 
-  Account.findOne({ _id: req.user._id }, (err, data) => {
-    if (err) return res.status(400).json({ err: `Invalid request` });
-    if (data) {
-      bcrypt.compare(password, data.password, (err, result) => {
-        if (err) return res.status(400).json({ err: `Invalid request` });
-        if (!result) return res.status(400).json({ err: `Invalid password` });
-        if (result) {
-          classroom.save().then(async (classList) => {
-            const teacher = await Teacher.findOne({ _id: req.user._id });
+    const pw = await comparePassword(password, account.password);
 
-            teacher.classroom_id.push(classList._id);
+    if (pw) {
+      const id = await classroom.save().then((data) => data._id);
+      console.log(id);
 
-            await teacher
-              .save()
-              .then((data) => {
-                return data.populate({ path: `classroom_id` });
-              })
-              .then((data) => {
-                res.status(200).json({
-                  data: data.classroom_id,
-                  msg: `Successfully save to database`,
-                });
-              })
-              .catch((e) => {
-                console.log(e);
-                return res.status(400).json({ err: `Something went wrong` });
-              });
-          });
-        }
-      });
+      const teacher = await Teacher.findOne({ _id: req.user._id });
+
+      teacher.classroom_id.push(id);
+
+      await teacher
+        .save()
+        .then((data) => data.populate({ path: 'classroom_id' }))
+        .then((data) =>
+          res.status(200).json({
+            data: data.classroom_id,
+            msg: 'Successfully saved to database',
+          })
+        )
+        .catch((e) => res.status(400).json({ err: e }));
+    } else {
+      res.status(400).json({ err: `Invalid Password` });
     }
-  });
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: e });
+  }
 });
 
 router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
@@ -125,6 +123,7 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
 
   try {
     const account = await Account.findOne({ _id: req.user._id }).exec();
+    if (!account) throw `User not found`;
     const pw = await comparePassword(password, account.password);
 
     if (pw) {
@@ -147,10 +146,16 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
         });
 
       res.status(400).json({ err: `Something went wrong` });
+    } else {
+      res.status(200).json({ err: `Invalid password` });
     }
   } catch (e) {
     console.log(e);
   }
+});
+
+router.get('/class-attendance/:id', (req, res) => {
+  res.status(200).json({ msg: 'hello' });
 });
 
 module.exports = router;

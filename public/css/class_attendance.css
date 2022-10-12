@@ -105,6 +105,13 @@ body {
   border-right: 1px solid black;
 }
 
+.link {
+  display: flex;
+  text-align: center;
+  width: 100%;
+  padding: 10px 0px;
+}
+
 #main_list {
   width: 50%;
   height: 92vh;

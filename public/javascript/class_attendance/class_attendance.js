@@ -1,6 +1,7 @@
 import { postRequest, getRequest, randDarkColor } from '../helpers/helpers.js';
 
 const teacher_data = [];
+const students = [];
 
 // Class List
 const getClassroomHandler = async () => {
@@ -109,7 +110,7 @@ const listToDomHandler = () => {
 
     const room = document.getElementById(`room_${data[i]._id}`);
     room.style.backgroundColor = color;
-    room.addEventListener('click', getClassHandler);
+    room.addEventListener('click', loadClassHandler);
   }
 };
 
@@ -123,7 +124,7 @@ const removeChildElement = () => {
   if (dom.hasChildNodes) dom.innerHTML = ``;
 };
 
-const getClassHandler = (e) => {
+const loadClassHandler = (e) => {
   const id = e.currentTarget.dataset.value;
   removeChildElement();
 
@@ -143,6 +144,8 @@ const getClassHandler = (e) => {
     'year_level'
   ).textContent = `Year Level: ${data.year_level}`;
   document.getElementById('section').textContent = `Section: ${data.section}`;
+
+  studentDomHandler();
 
   document
     .getElementById('edit_class')
@@ -169,6 +172,7 @@ const getClassDom = () => {
           <button class='button' id="edit_class">Edit Class</button>
           <button class='button' id="remove_class">Remove Class</button>
         </div>
+        <div class="link"></div>
         <div id="students_table"></div>
       </div>
     </div>
@@ -239,36 +243,62 @@ const searchDataInArr = (id) => {
   return;
 };
 
-const domMainClass = (data) => {
-  const { _id, subject, year_level, section } = data;
+const studentDomHandler = () => {
+  if (students.length < 1) console.log(`no students`);
+  const id = document.getElementById('main_list').dataset.value;
+  const url = window.location.href;
+  const link = `${url}/${id}`;
 
+  document
+    .querySelector('.link')
+    .insertAdjacentHTML('beforeend', linkDom(link));
+
+  document.getElementById('copy').addEventListener('click', copyLink);
+};
+
+const copyLink = () => {
+  const dom = document.getElementById('link_classroom');
+  navigator.clipboard.writeText(dom.value);
+  console.log(dom.value);
+};
+
+const linkDom = (link) => {
   return `
-    <div class="card" id="main_class">
-      <div id="message_main">
-        <p id="class_id" data-id="${_id}">Class ID: ${_id}</p>
-      </div>
-      <div class="form-group">
-        <label for="subject">Subject : </label>
-        <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required/>
-
-        <label for="year_level">Year level : </label>
-        <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required/>
-
-        <label for="section">Section : </label>
-        <input type="text" name="section" id="section" value="${section}" autocomplete="off" required/>
-      </div>
-
-      <div class='container_group'>
-        <div class="group_buttons">
-          <div class="container_buttons">
-            // <button type='button' class="button" id="add_user_btn">Add a User </button>
-            <button type='button' class="button" id="update_list_btn">Update</button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <input id="link_classroom" value="${link}" readonly>
+      <button class='button' id="copy"><i class="fa-solid fa-copy"></i></button>
   `;
 };
+
+// const domMainClass = (data) => {
+//   const { _id, subject, year_level, section } = data;
+
+//   return `
+//     <div class="card" id="main_class">
+//       <div id="message_main">
+//         <p id="class_id" data-id="${_id}">Class ID: ${_id}</p>
+//       </div>
+//       <div class="form-group">
+//         <label for="subject">Subject : </label>
+//         <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required/>
+
+//         <label for="year_level">Year level : </label>
+//         <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required/>
+
+//         <label for="section">Section : </label>
+//         <input type="text" name="section" id="section" value="${section}" autocomplete="off" required/>
+//       </div>
+
+//       <div class='container_group'>
+//         <div class="group_buttons">
+//           <div class="container_buttons">
+//             // <button type='button' class="button" id="add_user_btn">Add a User </button>
+//             <button type='button' class="button" id="update_list_btn">Update</button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   `;
+// };
 
 const domClassList = (data) => {
   const { _id, subject, year_level, section } = data;

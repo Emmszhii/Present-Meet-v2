@@ -470,18 +470,18 @@ const joinStream = async () => {
 
   try {
     if (device.localAudio) {
-      rtc.localTracks[0].setDevice(device.localAudio);
-
-      rtc.localTracks[0].setMuted(true);
+      await rtc.localTracks[0].setDevice(device.localAudio).then(() => {
+        rtc.localTracks[0].setMuted(true);
+      });
     } else {
-      rtc.localTracks[0].setMuted(true);
+      await rtc.localTracks[0].setMuted(true);
     }
 
     if (device.localVideo) {
-      rtc.localTracks[1].setDevice(device.localVideo);
-      rtc.localTracks[1].setMuted(true);
+      await rtc.localTracks[1].setDevice(device.localVideo);
+      await rtc.localTracks[1].setMuted(true);
     } else {
-      rtc.localTracks[1].setMuted(true);
+      await rtc.localTracks[1].setMuted(true);
     }
   } catch (err) {
     console.log(err);

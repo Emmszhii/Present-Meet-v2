@@ -6,7 +6,8 @@ const generateRTMToken = (req, resp) => {
   resp.header('Access-Control-Allow-Origin', '*');
 
   // get uid
-  const uid = req.params.uid;
+  const uid = req.user._id;
+  // req.params.uid;
   if (!uid || uid === '') {
     return resp.status(500).json({ error: 'uid is required' });
   }

@@ -15,7 +15,9 @@ const generateRTCToken = (req, resp) => {
   if (!channelName) {
     return resp.status(500).json({ error: 'channel is required' });
   }
-  let id = req.params.id;
+  let id = req.user._id;
+  console.log(req.user._id);
+  req.params.id;
   if (!id || id === '') {
     return resp.status(500).json({ error: 'id is required' });
   }

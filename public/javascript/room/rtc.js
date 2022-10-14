@@ -89,9 +89,13 @@ const data_init = async () => {
         userData.firstName = data.user.first_name;
         userData.lastName = data.user.last_name;
         userData.fullName = `${data.user.first_name} ${data.user.last_name}`;
+        console.log(data.user._id);
         userData.id = data.user._id;
-        userData.rtcId = data.user._id.slice(-4);
-        userData.rtmId = data.user._id.slice(-9);
+        userData.rtcId = data.user._id;
+        // .slice(-4);
+        userData.rtmId = data.user._id;
+        // data.user._id.slice(-9);
+
         return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
       })
       .then((resp) => {
@@ -157,7 +161,7 @@ const joinRoomInit = async () => {
   // addBotMessageToDom(`Welcome to the room ${userData.fullName}! 🤗`);
 
   // initialize setting the rtc
-  rtc.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+  rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
   // join rtc with the params info
   await rtc.client.join(
@@ -168,13 +172,12 @@ const joinRoomInit = async () => {
   );
 
   // on user publish and left method
-  rtc.client.on('user-published', handleUserPublished);
-  rtc.client.on('user-left', handleUserLeft);
-  rtc.client.on('token-privilege-will-expire', handleTokenExpire);
+  await rtc.client.on('user-published', handleUserPublished);
+  await rtc.client.on('user-left', handleUserLeft);
+  await rtc.client.on('token-privilege-will-expire', handleTokenExpire);
 
   // set the users camera and mic
   settingsHandler();
-  // settings();
   // if All are loaded loader will be gone
   loader.style.display = 'none';
 };

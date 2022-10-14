@@ -53,7 +53,7 @@ const saveClassList = () => {
 };
 
 const savedNewClassList = () => {
-  loaderHandler();
+  // loaderHandler();
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
@@ -69,7 +69,8 @@ const savedNewClassList = () => {
   postRequest(url, data)
     .then((data) => {
       if (data.data) {
-        teacher_data.push(data.data);
+        // teacher_data.push(data.data);
+        getClassroomHandler();
         listToDomHandler();
         removeChildElement();
       }
@@ -82,7 +83,7 @@ const savedNewClassList = () => {
     })
     .finally(() => {
       removedOnConfirm();
-      loaderHandler();
+      // loaderHandler();
     });
 };
 
@@ -201,23 +202,31 @@ const editClassHandler = () => {
 
   document
     .getElementById('save_class_btn')
-    .addEventListener('click', classSaved);
+    .addEventListener('click', updateClassHandler);
 };
 
-const classSaved = () => {
-  loaderHandler();
+const updateClassHandler = () => {
+  // loaderHandler();
+  document.body.insertAdjacentHTML('beforeend', onConfirm());
+
+  document.getElementById('cancel').addEventListener('click', removedOnConfirm);
+
+  document.getElementById('confirm').addEventListener('click', updateClass);
+};
+
+const updateClass = () => {
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
+  const password = document.getElementById('password').value;
   const id = document.getElementById('add_list').dataset.value;
 
-  console.log(id, subject, year_level, section);
-
   const url = `/update-class`;
-  postRequest(url, { id, subject, year_level, section })
+  postRequest(url, { id, subject, year_level, section, password })
     .then((data) => {
       if (data.data) {
-        teacher_data.push(data.data);
+        // teacher_data.push(data.data);
+        getClassroomHandler();
         listToDomHandler();
         removeChildElement();
       } else {
@@ -229,7 +238,7 @@ const classSaved = () => {
     })
     .finally(() => {
       removedOnConfirm();
-      loaderHandler();
+      // loaderHandler();
     });
 };
 
@@ -455,16 +464,19 @@ const deleteClassListHandler = () => {
 };
 
 const deleteClassList = () => {
-  loaderHandler();
+  // loaderHandler();
   const id = document.getElementById('main_list').dataset.value;
   const password = document.getElementById('password').value;
   const url = `/delete-class-list`;
+  console.log(id);
   postRequest(url, { id, password })
     .then((data) => {
       if (data.data) {
-        const classroom = data.data;
-        teacher_data.push(classroom);
+        // const classroom = data.data;
+        // teacher_data.push(classroom);
+        getClassroomHandler();
         listToDomHandler();
+        removeChildElement();
       } else {
         console.log(data);
       }
@@ -472,7 +484,7 @@ const deleteClassList = () => {
     .catch((e) => console.log(e))
     .finally(() => {
       removedOnConfirm();
-      loaderHandler();
+      // loaderHandler();
     });
 };
 

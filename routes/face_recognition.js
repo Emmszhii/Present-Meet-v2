@@ -5,31 +5,30 @@ const { ensureAuthenticated } = require('../config/auth');
 
 // User model
 const { Account, User, Student, Teacher } = require('../models/User');
+const { comparePassword } = require('./helpers/functions');
 
 router.get('/face-recognition', ensureAuthenticated, (req, res) => {
   res.render('face_recognition');
 });
 
-router.get('/getDescriptor', ensureAuthenticated, (req, res) => {
-  Student.findOne({ _id: req.user._id }, (err, data) => {
-    console.log(data);
-    if (err) return res.status(400).json({ err: err });
-    if (!data)
-      return res
-        .status(400)
-        .json({ err: `User don't have a registered face in the database!` });
+router.get('/getDescriptor', ensureAuthenticated, async (req, res) => {
+  try {
+    const student = await Student.findOne({ _id: req.user._id });
 
-    if (data.descriptor) {
-      res.status(200).json({ descriptor: data.descriptor });
-    } else {
-      res
-        .status(400)
-        .json({ err: `User don't have a registered face in the database!` });
-    }
-  });
+    if (!student.descriptor)
+      return res
+        .status(200)
+        .json({ warning: `Please register face recognition` });
+
+    if (student.descriptor)
+      return res.status(200).json({ descriptor: student.descriptor });
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: e });
+  }
 });
 
-router.post('/descriptor', ensureAuthenticated, (req, res) => {
+router.post('/descriptor', ensureAuthenticated, async (req, res) => {
   const descriptor = req.body.descriptor;
   const password = req.body.password;
 
@@ -42,29 +41,33 @@ router.post('/descriptor', ensureAuthenticated, (req, res) => {
   if (float.length !== 128)
     return res.status(400).json({ err: 'Invalid Face' });
 
-  Account.findOne({ _id: req.user._id }, (err, data) => {
-    if (err) return res.status(400).json({ err: err });
-    bcrypt.compare(password, data.password, (err, result) => {
-      if (err) return res.status(400).json({ err: 'Password is incorrect!' });
-      if (result) {
-        Student.updateOne(
-          { _id: req.user._id },
-          {
-            _id: req.user._id,
-            descriptor: descriptor,
-          },
-          { upsert: true },
-          (err) => {
-            if (err) return console.log(err);
-            res.status(200).json({ msg: `Successfully save to database` });
-            console.log(`successfully updated the document`);
-          }
-        );
-      } else {
-        return res.status(400).json({ err: 'Password is incorrect!' });
-      }
-    });
-  });
+  try {
+    const account = await Account.findOne({ _id: req.user._id });
+    console.log(account);
+
+    const booleanPassword = await comparePassword(password, account.password);
+    console.log(booleanPassword);
+
+    if (booleanPassword) {
+      Student.updateOne(
+        { _id: req.user._id },
+        {
+          _id: req.user._id,
+          descriptor: descriptor,
+        },
+        { upsert: true },
+        (err) => {
+          if (err) return console.log(err);
+          return res.status(200).json({ msg: `Successfully save to database` });
+        }
+      );
+    } else {
+      return res.status(400).json({ err: `Invalid Password` });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: e });
+  }
 });
 
 module.exports = router;

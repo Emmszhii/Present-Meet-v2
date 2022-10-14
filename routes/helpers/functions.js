@@ -41,10 +41,22 @@ const comparePassword = async (password, hash) => {
   return false;
 };
 
+const generateHashPassword = async (password) => {
+  try {
+    const rounds = 10;
+    const salt = await bcrypt.genSalt(rounds);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 module.exports = {
   capitalize,
   validateName,
   validateNameEmpty,
   validateEmpty,
   comparePassword,
+  generateHashPassword,
 };

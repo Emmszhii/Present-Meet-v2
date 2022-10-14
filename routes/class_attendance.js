@@ -53,18 +53,14 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 
       teacher.classroom_id.push(id);
 
-      await teacher
-        .save()
-        .then((data) => data.populate({ path: 'classroom_id' }))
-        .then((data) =>
-          res.status(200).json({
-            data: data.classroom_id,
-            msg: 'Successfully saved to database',
-          })
-        )
-        .catch((e) => res.status(400).json({ err: e }));
+      await teacher.save().then(() => {
+        return res.status(200).json({
+          data: 'ok',
+          msg: `CLass list successfully save to database`,
+        });
+      });
     } else {
-      res.status(400).json({ err: `Invalid Password` });
+      return res.status(400).json({ err: `Invalid Password` });
     }
   } catch (e) {
     console.log(e);
@@ -85,7 +81,7 @@ router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
 });
 
 router.post('/update-class', ensureAuthenticated, async (req, res) => {
-  const { id, subject, year_level, section } = req.body;
+  const { id, subject, year_level, section, password } = req.body;
   if (!id) return res.status(200).json({ err: `Invalid request` });
   if (validateEmpty(subject))
     return res.status(400).json({ err: `Subject is empty` });
@@ -93,25 +89,24 @@ router.post('/update-class', ensureAuthenticated, async (req, res) => {
     return res.status(400).json({ err: `Year level is empty` });
   if (validateEmpty(section))
     return res.status(400).json({ err: `Section is empty` });
+  if (validateEmpty(password))
+    return res.status(400).json({ err: `Password is required` });
 
   try {
-    const classroom = await Classroom.updateOne(
-      { _id: id },
-      { subject, year_level, section }
-    );
+    const account = await Account.findOne({ _id: req.user._id });
+    // console.log(account);
 
-    console.log(classroom);
+    const booleanPassword = await comparePassword(password, account.password);
 
-    Teacher.findOne({ _id: req.user._id })
-      .populate({ path: 'classroom_id' })
-      .exec((err, data) => {
-        if (err) return res.status(200).json({ err: `Something went wrong` });
-        console.log(data);
-        return res.status(200).json({ data: data.classroom_id });
-      });
+    if (booleanPassword) {
+      await Classroom.updateOne({ _id: id }, { subject, year_level, section });
+      return res.status(200).json({ data: `ok`, msg: `Successfully update` });
+    } else {
+      return res.status(400).json({ err: `Invalid password` });
+    }
   } catch (e) {
     console.log(e);
-    res.status(400).json({ err: e });
+    return res.status(400).json({ err: e });
   }
 });
 
@@ -140,12 +135,7 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
           if (err) return res.status(400).json({ err: `Something went wrong` });
           console.log(data);
           return res.status(200).json({ data: data.classroom_id });
-        })
-        .catch((e) => {
-          return res.status(400).json({ err: e });
         });
-
-      res.status(400).json({ err: `Something went wrong` });
     } else {
       res.status(200).json({ err: `Invalid password` });
     }

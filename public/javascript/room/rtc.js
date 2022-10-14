@@ -89,13 +89,9 @@ const data_init = async () => {
         userData.firstName = data.user.first_name;
         userData.lastName = data.user.last_name;
         userData.fullName = `${data.user.first_name} ${data.user.last_name}`;
-        console.log(data.user._id);
         userData.id = data.user._id;
         userData.rtcId = data.user._id;
-        // .slice(-4);
         userData.rtmId = data.user._id;
-        // data.user._id.slice(-9);
-
         return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
       })
       .then((resp) => {
@@ -322,9 +318,8 @@ const switchToCamera = async () => {
 const handleStopShareScreen = async () => {
   rtc.sharingScreen = false;
   cameraBtn.style.display = 'block';
-  if (screenBtn.classList.contains('active')) {
+  if (screenBtn.classList.contains('active'))
     screenBtn.classList.remove('active');
-  }
 
   // remove the local screen tracks to the dom
   document.getElementById(`user-container-${userData.rtcId}`).remove();
@@ -336,6 +331,7 @@ const handleStopShareScreen = async () => {
   resetTheFrames();
   // then switch to camera
   switchToCamera();
+
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'user_screen_share_close',

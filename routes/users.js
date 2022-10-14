@@ -4,12 +4,19 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { isEmail } = require('validator');
 const { ensureAuthenticated } = require('../config/auth');
-const { capitalize } = require('./helpers/functions');
+const {
+  capitalize,
+  generateHashPassword,
+  comparePassword,
+  validateEmpty,
+} = require('./helpers/functions');
 
 // User model
 const { Account, User, Student, Teacher } = require('../models/User');
 
-router.get('/login', (req, res) => {
+// Login Handle
+
+router.get('/login', async (req, res) => {
   if (req.isAuthenticated()) {
     res.redirect('/');
     console.log(req.user);
@@ -18,13 +25,21 @@ router.get('/login', (req, res) => {
   }
 });
 
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true,
+  })(req, res, next);
+});
+
 // register page
 router.get('/register', (req, res) => {
   res.render('register');
 });
 
 // Register Handle
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const {
     first_name,
     middle_name,
@@ -38,18 +53,14 @@ router.post('/register', (req, res) => {
 
   const errors = [];
   // check required fields
-  if (
-    !first_name ||
-    !middle_name ||
-    !last_name ||
-    !birthday ||
-    !type ||
-    !email ||
-    !password ||
-    !password2
-  ) {
-    errors.push({ msg: 'Please fill in all fields' });
-  }
+  if (validateEmpty(first_name)) errors.push({ msg: `First name is empty` });
+  if (validateEmpty(middle_name)) errors.push({ msg: `Middle name is empty` });
+  if (validateEmpty(last_name)) errors.push({ msg: `Last name is empty` });
+  if (validateEmpty(birthday)) errors.push({ msg: `Birthday is empty` });
+  if (validateEmpty(type)) errors.push({ msg: `Account type is empty` });
+  if (validateEmpty(email)) errors.push({ msg: `email is empty` });
+  if (validateEmpty(password)) errors.push({ msg: `Password is empty` });
+
   // check if first_name is valid
   if (first_name < 3 || first_name.trim() === '') {
     errors.push({ msg: 'First name must contain at least 3 letters' });
@@ -99,63 +110,55 @@ router.post('/register', (req, res) => {
       password2,
     });
   } else {
-    // Validation Pass
-    Account.findOne({ email: email }).then((user) => {
-      if (user) {
-        // User Exist
-        errors.push({ msg: `Email is already registered` });
-        res.render('register', {
-          errors,
-          first_name,
-          middle_name,
-          last_name,
+    const account = await Account.findOne({ email: email });
+    console.log(account);
+
+    if (account) {
+      errors.push({ msg: `Email is already registered` });
+      res.render('register', {
+        errors,
+        first_name,
+        middle_name,
+        last_name,
+        birthday,
+        type,
+        email,
+        password,
+        password2,
+      });
+    } else {
+      const fname = capitalize(first_name);
+      const mname = capitalize(middle_name);
+      const lname = capitalize(last_name);
+
+      try {
+        const hash = await generateHashPassword(password);
+
+        const new_account = new Account({
+          email,
+          password: hash,
+        });
+
+        const accountUser = await new_account.save();
+
+        const new_user = new User({
+          _id: accountUser._id,
+          first_name: fname,
+          middle_name: mname,
+          last_name: lname,
           birthday,
           type,
-          email,
-          password,
-          password2,
         });
-      } else {
-        const fname = capitalize(first_name);
-        const mname = capitalize(middle_name);
-        const lname = capitalize(last_name);
-        // Hash password
-        const salt = 10;
-        bcrypt.genSalt(salt, (err, salt) =>
-          bcrypt.hash(password, salt, (err, hash) => {
-            if (err) throw err;
-            // set password to hash
-            const new_account = new Account({
-              email,
-              password: hash,
-            });
 
-            new_account
-              .save()
-              .then((user) => {
-                const new_user = new User({
-                  _id: user._id,
-                  first_name: fname,
-                  middle_name: mname,
-                  last_name: lname,
-                  birthday,
-                  type,
-                });
-
-                new_user.save().then((data) => {
-                  console.log(data);
-                  req.flash(
-                    'success_msg',
-                    'You are now Registered and can log in'
-                  );
-                  res.redirect('/login');
-                });
-              })
-              .catch((err) => console.log(err));
-          })
-        );
+        await new_user.save().then((data) => {
+          console.log(data);
+          req.flash('success_msg', 'You are now Registered and can log in');
+          res.redirect('/login');
+        });
+      } catch (e) {
+        console.log(e);
       }
-    });
+    }
   }
 });
 
@@ -251,9 +254,6 @@ router.post('/password', ensureAuthenticated, (req, res) => {
     newPassword1: newPw1,
   } = req.body;
 
-  console.log(req.body);
-  console.log(req.user);
-
   if (!oldPw || !newPw || !newPw1)
     return res
       .status(400)
@@ -302,15 +302,6 @@ router.post('/password', ensureAuthenticated, (req, res) => {
       }
     });
   });
-});
-
-// Login Handle
-router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true,
-  })(req, res, next);
 });
 
 // Logout Handle

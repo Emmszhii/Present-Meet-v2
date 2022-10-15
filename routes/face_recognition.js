@@ -43,10 +43,9 @@ router.post('/descriptor', ensureAuthenticated, async (req, res) => {
 
   try {
     const account = await Account.findOne({ _id: req.user._id });
-    console.log(account);
+    if (!account) return res.status(400).json({ err: `Invalid request` });
 
     const booleanPassword = await comparePassword(password, account.password);
-    console.log(booleanPassword);
 
     if (booleanPassword) {
       Student.updateOne(

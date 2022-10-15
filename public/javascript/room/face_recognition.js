@@ -76,12 +76,12 @@ const startCamera = () => {
 
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
     video.srcObject = stream;
-    if (backend === 'webgl') face_detection();
+    if (backend === 'webgl') face_detection(backend);
     track = stream.getTracks();
   });
 };
 
-const face_detection = () => {
+const face_detection = (backend) => {
   console.log(backend);
 };
 
@@ -147,7 +147,6 @@ const faceRecognized = async () => {
   // if user not register their face description
 
   // convert string to float32array
-
   const float = userData.descriptor.split(',');
   const data = new Float32Array(float);
 

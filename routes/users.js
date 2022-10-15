@@ -111,7 +111,6 @@ router.post('/register', async (req, res) => {
     });
   } else {
     const account = await Account.findOne({ email: email });
-    console.log(account);
 
     if (account) {
       errors.push({ msg: `Email is already registered` });
@@ -175,8 +174,7 @@ router.get('/profile', ensureAuthenticated, (req, res) => {
 });
 
 // profile post request
-router.post('/profile', ensureAuthenticated, (req, res) => {
-  console.log(req.body);
+router.post('/profile', ensureAuthenticated, async (req, res) => {
   const { first_name, middle_name, last_name, birthday, type, password } =
     req.body;
   if (
@@ -218,36 +216,38 @@ router.post('/profile', ensureAuthenticated, (req, res) => {
   if (type.trim() === '' && type !== 'student' && type !== 'teacher')
     return res.status(400).json({ err: 'Please input a valid account type' });
 
-  Account.findOne({ _id: req.user._id }, (err, data) => {
-    if (err) res.status(400).json({ err });
-    bcrypt.compare(password, data.password, (err, result) => {
-      if (err) return res.status(200).json({ err: err });
-      if (result) {
-        const data = {
-          first_name: capitalize(first_name),
-          middle_name: capitalize(middle_name),
-          last_name: capitalize(last_name),
-          birthday: birthday,
-          type: type,
-        };
+  try {
+    const data = {
+      first_name: capitalize(first_name),
+      middle_name: capitalize(middle_name),
+      last_name: capitalize(last_name),
+      birthday: birthday,
+      type: type,
+    };
 
-        User.updateOne({ _id: req.user._id }, data, (error, result) => {
-          if (error) return res.status(200).json({ err: error });
-          console.log(result.acknowledged);
-          if (result.acknowledged) {
-            return res.status(200).json({ msg: 'User info has been updated' });
-          } else {
-            return res.status(400).json({ err: 'Something gone wrong' });
-          }
-        });
-      } else {
-        return res.status(400).json({ err: 'Invalid Password' });
-      }
-    });
-  });
+    const account = await Account.findOne({ _id: req.user._id });
+
+    const booleanPassword = await comparePassword(password, account.password);
+
+    if (booleanPassword) {
+      User.updateOne({ _id: req.user._id }, data, (error, result) => {
+        if (error) return res.status(400).json({ err: error });
+        console.log(result);
+        if (result.acknowledged)
+          return res.status(200).json({ msg: 'User info has been updated' });
+        if (!result.acknowledged)
+          return res.status(400).json({ err: 'Something gone wrong' });
+      });
+    } else {
+      return res.status(400).json({ err: `Invalid password` });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: `Something went wrong` });
+  }
 });
 
-router.post('/password', ensureAuthenticated, (req, res) => {
+router.post('/password', ensureAuthenticated, async (req, res) => {
   const {
     password: oldPw,
     newPassword: newPw,
@@ -269,39 +269,31 @@ router.post('/password', ensureAuthenticated, (req, res) => {
       .status(400)
       .json({ err: 'New Password and confirm password is not the same!' });
 
-  Account.findOne({ _id: req.user._id }, (err, data) => {
-    if (err) res.status(400).json({ err });
-    console.log(data);
+  const account = await Account.findOne({ _id: req.user._id });
+  if (!account) return res.status(200).json({ err: 'Invalid request' });
 
-    bcrypt.compare(oldPw, data.password, (err, result) => {
-      if (err)
-        return res.status(400).json({ err: 'Old Password is incorrect' });
+  const booleanPassword = await comparePassword(oldPw, account.password);
 
-      if (result) {
-        bcrypt.genSalt(10, (err, salt) => {
-          if (err) return res.status(400).json({ err: 'Something gone wrong' });
-          bcrypt.hash(newPw, salt, (err, hash) => {
-            if (err)
-              return res.status(400).json({ err: 'Something gone wrong' });
+  if (booleanPassword) {
+    try {
+      const hash = await generateHashPassword(newPw);
+      console.log(hash);
 
-            Account.updateOne(
-              { _id: req.user._id },
-              { password: hash },
-              (error, result) => {
-                if (error)
-                  return res.status(400).json({ err: 'Something gone wrong' });
-                if (result) {
-                  return res
-                    .status(200)
-                    .json({ msg: 'Password have been changed!' });
-                }
-              }
-            );
-          });
-        });
-      }
-    });
-  });
+      Account.updateOne(
+        { _id: req.user._id },
+        { password: hash },
+        (error, result) => {
+          if (error) res.status(400).json({ err: 'Something went wrong' });
+          if (result.acknowledged)
+            return res.status(200).json({ msg: `Password has been changed` });
+          return res.status(400).json({ err: `Something gone wrong` });
+        }
+      );
+    } catch (e) {
+      console.log(e);
+      return res.status(400).json({ err: `Something gone wrong` });
+    }
+  }
 });
 
 // Logout Handle

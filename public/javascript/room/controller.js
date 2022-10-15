@@ -87,5 +87,4 @@ window.addEventListener('load', () => {
     });
 
   data_init();
-  get_descriptor;
 });

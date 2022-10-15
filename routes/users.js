@@ -17,21 +17,38 @@ const { Account, User, Student, Teacher } = require('../models/User');
 // Login Handle
 
 router.get('/login', async (req, res) => {
+  // let redirectTo = `/`;
+
+  // if (req.session.reqUrl) {
+  //   redirectTo = req.session.reqUrl;
+  //   req.session.reqUrl = null;
+  // }
+
+  // res.redirect(redirectTo);
   if (req.isAuthenticated()) {
     res.redirect('/');
-    console.log(req.user);
   } else {
     res.render('login');
   }
 });
 
-router.post('/login', (req, res, next) => {
+router.post(
+  '/login',
   passport.authenticate('local', {
-    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true,
-  })(req, res, next);
-});
+    keepSessionInfo: true,
+  }),
+  (req, res) => {
+    let redirectTo = `/`;
+
+    if (req.session.reqUrl) {
+      redirectTo = req.session.reqUrl;
+      req.session.reqUrl = null;
+    }
+    res.redirect(redirectTo);
+  }
+);
 
 // register page
 router.get('/register', (req, res) => {

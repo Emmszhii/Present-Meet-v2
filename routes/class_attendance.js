@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
+const { createJsonToken, verifyJsonToken } = require('../config/jwt');
 const {
   capitalize,
   validateName,
@@ -94,7 +95,7 @@ router.post('/update-class', ensureAuthenticated, async (req, res) => {
 
   try {
     const account = await Account.findOne({ _id: req.user._id });
-    // console.log(account);
+    if (!account) return res.status(400).json({ err: `Invalid request` });
 
     const booleanPassword = await comparePassword(password, account.password);
 
@@ -144,7 +145,20 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/class-attendance/:id', (req, res) => {
+router.get(
+  '/generate-class-token/:id/:expire',
+  ensureAuthenticated,
+  (req, res) => {
+    const { id, expire } = req.params;
+    console.log(id);
+    console.log(expire);
+    const token = createJsonToken(id, expire);
+    res.status(200).json({ token });
+  }
+);
+
+router.get('/class-attendance/:id/:token', ensureAuthenticated, (req, res) => {
+  const { id, token } = req.params;
   res.status(200).json({ msg: 'hello' });
 });
 

@@ -53,7 +53,6 @@ const saveClassList = () => {
 };
 
 const savedNewClassList = () => {
-  // loaderHandler();
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
@@ -69,7 +68,6 @@ const savedNewClassList = () => {
   postRequest(url, data)
     .then((data) => {
       if (data.data) {
-        // teacher_data.push(data.data);
         getClassroomHandler();
         listToDomHandler();
         removeChildElement();
@@ -83,7 +81,6 @@ const savedNewClassList = () => {
     })
     .finally(() => {
       removedOnConfirm();
-      // loaderHandler();
     });
 };
 
@@ -225,7 +222,6 @@ const updateClass = () => {
   postRequest(url, { id, subject, year_level, section, password })
     .then((data) => {
       if (data.data) {
-        // teacher_data.push(data.data);
         getClassroomHandler();
         listToDomHandler();
         removeChildElement();
@@ -238,7 +234,6 @@ const updateClass = () => {
     })
     .finally(() => {
       removedOnConfirm();
-      // loaderHandler();
     });
 };
 
@@ -252,15 +247,29 @@ const searchDataInArr = (id) => {
   return;
 };
 
-const studentDomHandler = () => {
-  if (students.length < 1) console.log(`no students`);
+const studentDomHandler = async () => {
+  const expireTime = ['15m', '30m', '1h', '1d', '7d'];
   const id = document.getElementById('main_list').dataset.value;
   const url = window.location.href;
-  const link = `${url}/${id}`;
 
-  document
-    .querySelector('.link')
-    .insertAdjacentHTML('beforeend', linkDom(link));
+  document.querySelector('.link').insertAdjacentHTML('beforeend', linkDom());
+
+  const linkDropDown = document.getElementById('link_time');
+
+  for (const time of expireTime) {
+    const option = new Option();
+    option.value = time;
+    option.text = time;
+    linkDropDown.options.add(option);
+  }
+
+  const { token } = await getClassToken();
+
+  const link = `${url}/${id}/${token}`;
+
+  document.getElementById('link_classroom').value = link;
+
+  linkDropDown.addEventListener('change', onChangeLinkDropDown);
 
   document.getElementById('copy').addEventListener('click', copyLink);
 };
@@ -271,43 +280,31 @@ const copyLink = () => {
   console.log(dom.value);
 };
 
-const linkDom = (link) => {
+const linkDom = () => {
   return `
-      <input id="link_classroom" value="${link}" readonly>
+      <input class='un-capitalize' id="link_classroom" readonly>
+      <select id="link_time"></select>
       <button class='button' id="copy"><i class="fa-solid fa-copy"></i></button>
   `;
 };
 
-// const domMainClass = (data) => {
-//   const { _id, subject, year_level, section } = data;
+const onChangeLinkDropDown = async (e) => {
+  const { token } = await getClassToken();
 
-//   return `
-//     <div class="card" id="main_class">
-//       <div id="message_main">
-//         <p id="class_id" data-id="${_id}">Class ID: ${_id}</p>
-//       </div>
-//       <div class="form-group">
-//         <label for="subject">Subject : </label>
-//         <input type="text" name="subject" id="subject" value="${subject}" autocomplete="off" required/>
+  const id = document.getElementById('main_list').dataset.value;
+  const url = window.location.href;
 
-//         <label for="year_level">Year level : </label>
-//         <input type="text" name="year_level" id="year_level" value="${year_level}" autocomplete="off" required/>
+  const link = `${url}/${id}/${token}`;
+  document.getElementById('link_classroom').value = link;
+};
 
-//         <label for="section">Section : </label>
-//         <input type="text" name="section" id="section" value="${section}" autocomplete="off" required/>
-//       </div>
-
-//       <div class='container_group'>
-//         <div class="group_buttons">
-//           <div class="container_buttons">
-//             // <button type='button' class="button" id="add_user_btn">Add a User </button>
-//             <button type='button' class="button" id="update_list_btn">Update</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   `;
-// };
+const getClassToken = async () => {
+  const id = document.getElementById('main_list').dataset.value;
+  const time = document.getElementById('link_time').value;
+  const url = `/generate-class-token/${id}/${time}`;
+  const token = getRequest(url);
+  return token;
+};
 
 const domClassList = (data) => {
   const { _id, subject, year_level, section } = data;
@@ -464,16 +461,12 @@ const deleteClassListHandler = () => {
 };
 
 const deleteClassList = () => {
-  // loaderHandler();
   const id = document.getElementById('main_list').dataset.value;
   const password = document.getElementById('password').value;
   const url = `/delete-class-list`;
-  console.log(id);
   postRequest(url, { id, password })
     .then((data) => {
       if (data.data) {
-        // const classroom = data.data;
-        // teacher_data.push(classroom);
         getClassroomHandler();
         listToDomHandler();
         removeChildElement();
@@ -484,8 +477,14 @@ const deleteClassList = () => {
     .catch((e) => console.log(e))
     .finally(() => {
       removedOnConfirm();
-      // loaderHandler();
     });
+};
+
+const generateStudentToken = async () => {
+  const id = document.getElementById('main_list').dataset.value;
+
+  const data = await getRequest(id, '1h');
+  console.log(data);
 };
 
 export { classListHandler, getClassroomHandler };

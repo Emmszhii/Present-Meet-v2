@@ -95,6 +95,10 @@ body {
   cursor: pointer;
 }
 
+.un-capitalize {
+  text-transform: lowercase;
+}
+
 .class_list {
   width: 20vw;
   overflow-y: auto;

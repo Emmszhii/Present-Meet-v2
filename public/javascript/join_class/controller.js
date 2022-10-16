@@ -5,10 +5,28 @@ const urlParams = new URLSearchParams(url);
 const classId = urlParams.get('id');
 const token = urlParams.get('token');
 
-const joinClass = () => {
+const joinClass = async () => {
   const url = `/join/${classId}/${token}`;
-  console.log(url);
-  // getRequest(url);
+  const { msg, err } = await getRequest(url);
+  if (msg) {
+  }
 };
+
+const successJoinHandler = () => {
+  const oldDom = document.querySelector('.invitation_link');
+  if (oldDom) oldDom.remove();
+  document.body.insertAdjacentHTML('afterbegin');
+};
+
+const successDom = () => {
+  return `
+    <div class="card invitation_link">
+      <div>
+      </div>
+    </div>
+  `;
+};
+
+const failedJoinHandler = () => {};
 
 document.getElementById('join').addEventListener('click', joinClass);

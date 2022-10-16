@@ -165,6 +165,7 @@ const photoHandler = async () => {
     }
   } catch (err) {
     console.log(err);
+    errorHandler(err);
   } finally {
     preloader.style.display = 'none';
   }
@@ -342,27 +343,6 @@ const postToServer = async (e) => {
     const data = await postRequest(url, post_data);
     if (data.err) return errorHandler(data.err);
     if (data.msg) window.location.href = data.msg;
-    // const response = await fetch(`/descriptor`, {
-    //   method: 'POST',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     descriptor,
-    //     password: password.value,
-    //   }),
-    // });
-    // const data = await response.json();
-    // if (response.status === 200) {
-    //   if (data.msg) {
-    //     // return msgHandler(data.msg);
-    //   } else {
-    //     return errorHandler(data.err);
-    //   }
-    // } else {
-    //   return errorHandler(data.err);
-    // }
   } catch (err) {
     return errorHandler(err);
   } finally {

@@ -150,10 +150,8 @@ router.get(
   ensureAuthenticated,
   (req, res) => {
     const { id, expire } = req.params;
-    console.log(id);
-    console.log(expire);
     const token = createJsonToken(id, expire);
-    res.status(200).json({ token });
+    return res.status(200).json({ token });
   }
 );
 
@@ -171,15 +169,51 @@ router.get('/class-attendance/join', ensureAuthenticated, async (req, res) => {
   const subject = classroom.subject;
   const section = classroom.section;
   const year_level = classroom.year_level;
+  const type = req.user.type;
 
-  res.render('join_class', {
-    instructor,
-    id,
-    user,
-    subject,
-    section,
-    year_level,
-  });
+  if (req.user.type === 'student')
+    res.render('join_class', {
+      instructor,
+      id,
+      user,
+      subject,
+      section,
+      year_level,
+      type,
+    });
+  if (req.user.type === 'teacher') {
+    res.render('join_class', {
+      user,
+      text: `This is for student account only`,
+      type,
+    });
+  }
+});
+
+router.get('/join/:id/:token', ensureAuthenticated, async (req, res) => {
+  const id = req.params.id;
+  const token = req.params.token;
+
+  if (!id) return res.status(400).json({ err: `Link ID is empty` });
+  if (!token) return res.status(400).json({ err: `Token is empty` });
+
+  try {
+    const classroom = await Classroom.findOne({ _id: id });
+    if (!classroom)
+      return res.status(400).json({ err: `Class list does not exist` });
+
+    const verifyToken = verifyJsonToken(token);
+    if (verifyToken.data === id) {
+      classroom.students.push(req.user._id);
+      classroom.save();
+      return res.status(200).json({ msg: `You have joined the class list` });
+    } else {
+      return res.status(400).json({ err: `Token expired` });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: e });
+  }
 });
 
 module.exports = router;

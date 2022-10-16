@@ -12,19 +12,29 @@
     <div id="navbar"></div>
     <div class="card invitation_link">
       <div class="content">
-        <div class="content_message">
-          <h3>You are invited in a Class List</h3>
+        <% if(type === 'teacher') { %>
+        <div class="text" data-value="<%= type %>">
+          <h2>Hello <%= user %></h2>
+          <h3><%= text %></h3>
         </div>
+        <button class="button" onclick="location.href='/'">Home</button>
+        <% } %>
+        <!--  -->
+        <% if(type === 'student') { %>
         <div class="current_user">
-          <h4>Hello <%= user %></h4>
+          <h3>Hello student <%= user %></h3>
+        </div>
+        <div class="content_message">
+          <h2>You are invited in a Class List</h2>
         </div>
         <div class="class_information">
-          <h4>Class instructor : <%= instructor %></h4>
-          <h4>Subject : <%= subject %></h4>
-          <h4>Section : <%= section %></h4>
-          <h4>Year Level : <%= year_level %></h4>
+          <h5>Class instructor : <%= instructor %></h5>
+          <h5>Subject : <%= subject %></h5>
+          <h5>Section : <%= section %></h5>
+          <h5>Year Level : <%= year_level %></h5>
         </div>
         <button class="button" id="join">Join Class</button>
+        <% } %>
       </div>
     </div>
   </body>

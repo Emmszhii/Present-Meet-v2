@@ -184,6 +184,10 @@ body {
   position: relative;
 }
 
+.no_student {
+  text-align: center;
+}
+
 .users {
   display: flex;
   flex-direction: column;
@@ -230,7 +234,6 @@ form {
 }
 
 .group_buttons {
-  /* float: right; */
   display: flex;
   flex-direction: column;
   gap: 10px;

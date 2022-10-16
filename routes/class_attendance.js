@@ -14,6 +14,7 @@ const {
 // mongoose model
 const { Account, User } = require('../models/User');
 const { Teacher, Classroom, Attendance } = require('../models/Class');
+const { text } = require('body-parser');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
   Teacher.findOneAndUpdate(
@@ -79,6 +80,25 @@ router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
       if (classroom.length > 0)
         return res.status(200).json({ data: classroom });
     });
+});
+
+router.get('/get_students/:id', ensureAuthenticated, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const classroom = await Classroom.findOne({ _id: id }).populate({
+      path: 'students',
+    });
+    if (!classroom) return res.status(400).json({ err: `Invalid request` });
+    console.log(classroom.students);
+
+    if (classroom.students.length < 1)
+      return res.status(200).json({ msg: `Student is empty` });
+    if (classroom.students.length > 0)
+      return res.status(200).json({ data: classroom.students });
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 router.post('/update-class', ensureAuthenticated, async (req, res) => {
@@ -171,23 +191,35 @@ router.get('/class-attendance/join', ensureAuthenticated, async (req, res) => {
   const year_level = classroom.year_level;
   const type = req.user.type;
 
-  if (req.user.type === 'student')
-    res.render('join_class', {
-      instructor,
-      id,
-      user,
-      subject,
-      section,
-      year_level,
-      type,
-    });
+  let isExist = false;
+  let text = ``;
+
+  // check if user is a teacher
   if (req.user.type === 'teacher') {
-    res.render('join_class', {
-      user,
-      text: `This is for student account only`,
-      type,
-    });
+    text = 'This is for student account only';
   }
+
+  // query if user is already in the class list
+  const exist = await Classroom.findOne({
+    _id: id,
+    students: { $in: req.user._id },
+  });
+  if (exist) {
+    isExist = true;
+    text = `You are already in this class list`;
+  }
+
+  return res.render('join_class', {
+    isExist,
+    text,
+    instructor,
+    id,
+    user,
+    subject,
+    section,
+    year_level,
+    type,
+  });
 });
 
 router.get('/join/:id/:token', ensureAuthenticated, async (req, res) => {
@@ -208,12 +240,14 @@ router.get('/join/:id/:token', ensureAuthenticated, async (req, res) => {
       classroom.save();
       return res.status(200).json({ msg: `You have joined the class list` });
     } else {
-      return res.status(400).json({ err: `Token expired` });
+      return res
+        .status(400)
+        .json({ err: `Token expired, request a new link to your instructor` });
     }
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ err: e });
   }
+  return res.status(400).json({ err: e });
 });
 
 module.exports = router;

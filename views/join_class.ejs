@@ -12,6 +12,14 @@
     <div id="navbar"></div>
     <div class="card invitation_link">
       <div class="content">
+        <% if(isExist) { %>
+        <div class="text">
+          <h2>Hello <%= user %></h2>
+          <h3><%= text %></h3>
+        </div>
+        <button class="button" onclick="location.href='/'">Home</button>
+        <% } %>
+        <!--  -->
         <% if(type === 'teacher') { %>
         <div class="text" data-value="<%= type %>">
           <h2>Hello <%= user %></h2>
@@ -20,12 +28,12 @@
         <button class="button" onclick="location.href='/'">Home</button>
         <% } %>
         <!--  -->
-        <% if(type === 'student') { %>
+        <% if(type === 'student' && !isExist) { %>
         <div class="current_user">
           <h3>Hello student <%= user %></h3>
         </div>
         <div class="content_message">
-          <h2>You are invited in a Class List</h2>
+          <h2 id="msg">You are invited in a Class List</h2>
         </div>
         <div class="class_information">
           <h5>Class instructor : <%= instructor %></h5>

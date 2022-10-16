@@ -1,4 +1,4 @@
-import { classListHandler, getClassroomHandler } from './class_attendance.js';
+import { classListHandler, getClassroomHandler } from './classroom.js';
 
 document
   .getElementById('add_class_list')

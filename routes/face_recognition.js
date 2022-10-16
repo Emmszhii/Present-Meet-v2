@@ -8,17 +8,19 @@ const { Account, User, Student, Teacher } = require('../models/User');
 const { comparePassword } = require('./helpers/functions');
 
 router.get('/face-recognition', ensureAuthenticated, (req, res) => {
+  console.log(req.user);
+  console.log(req.user._id);
   res.render('face_recognition');
 });
 
 router.get('/getDescriptor', ensureAuthenticated, async (req, res) => {
   try {
     const student = await Student.findOne({ _id: req.user._id });
-
-    if (!student.descriptor)
+    console.log(student);
+    if (!student)
       return res
         .status(200)
-        .json({ warning: `Please register face recognition` });
+        .json({ warning: `Please register your face descriptor` });
 
     if (student.descriptor)
       return res.status(200).json({ descriptor: student.descriptor });
@@ -57,7 +59,8 @@ router.post('/descriptor', ensureAuthenticated, async (req, res) => {
         { upsert: true },
         (err) => {
           if (err) return console.log(err);
-          return res.status(200).json({ msg: `Successfully save to database` });
+          return res.status(200).json({ msg: `/` });
+          // res.redirect('/');
         }
       );
     } else {

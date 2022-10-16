@@ -16,6 +16,12 @@ main {
   width: 100vw;
 }
 
+.intro {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
 .card {
   background-color: white;
   padding: 20px;
@@ -171,21 +177,6 @@ select {
   background-color: black;
   color: white;
 }
-
-/* #change-pw {
-  background-color: black;
-  font-size: 18px;
-  padding: 10px 15px;
-  border: none;
-  color: #fff;
-  text-shadow: 2px 2px black;
-  bottom: 0.9rem;
-  border-radius: 8px;
-  display: flex;
-  margin: 3% auto;
-  cursor: pointer;
-}  */
-
 .footer {
   text-align: center;
   font-size: 1.2rem;

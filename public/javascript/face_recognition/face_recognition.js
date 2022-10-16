@@ -1,3 +1,5 @@
+import { postRequest } from '../helpers/helpers.js';
+
 const preloader = document.getElementById('preloader');
 const camera = document.querySelector('.attendance-camera');
 let track;
@@ -19,6 +21,9 @@ const fetchPrevDescriptor = async () => {
       refUser.push([{ descriptor: float32 }]);
       msgHandler('Previous face description is now added.');
     }
+    if (data.warning) {
+      warningHandler(data.warning);
+    }
   }
   if (res.status === 400) {
     errorHandler(data.err);
@@ -27,6 +32,7 @@ const fetchPrevDescriptor = async () => {
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
+  resetMessages();
   const backend = faceapi.tf.getBackend();
   preloader.style.display = 'block';
   const vid = document.createElement('video');
@@ -56,7 +62,6 @@ const startVideoHandler = async () => {
     .then((stream) => {
       vid.srcObject = stream;
       track = stream.getTracks();
-      resetMessages();
       if (backend === 'webgl') faceDetection(500);
 
       const text = document.getElementById('video_text');
@@ -101,6 +106,7 @@ const faceDetection = (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
+  resetMessages();
   preloader.style.display = 'block';
   const video = document.getElementById('video');
   const landmarks = document.getElementById('face_landmarks');
@@ -166,6 +172,7 @@ const photoHandler = async () => {
 
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
+  resetMessages();
   preloader.style.display = 'block';
   const video = document.getElementById('video');
   try {
@@ -219,6 +226,7 @@ const recognizeHandler = async () => {
 
 // compare the person
 const comparePerson = async (referenceImg, queryImg) => {
+  resetMessages();
   // guard clause if input is null
   if (!referenceImg) return errorHandler('Please register an image first');
   if (!queryImg) return errorHandler('Query img is invalid');
@@ -265,42 +273,34 @@ const stopVideo = () => {
 const resetMessages = () => {
   const err = document.getElementById('err');
   const msg = document.getElementById('msg');
+  const warning = document.getElementById('warning');
   if (err) err.remove();
   if (msg) msg.remove();
+  if (warning) warning.remove();
 };
 
 const errorHandler = (err) => {
-  const msg = document.getElementById('msg');
-  if (msg) {
-    msg.remove();
-  }
   const p = document.createElement('p');
   p.textContent = err;
   p.id = 'err';
 
-  const errP = document.getElementById('err');
-  if (errP) {
-    errP.innerText = err;
-  } else {
-    document.getElementById('messages').appendChild(p);
-  }
+  document.getElementById('messages').appendChild(p);
+};
+
+const warningHandler = (warning) => {
+  const p = document.createElement('p');
+  p.textContent = warning;
+  p.id = 'warning';
+
+  document.getElementById('messages').appendChild(p);
 };
 
 const msgHandler = (msg) => {
-  const err = document.getElementById('err');
-  if (err) {
-    err.remove();
-  }
   const p = document.createElement('p');
   p.textContent = msg;
   p.id = 'msg';
 
-  const msgP = document.getElementById('msg');
-  if (msgP) {
-    msgP.innerText = msg;
-  } else {
-    document.getElementById('messages').appendChild(p);
-  }
+  document.getElementById('messages').appendChild(p);
 };
 
 const createPostButton = async () => {
@@ -315,6 +315,7 @@ const createPostButton = async () => {
 };
 
 const showConfirm = () => {
+  resetMessages();
   const modal = document.getElementById('modal-confirm');
   const confirmBtn = document.getElementById('confirm');
   const cancelBtn = document.getElementById('cancel');
@@ -336,28 +337,32 @@ const postToServer = async (e) => {
   try {
     const id = refUser[0];
     const descriptor = id[0].descriptor.toString();
-
-    const response = await fetch(`/descriptor`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        descriptor,
-        password: password.value,
-      }),
-    });
-    const data = await response.json();
-    if (response.status === 200) {
-      if (data.msg) {
-        return msgHandler(data.msg);
-      } else {
-        return errorHandler(data.err);
-      }
-    } else {
-      return errorHandler(data.err);
-    }
+    const url = `/descriptor`;
+    const post_data = { descriptor, password: password.value };
+    const data = await postRequest(url, post_data);
+    if (data.err) return errorHandler(data.err);
+    if (data.msg) window.location.href = data.msg;
+    // const response = await fetch(`/descriptor`, {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     descriptor,
+    //     password: password.value,
+    //   }),
+    // });
+    // const data = await response.json();
+    // if (response.status === 200) {
+    //   if (data.msg) {
+    //     // return msgHandler(data.msg);
+    //   } else {
+    //     return errorHandler(data.err);
+    //   }
+    // } else {
+    //   return errorHandler(data.err);
+    // }
   } catch (err) {
     return errorHandler(err);
   } finally {

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const mongoose = require('mongoose');
+const passportLocalMongoose = require('passport-local-mongoose');
 const { isEmail } = require('validator');
 const { ensureAuthenticated } = require('../config/auth');
 const {
@@ -12,19 +14,19 @@ const {
 } = require('./helpers/functions');
 
 // User model
-const { Account, User, Student, Teacher } = require('../models/User');
+const {
+  Account,
+  userSchema,
+  User,
+  Student,
+  Teacher,
+} = require('../models/User');
+
+// passport local mongoose
+userSchema.plugin(passportLocalMongoose);
 
 // Login Handle
-
 router.get('/login', async (req, res) => {
-  // let redirectTo = `/`;
-
-  // if (req.session.reqUrl) {
-  //   redirectTo = req.session.reqUrl;
-  //   req.session.reqUrl = null;
-  // }
-
-  // res.redirect(redirectTo);
   if (req.isAuthenticated()) {
     res.redirect('/');
   } else {
@@ -167,9 +169,14 @@ router.post('/register', async (req, res) => {
         });
 
         await new_user.save().then((data) => {
-          console.log(data);
           req.flash('success_msg', 'You are now Registered and can log in');
-          res.redirect('/login');
+          passport.authenticate('local')(req, res, () => {
+            if (data.type === 'student') {
+              res.redirect('face-recognition');
+            } else {
+              res.redirect('class-attendance');
+            }
+          });
         });
       } catch (e) {
         console.log(e);

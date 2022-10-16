@@ -50,6 +50,17 @@ main {
   text-align: center;
 }
 
+#warning {
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: none;
+  background-color: orange;
+  font-size: 1.4rem;
+  color: white;
+  text-shadow: 1px 1px black;
+  text-align: center;
+}
+
 /* face recognition buttons */
 #home {
   top: 10px;

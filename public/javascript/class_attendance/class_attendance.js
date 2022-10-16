@@ -265,7 +265,7 @@ const studentDomHandler = async () => {
 
   const { token } = await getClassToken();
 
-  const link = `${url}/${id}/${token}`;
+  const link = `${url}/join/?id=${id}&token=${token}`;
 
   document.getElementById('link_classroom').value = link;
 

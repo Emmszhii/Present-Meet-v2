@@ -1,8 +1,8 @@
 <%- include('partials/header') %>
 <main>
   <div class="card">
+    <div class="intro">Login</div>
     <%- include('partials/messages') %>
-
     <form action="/login" id="user-login" method="post">
       <input type="email" name="email" id="email" value="" autocomplete="off" />
       <label for="email">Email</label>

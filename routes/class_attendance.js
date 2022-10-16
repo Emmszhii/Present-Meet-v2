@@ -12,7 +12,7 @@ const {
 } = require('./helpers/functions');
 
 // mongoose model
-const { Account } = require('../models/User');
+const { Account, User } = require('../models/User');
 const { Teacher, Classroom, Attendance } = require('../models/Class');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
@@ -157,9 +157,29 @@ router.get(
   }
 );
 
-router.get('/class-attendance/:id/:token', ensureAuthenticated, (req, res) => {
-  const { id, token } = req.params;
-  res.status(200).json({ msg: 'hello' });
+router.get('/class-attendance/join', ensureAuthenticated, async (req, res) => {
+  const id = req.query.id;
+  const token = req.query.token;
+
+  const classroom = await Classroom.findOne({ _id: id });
+  const teacher = await Teacher.findOne({ classroom_id: id });
+  const teacher_user = await User.findOne({ _id: teacher._id });
+  const student_user = await User.findOne({ _id: req.user._id });
+
+  const instructor = `${teacher_user.last_name}, ${teacher_user.first_name}`;
+  const user = `${student_user.last_name}, ${student_user.first_name}`;
+  const subject = classroom.subject;
+  const section = classroom.section;
+  const year_level = classroom.year_level;
+
+  res.render('join_class', {
+    instructor,
+    id,
+    user,
+    subject,
+    section,
+    year_level,
+  });
 });
 
 module.exports = router;

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Present Meet</title>
+    <link type="text/css" rel="stylesheet" href="/css/join_class.css" />
+    <script type="module" src="/javascript/join_class/controller.js"></script>
+  </head>
+  <body>
+    <div id="navbar"></div>
+    <div class="card invitation_link">
+      <div class="content">
+        <div class="content_message">
+          <h3>You are invited in a Class List</h3>
+        </div>
+        <div class="current_user">
+          <h4>Hello <%= user %></h4>
+        </div>
+        <div class="class_information">
+          <h4>Class instructor : <%= instructor %></h4>
+          <h4>Subject : <%= subject %></h4>
+          <h4>Section : <%= section %></h4>
+          <h4>Year Level : <%= year_level %></h4>
+        </div>
+        <button class="button" id="join">Join Class</button>
+      </div>
+    </div>
+  </body>
+</html>

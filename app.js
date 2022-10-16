@@ -18,6 +18,9 @@ mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => {
     console.log(`MongoDB connected...`);
+    app.listen(PORT, () => {
+      console.log(`Server is up and listening on PORT ${PORT}`);
+    });
   })
   .catch((err) => {
     console.log(err);
@@ -26,6 +29,7 @@ mongoose
 // EJS
 app.use(express.static('public'));
 app.use('/public/', express.static('./public'));
+app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 
 // BodyParser
@@ -62,8 +66,3 @@ app.use('/', require('./routes/users'));
 app.use('/', require('./routes/room'));
 app.use('/', require('./routes/face_recognition'));
 app.use('/', require('./routes/class_attendance'));
-
-// listen to the route
-app.listen(PORT, () => {
-  console.log(`Server is up and listening on PORT ${PORT}`);
-});

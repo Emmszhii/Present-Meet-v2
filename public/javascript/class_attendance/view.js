@@ -1,5 +1,6 @@
 const closeParentNode = (e) => {
   const dom = e.currentTarget.parentNode;
+  console.log(dom);
   if (dom) dom.remove();
 };
 
@@ -167,6 +168,31 @@ const loaderDom = () => {
 `;
 };
 
+const errorMessage = () => {
+  return `
+    <div class="error_msg">
+      <div class="errorMsg"></div>
+      <button class='button error_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+const successMessage = () => {
+  return `
+    <div class="success_msg">
+      <div class="successMsg"></div>
+      <button class='button success_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+const warningMessage = () => {
+  return `
+    <div class="warning_msg">
+      <div class="warningMsg"></div>
+      <button class='button warning_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+
 export {
   loaderDom,
   loaderHandler,
@@ -182,4 +208,7 @@ export {
   resetClassList,
   noListDom,
   closeParentNode,
+  errorMessage,
+  successMessage,
+  warningMessage,
 };

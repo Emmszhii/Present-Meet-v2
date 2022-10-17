@@ -42,14 +42,12 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 
   try {
     const account = await Account.findOne({ _id: req.user._id }).exec();
-    console.log(account);
     if (!account) throw `Account not found!`;
 
     const pw = await comparePassword(password, account.password);
 
     if (pw) {
       const id = await classroom.save().then((data) => data._id);
-      console.log(id);
 
       const teacher = await Teacher.findOne({ _id: req.user._id });
 
@@ -57,8 +55,7 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 
       await teacher.save().then(() => {
         return res.status(200).json({
-          data: 'ok',
-          msg: `CLass list successfully save to database`,
+          msg: `Class list successfully save to database`,
         });
       });
     } else {
@@ -90,7 +87,6 @@ router.get('/get_students/:id', ensureAuthenticated, async (req, res) => {
       path: 'students',
     });
     if (!classroom) return res.status(400).json({ err: `Invalid request` });
-    console.log(classroom.students);
 
     if (classroom.students.length < 1)
       return res.status(200).json({ msg: `Student is empty` });
@@ -150,13 +146,7 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
         { $pull: { classroom_id: id } }
       );
 
-      Teacher.findOne({ _id: req.user._id })
-        .populate('classroom_id')
-        .exec((err, data) => {
-          if (err) return res.status(400).json({ err: `Something went wrong` });
-          console.log(data);
-          return res.status(200).json({ data: data.classroom_id });
-        });
+      return res.status(200).json({ data: `Successfully deleted` });
     } else {
       res.status(200).json({ err: `Invalid password` });
     }
@@ -248,6 +238,34 @@ router.get('/join/:id/:token', ensureAuthenticated, async (req, res) => {
     console.log(e);
   }
   return res.status(400).json({ err: e });
+});
+
+// STUDENTS
+router.post('/delete-student', ensureAuthenticated, async (req, res) => {
+  const { id, password } = req.body;
+  if (validateEmpty(id)) return res.status(400).json({ err: `Id is required` });
+  if (validateEmpty(password))
+    return res.status(400).json({ err: `Password is required` });
+
+  try {
+    const account = await Account.findOne({ _id: req.user._id });
+    if (!account) throw `Invalid request`;
+
+    const booleanPassword = await comparePassword(password, account.password);
+
+    if (booleanPassword) {
+      await Classroom.updateOne({ students: id }, { $pull: { students: id } });
+
+      return res
+        .status(200)
+        .json({ msg: `Successfully deleted a student in the list` });
+    } else {
+      return res.status(400).json({ err: `Invalid password` });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({ err: e });
+  }
 });
 
 module.exports = router;

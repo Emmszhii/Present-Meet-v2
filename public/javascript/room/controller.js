@@ -18,7 +18,6 @@ import {
   hideDisplayFrame,
   settingsToggle,
 } from './room.js';
-import { get_descriptor } from './face_recognition.js';
 
 // Event Listeners
 // copy to clipboard

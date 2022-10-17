@@ -1,4 +1,5 @@
 import { getRequest, postRequest, randDarkColor } from '../helpers/helpers.js';
+import { successDom, warningDom, errorDom, deleteMsg } from './helper.js';
 import {
   students_data,
   fetchStudents,
@@ -90,24 +91,26 @@ const deleteClassListHandler = () => {
   document.getElementById('confirm').addEventListener('click', deleteClassList);
 };
 
-const deleteClassList = () => {
+const deleteClassList = async () => {
   const id = document.getElementById('main_list').dataset.value;
   const password = document.getElementById('password').value;
   const url = `/delete-class-list`;
-  postRequest(url, { id, password })
-    .then((data) => {
-      if (data.data) {
-        getClassroomHandler();
-        listToDomHandler();
-        removeChildElement();
-      } else {
-        console.log(data);
-      }
-    })
-    .catch((e) => console.log(e))
-    .finally(() => {
-      removedOnConfirm();
-    });
+  try {
+    const { data, err } = await postRequest(url, { id, password });
+    if (data) {
+      successDom(data);
+      getClassroomHandler();
+      listStudentToDom();
+      removeChildElement();
+    }
+    if (err) {
+      return errorDom(err);
+    }
+  } catch (e) {
+    return errorDom(e);
+  } finally {
+    removedOnConfirm();
+  }
 };
 
 const getClassToken = async () => {
@@ -124,7 +127,7 @@ const onChangeLinkDropDown = async (e) => {
   const id = document.getElementById('main_list').dataset.value;
   const url = window.location.href;
 
-  const link = `${url}/${id}/${token}`;
+  const link = `${url}/join/?id=${id}&token=${token}`;
   document.getElementById('link_classroom').value = link;
 };
 
@@ -229,17 +232,6 @@ const searchTeacherDataInArr = (id) => {
     }
   }
   return;
-};
-
-const searchStudentDataInArr = (id) => {
-  const data = students[0];
-  for (const [index, value] of data) {
-    console.log(index, value);
-    if (id === value._id) {
-      console.log(`found`);
-      return value;
-    }
-  }
 };
 
 const loadClassHandler = async (e) => {

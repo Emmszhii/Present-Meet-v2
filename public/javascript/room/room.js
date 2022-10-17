@@ -10,10 +10,6 @@ import {
   devices,
 } from './rtc.js';
 
-// For logging errors in agora set 3 for warnings and error to be log at console set 1 to log it all.
-AgoraRTC.setLogLevel(3);
-
-// Initializing variables
 // getting meeting Link
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
@@ -65,7 +61,17 @@ const resetTheFrames = () => {
 
 // Copy Meeting ID function
 const copyClipboard = () => {
-  navigator.clipboard.writeText(meetingId);
+  const link = window.location.href;
+  const text = `Present Meet
+A video conferencing web app with face recognition attendance.
+
+Open this link via google chrome browser in any desktop , android and ios for the features to work.
+
+Here's the invitation link :
+${link}
+
+Enjoy using our service :D`;
+  navigator.clipboard.writeText(text);
 };
 
 // message and participant toggle

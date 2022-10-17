@@ -22,7 +22,17 @@ function makeId(length) {
 
 // COPY MEETING CODE
 const copyClipboard = () => {
-  const text = linkInput.value;
+  const link = `${window.location.href}room?meetingId=${linkInput.value}`;
+  const text = `Present Meet
+A video conferencing web app with face recognition attendance.
+  
+Open this link via google chrome browser in any desktop , android and ios for the features to work.
+  
+Here's the invitation link :
+${link}
+  
+Enjoy using our service :D`;
+
   navigator.clipboard.writeText(text);
 };
 

@@ -61,6 +61,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// 404
+// app.use(function (req, res, next) {
+//   res.status(404).render('404', { title: 'Sorry, page not found' });
+// });
+
 // Routes
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/users'));

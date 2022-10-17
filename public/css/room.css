@@ -528,6 +528,7 @@ select {
   #quit-btn {
     font-size: 1rem;
     padding: 10px 15px;
+    margin: auto 5px;
   }
 }
 @media (max-width: 480px) {

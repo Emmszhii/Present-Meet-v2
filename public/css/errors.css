@@ -5,7 +5,7 @@
   color: white;
   border-radius: 5px;
   font-size: 1.2rem;
-  margin: 10px;
+  margin: 10px 0px;
 }
 
 .success {
@@ -17,7 +17,7 @@
   text-shadow: 1px 1px black;
   border-radius: 5px;
   font-size: 1.2rem;
-  margin: 10px;
+  margin: 10px 0px;
 }
 
 .warning {
@@ -26,8 +26,8 @@
   border: none;
   background-color: orange;
   color: black;
-  /* text-shadow: 2px 2px white; */
+  text-shadow: 1px 1px white;
   border-radius: 5px;
   font-size: 1.2rem;
-  margin: 10px;
+  margin: 10px 0px;
 }

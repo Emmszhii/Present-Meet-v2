@@ -76,13 +76,13 @@ const startCamera = () => {
 
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
     video.srcObject = stream;
-    if (backend === 'webgl') face_detection(backend);
+    if (backend === 'webgl') face_detection();
     track = stream.getTracks();
   });
 };
 
-const face_detection = (backend) => {
-  console.log(backend);
+const face_detection = () => {
+  console.log(`run`);
 };
 
 const resetCamera = () => {
@@ -184,6 +184,7 @@ const sendAttendance = async () => {
 
 const faceRecognitionHandler = () => {
   document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
+
   startCamera();
 
   interval = setInterval(updateCountdown, 1000);

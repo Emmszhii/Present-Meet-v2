@@ -493,7 +493,7 @@ select {
     left: 30%;
   }
   .rightBtn {
-    width: 15%;
+    width: 25%;
   }
   .videoLink {
     width: 20%;
@@ -507,16 +507,16 @@ select {
     height: 85vh;
   }
   .middleBtn {
-    width: 50%;
+    width: 40%;
   }
   .rightBtn {
-    width: 20%;
+    width: 28%;
   }
   .videoLink {
     width: 30%;
   }
   .mainBtn {
-    left: 55%;
+    left: 50%;
   }
   .settings-modal {
     width: 80%;
@@ -524,14 +524,22 @@ select {
   #screen-btn {
     display: none;
   }
-}
-@media (max-width: 480px) {
   #join-btn,
   #quit-btn {
-    font-size: 14px;
+    font-size: 1rem;
     padding: 10px 15px;
   }
+}
+@media (max-width: 480px) {
   .settings-modal {
-    width: 70%;
+    width: 90%;
+  }
+  .videoLink {
+    width: 28%;
+  }
+  #join-btn,
+  #quit-btn {
+    font-size: 0.9rem;
+    padding: 5px 10px;
   }
 }

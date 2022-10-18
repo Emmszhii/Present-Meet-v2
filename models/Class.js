@@ -12,12 +12,10 @@ const teacherSchema = new mongoose.Schema(
 
 const classroomSchema = new mongoose.Schema(
   {
-    attendance_id: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
-    ],
     subject: String,
     year_level: String,
     section: String,
+    attendance_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }

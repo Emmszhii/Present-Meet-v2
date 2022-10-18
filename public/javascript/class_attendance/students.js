@@ -116,7 +116,6 @@ const deleteStudent = async (e) => {
     if (msg) {
       successDom(msg);
       getClassroomHandler();
-      listStudentToDom();
       removeChildElement();
     }
     if (err) errorDom(err);

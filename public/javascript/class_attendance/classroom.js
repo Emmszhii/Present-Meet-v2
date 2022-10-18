@@ -70,12 +70,11 @@ const savedNewClassList = async () => {
     if (data) {
       successDom(msg);
       getClassroomHandler();
-      listToDomHandler();
       removeChildElement();
     }
     if (err) errorDom(err);
   } catch (e) {
-    errorDom(e);
+    console.log(e);
   } finally {
     removedOnConfirm();
   }
@@ -94,18 +93,17 @@ const deleteClassList = async () => {
   const password = document.getElementById('password').value;
   const url = `/delete-class-list`;
   try {
-    const { data, err } = await postRequest(url, { id, password });
+    const { data, msg, err } = await postRequest(url, { id, password });
     if (data) {
-      successDom(data);
+      successDom(msg);
       getClassroomHandler();
-      listStudentToDom();
       removeChildElement();
     }
     if (err) {
-      return errorDom(err);
+      errorDom(err);
     }
   } catch (e) {
-    return errorDom(e);
+    console.log(e);
   } finally {
     removedOnConfirm();
   }
@@ -209,12 +207,11 @@ const updateClass = async () => {
     if (data) {
       successDom(msg);
       getClassroomHandler();
-      listToDomHandler();
       removeChildElement();
     }
     if (err) errorDom(err);
   } catch (e) {
-    errorDom(e);
+    console.log(e);
   } finally {
     removedOnConfirm();
   }
@@ -269,9 +266,11 @@ const listToDomHandler = () => {
 };
 
 const listTeacherToDom = () => {
+  console.log(teacher_data);
   if (teacher_data.length > 1) teacher_data.shift();
   const data = teacher_data[0];
-
+  console.log(data);
+  console.log(data.length);
   for (let i = 0; data.length > i; i++) {
     const color = randDarkColor();
 
@@ -293,17 +292,19 @@ const getClassroomHandler = async () => {
   try {
     const { data, msg, err } = await getRequest(url);
     if (msg) {
-      return noListDom(msg);
+      resetClassList();
+      noListDom(msg);
     }
     if (data) {
       teacher_data.push(data);
+      console.log(teacher_data);
       listToDomHandler();
     }
     if (err) {
       errorDom(err);
     }
   } catch (e) {
-    errorDom(e);
+    console.log(e);
   } finally {
     loaderHandler();
   }

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
 const { createJsonToken, verifyJsonToken } = require('../config/jwt');
+
 const {
   capitalize,
   validateName,
@@ -10,19 +11,19 @@ const {
   validateEmpty,
   comparePassword,
 } = require('./helpers/functions');
+const { ObjectId } = require('mongodb');
 
 // mongoose model
 const { Account, User } = require('../models/User');
 const { Teacher, Classroom, Attendance } = require('../models/Class');
-const { text } = require('body-parser');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
+  if (req.user.type !== 'teacher') return res.redirect('*');
   Teacher.findOneAndUpdate(
     { _id: req.user._id },
     { _id: req.user._id },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   ).then((err, result) => {});
-
   res.render('class_attendance');
 });
 
@@ -42,7 +43,7 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 
   try {
     const account = await Account.findOne({ _id: req.user._id }).exec();
-    if (!account) throw `Account not found!`;
+    if (!account) return res.status(400).json({ err: `Invalid Request` });
 
     const pw = await comparePassword(password, account.password);
 
@@ -64,7 +65,6 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ err: e });
   }
 });
 
@@ -141,21 +141,23 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
   if (!password) return res.status(400).json({ err: 'Password is required' });
 
   try {
-    const account = await Account.findOne({ _id: req.user._id }).exec();
-    if (!account) throw `User not found`;
+    const _id = ObjectId(id);
+    const account = await Account.findOne({ _id: req.user._id });
+    if (!account) return res.status(400).json({ err: `Invalid request` });
+
     const pw = await comparePassword(password, account.password);
 
     if (pw) {
-      await Classroom.findOneAndRemove({ _id: id }, { new: false });
+      await Classroom.findOneAndRemove({ _id: _id });
 
       await Teacher.updateOne(
-        { classroom_id: id },
-        { $pull: { classroom_id: id } }
+        { classroom_id: _id },
+        { $pull: { classroom_id: _id } }
       );
 
-      return res.status(200).json({ data: `Successfully deleted` });
+      return res.status(200).json({ data: `ok`, msg: `Successfully deleted` });
     } else {
-      res.status(200).json({ err: `Invalid password` });
+      return res.status(200).json({ err: `Invalid password` });
     }
   } catch (e) {
     console.log(e);

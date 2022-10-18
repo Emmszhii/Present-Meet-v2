@@ -22,6 +22,7 @@ import {
   createSelectElement,
   settingsHandler,
 } from './room.js';
+import { getRequest, postRequest } from '../helpers/helpers.js';
 
 // User Local Data and Tokens
 const userData = {};
@@ -76,42 +77,55 @@ const player = (uid, name) => {
     `;
 };
 
+const getRtcToken = async () => {
+  const url = `/rtc/${meetingId}/publisher/uid/${userData.rtcId}`;
+  const data = await getRequest(url);
+  return data;
+};
+
+const getRtmToken = async () => {
+  const url = `/rtm/${userData.rtmId}`;
+  const data = await getRequest(url);
+  return data;
+};
+
 const data_init = async () => {
-  try {
-    fetch('/getInfo')
-      .then((resp) => {
-        return resp.json();
-      })
-      .then((data) => {
-        userData.type = data.user.type;
-        userData.APP_ID = data.AGORA_APP_ID;
-        userData.firstName = data.user.first_name;
-        userData.lastName = data.user.last_name;
-        userData.fullName = `${data.user.first_name} ${data.user.last_name}`;
-        userData.id = data.user._id;
-        userData.rtcId = data.user._id;
-        userData.rtmId = data.user._id;
-        return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
-      })
-      .then((resp) => {
-        return resp.json();
-      })
-      .then((data) => {
-        userData.rtcToken = data.rtcToken;
-        return fetch(`/rtm/${userData.rtmId}`);
-      })
-      .then((resp) => {
-        return resp.json();
-      })
-      .then((data) => {
-        userData.rtmToken = data.rtmToken;
-      })
-      .finally(() => {
-        joinRoomInit();
-      });
-  } catch (e) {
-    console.log(e);
-  }
+  fetch('/getInfo')
+    .then((resp) => {
+      return resp.json();
+    })
+    .then((data) => {
+      const { _id, first_name, middle_name, last_name, type, AGORA_APP_ID } =
+        data;
+      userData.type = type;
+      userData.APP_ID = AGORA_APP_ID;
+      userData.firstName = first_name;
+      userData.lastName = last_name;
+      userData.fullName = `${first_name} ${last_name}`;
+      userData.id = _id;
+      userData.rtcId = _id;
+      userData.rtmId = _id;
+      return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
+    })
+    .then((resp) => {
+      return resp.json();
+    })
+    .then((data) => {
+      userData.rtcToken = data.rtcToken;
+      return fetch(`/rtm/${userData.rtmId}`);
+    })
+    .then((resp) => {
+      return resp.json();
+    })
+    .then((data) => {
+      userData.rtmToken = data.rtmToken;
+    })
+    .catch((e) => {
+      console.log(e);
+    })
+    .finally(() => {
+      joinRoomInit();
+    });
 };
 
 // initializing the agora sdk for joining the room and validating the user token for security joining
@@ -177,10 +191,10 @@ const joinRoomInit = async () => {
 };
 
 const handleTokenExpire = async () => {
-  alert(
-    `token will expire and user will be redirect at homepage at 30 seconds`
-  );
-  window.location.href = '/';
+  // alert(
+  //   `token will expire and user will be redirect at homepage at 30 seconds`
+  // );
+  // window.location.href = '/';
 };
 
 // user joined the meeting handler
@@ -449,23 +463,25 @@ const joinStream = async () => {
   document.getElementsByClassName('mainBtn')[0].style.display = 'none';
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
   document.getElementById('settings-btn').style.display = 'none';
-
-  // initialize local tracks
-  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
-
-  // handle error on video track
-  await rtc.localTracks[0].on('track-ended', () => {});
-  await rtc.localTracks[1].on('track-ended', () => {});
-
-  // add the player into the DOM
-  document
-    .getElementById('streams__container')
-    .insertAdjacentHTML('beforeend', player(userData.rtcId, userData.fullName));
-  document
-    .getElementById(`user-container-${userData.rtcId}`)
-    .addEventListener('click', expandVideoFrame);
-
   try {
+    // initialize local tracks
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
+
+    // handle error on video track
+    await rtc.localTracks[0].on('track-ended', audioTrackEnded);
+    await rtc.localTracks[1].on('track-ended', videoTrackEnded);
+
+    // add the player into the DOM
+    document
+      .getElementById('streams__container')
+      .insertAdjacentHTML(
+        'beforeend',
+        player(userData.rtcId, userData.fullName)
+      );
+    document
+      .getElementById(`user-container-${userData.rtcId}`)
+      .addEventListener('click', expandVideoFrame);
+
     if (device.localAudio) {
       await rtc.localTracks[0].setDevice(device.localAudio).then(() => {
         rtc.localTracks[0].setMuted(true);
@@ -480,20 +496,24 @@ const joinStream = async () => {
     } else {
       await rtc.localTracks[1].setMuted(true);
     }
-  } catch (err) {
-    console.log(err);
-  } finally {
     // play the local video and audio to the dom
     rtc.localTracks[1].play(`user-${userData.rtcId}`);
     // publish the video for other users to see
     // localTracks[0] for audio and localTracks[1] for the video
-    await rtc.client
-      .publish([rtc.localTracks[0], rtc.localTracks[1]])
-      .finally(() => {
-        // loader done
-        loader.style.display = 'none';
-      });
+    await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    loader.style.display = 'none';
   }
+};
+
+const audioTrackEnded = () => {
+  console.log(`audio track ended`);
+};
+
+const videoTrackEnded = () => {
+  console.log(`video track ended`);
 };
 
 // leave stream

@@ -168,6 +168,18 @@ const refreshDeviceModal = () => {
   settingsHandler();
 };
 
+const permissionDeniedDom = () => {
+  const dom = document.querySelector('.text_settings');
+  const camBtn = document.getElementById('camera-btn');
+  const micBtn = document.getElementById('mic-btn');
+
+  if (camBtn) camBtn.title = 'Allow Camera permission first';
+  if (micBtn) micBtn.title = 'Allow Mic permission first';
+
+  if (dom)
+    dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
+};
+
 const settings_dom = () => {
   return `
     <div id="modal-settings" class="modal-settings">
@@ -178,7 +190,7 @@ const settings_dom = () => {
         <h3>Settings</h3>
         <div id="video-settings"></div>
         <div id="devices-settings"></div>
-        <span>Here's the devices available in your setup!</span>
+        <span class='text_settings'>Here's the devices available in your setup!</span>
         <button class="button_box" type="button" id="setup-btn">Done</button>
       </div>
     </div>
@@ -197,14 +209,17 @@ const settingsHandler = async () => {
 
     document.querySelector('.video__container').style.cursor = 'auto';
   }
-  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-  rtc.localTracks[1].play(`user-${userData.rtcId}`);
+  try {
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+    rtc.localTracks[1].play(`user-${userData.rtcId}`);
+  } catch (e) {
+    permissionDeniedDom();
+  }
 
   devices().then(() => {
     if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
     if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
 
-    console.log(video_devices, audio_devices);
     const videoDom = document.getElementById('Video');
     const audioDom = document.getElementById('Audio');
     if (!videoDom) {

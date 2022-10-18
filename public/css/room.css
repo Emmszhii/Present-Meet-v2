@@ -99,6 +99,14 @@ body {
   background-color: green;
   color: black;
 }
+
+.close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+}
+
 .copy {
   color: #fff;
   background-color: #494949;

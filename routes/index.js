@@ -16,13 +16,11 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
   const { _id, first_name, middle_name, last_name, type } = req.user;
   try {
     res.status(200).json({
-      user: {
-        _id,
-        first_name,
-        middle_name,
-        last_name,
-        type,
-      },
+      _id,
+      first_name,
+      middle_name,
+      last_name,
+      type,
       AGORA_APP_ID: process.env.AGORA_APP_ID,
     });
   } catch (e) {

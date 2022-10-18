@@ -39,21 +39,29 @@ const fetchStudents = async (id) => {
 };
 
 const listStudentToDom = async (id) => {
-  const { data, msg } = await fetchStudents(id);
-  if (data) students_data.push(data);
+  loaderHandler();
+  try {
+    const { data, msg } = await fetchStudents(id);
+    if (data) students_data.push(data);
 
-  if (students_data.length > 1) students_data.shift();
+    if (students_data.length > 1) students_data.shift();
 
-  const domStudents = document.getElementById('students_table');
+    const domStudents = document.getElementById('students_table');
 
-  if (msg) {
-    const dom = document.querySelector('no_student');
-    if (!dom) domStudents.insertAdjacentHTML('beforeend', msgStudentTable(msg));
-  }
+    if (msg) {
+      const dom = document.querySelector('no_student');
+      if (!dom)
+        domStudents.insertAdjacentHTML('beforeend', msgStudentTable(msg));
+    }
 
-  if (data) {
-    domStudents.insertAdjacentHTML('beforeend', addTable());
-    studentTableData(students_data);
+    if (data) {
+      domStudents.insertAdjacentHTML('beforeend', addTable());
+      studentTableData(students_data);
+    }
+  } catch (e) {
+    errorDom(e);
+  } finally {
+    loaderHandler();
   }
 };
 
@@ -62,14 +70,13 @@ const studentTableData = (data) => {
   let dataHtml = ``;
   let n = 0;
   const copyData = data[0];
-  console.log(copyData);
   for (const [index, student] of copyData.entries()) {
     n++;
     dataHtml += `
     <tr>
+      <td>${student.last_name}</td>
       <td>${student.first_name}</td>
       <td>${student.middle_name}</td>
-      <td>${student.last_name}</td>
       <td class="no_border">
       <button class='button' id="delete_${index}" value="${student._id}">
         <i class='fa-solid fa-x'>
@@ -80,7 +87,6 @@ const studentTableData = (data) => {
     `;
   }
   tableBody.innerHTML = dataHtml;
-  // students_data = data;
   for (let i = 0; n > i; i++) {
     document
       .getElementById(`delete_${i}`)
@@ -115,7 +121,6 @@ const deleteStudent = async (e) => {
     }
     if (err) errorDom(err);
   } catch (e) {
-    console.log(e);
     errorDom(e);
   } finally {
     loaderHandler();

@@ -51,36 +51,34 @@ const saveClassList = () => {
     .addEventListener('click', savedNewClassList);
 };
 
-const savedNewClassList = () => {
+const savedNewClassList = async () => {
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
 
   const password = document.getElementById('password').value;
-  const data = {
+  const postData = {
     subject,
     year_level,
     section,
     password,
   };
   const url = '/add-class-list';
-  postRequest(url, data)
-    .then((data) => {
-      if (data.data) {
-        getClassroomHandler();
-        listToDomHandler();
-        removeChildElement();
-      }
-      if (data.err) {
-        console.log(data.err);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    })
-    .finally(() => {
-      removedOnConfirm();
-    });
+
+  try {
+    const { data, err, msg } = await postRequest(url, postData);
+    if (data) {
+      successDom(msg);
+      getClassroomHandler();
+      listToDomHandler();
+      removeChildElement();
+    }
+    if (err) errorDom(err);
+  } catch (e) {
+    errorDom(e);
+  } finally {
+    removedOnConfirm();
+  }
 };
 
 const deleteClassListHandler = () => {
@@ -134,7 +132,6 @@ const onChangeLinkDropDown = async (e) => {
 const copyLink = () => {
   const dom = document.getElementById('link_classroom');
   navigator.clipboard.writeText(dom.value);
-  console.log(dom.value);
 };
 
 const studentDomHandler = async () => {
@@ -190,7 +187,6 @@ const editClassHandler = () => {
 };
 
 const updateClassHandler = () => {
-  // loaderHandler();
   document.body.insertAdjacentHTML('beforeend', onConfirm());
 
   document.getElementById('cancel').addEventListener('click', removedOnConfirm);
@@ -198,7 +194,7 @@ const updateClassHandler = () => {
   document.getElementById('confirm').addEventListener('click', updateClass);
 };
 
-const updateClass = () => {
+const updateClass = async () => {
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
@@ -206,22 +202,22 @@ const updateClass = () => {
   const id = document.getElementById('add_list').dataset.value;
 
   const url = `/update-class`;
-  postRequest(url, { id, subject, year_level, section, password })
-    .then((data) => {
-      if (data.data) {
-        getClassroomHandler();
-        listToDomHandler();
-        removeChildElement();
-      } else {
-        console.log(data);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    })
-    .finally(() => {
-      removedOnConfirm();
-    });
+  const postData = { id, subject, year_level, section, password };
+  try {
+    const update = await postRequest(url, postData);
+    const { data, msg, err } = await update;
+    if (data) {
+      successDom(msg);
+      getClassroomHandler();
+      listToDomHandler();
+      removeChildElement();
+    }
+    if (err) errorDom(err);
+  } catch (e) {
+    errorDom(e);
+  } finally {
+    removedOnConfirm();
+  }
 };
 
 const searchTeacherDataInArr = (id) => {
@@ -296,19 +292,18 @@ const getClassroomHandler = async () => {
 
   try {
     const { data, msg, err } = await getRequest(url);
-    console.log(data, msg, err);
     if (msg) {
       return noListDom(msg);
     }
     if (data) {
       teacher_data.push(data);
-      return listToDomHandler();
+      listToDomHandler();
     }
     if (err) {
-      console.log(e);
+      errorDom(err);
     }
   } catch (e) {
-    console.log(e);
+    errorDom(e);
   } finally {
     loaderHandler();
   }

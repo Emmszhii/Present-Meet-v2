@@ -55,6 +55,7 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 
       await teacher.save().then(() => {
         return res.status(200).json({
+          data: `ok`,
           msg: `Class list successfully save to database`,
         });
       });
@@ -68,15 +69,19 @@ router.post('/add-class-list', ensureAuthenticated, async (req, res) => {
 });
 
 router.get(`/get_classroom`, ensureAuthenticated, (req, res) => {
-  Teacher.findOne({ _id: req.user._id })
-    .populate({ path: 'classroom_id' })
-    .then((data) => {
-      const classroom = data.classroom_id;
-      if (classroom.length < 1)
-        return res.status(200).json({ msg: `Class is empty` });
-      if (classroom.length > 0)
-        return res.status(200).json({ data: classroom });
-    });
+  if (req.user.type === 'teacher') {
+    Teacher.findOne({ _id: req.user._id })
+      .populate({ path: 'classroom_id' })
+      .then((data) => {
+        const classroom = data.classroom_id;
+        if (classroom.length < 1)
+          return res.status(200).json({ msg: `Class is empty` });
+        if (classroom.length > 0)
+          return res.status(200).json({ data: classroom });
+      });
+  } else {
+    return res.status(400).json({ err: `Request is invalid` });
+  }
 });
 
 router.get('/get_students/:id', ensureAuthenticated, async (req, res) => {
@@ -85,7 +90,9 @@ router.get('/get_students/:id', ensureAuthenticated, async (req, res) => {
   try {
     const classroom = await Classroom.findOne({ _id: id }).populate({
       path: 'students',
+      options: { sort: { last_name: 1, first_name: 1 } },
     });
+
     if (!classroom) return res.status(400).json({ err: `Invalid request` });
 
     if (classroom.students.length < 1)

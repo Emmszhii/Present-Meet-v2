@@ -49,4 +49,93 @@ function generateLightColorHex() {
   return color;
 }
 
+// error, success ,warning functions & view
+const closeParentNode = (e) => {
+  const dom = e.currentTarget.parentNode;
+  if (dom) dom.remove();
+};
+
+const body = document.querySelector('body');
+
+const errorMessage = () => {
+  return `
+    <div class="error_msg">
+      <div class="errorMsg"></div>
+      <button class='button error_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+const successMessage = () => {
+  return `
+    <div class="success_msg">
+      <div class="successMsg"></div>
+      <button class='button success_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+const warningMessage = () => {
+  return `
+    <div class="warning_msg">
+      <div class="warningMsg"></div>
+      <button class='button warning_btn'><span>&times;</span></button>
+    </div>
+  `;
+};
+const successDom = (msg) => {
+  deleteMsg();
+  const addDom = document.querySelector('.success_msg');
+  let domText = document.querySelector('.successMsg');
+
+  if (!addDom) {
+    body.insertAdjacentHTML('beforeend', successMessage());
+    domText = document.querySelector('.successMsg');
+    domText.textContent = msg;
+    const btn = document.querySelector('.success_btn');
+    btn.addEventListener('click', closeParentNode);
+  } else {
+    domText.textContent = msg;
+  }
+};
+
+const warningDom = (msg) => {
+  deleteMsg();
+  const addDom = document.querySelector('.warning_msg');
+  let domText = document.querySelector('.warningMsg');
+
+  if (!addDom) {
+    body.insertAdjacentHTML('beforeend', warningMessage());
+    domText = document.querySelector('.warningMsg');
+    domText.textContent = msg;
+    const btn = document.querySelector('.warning_btn');
+    btn.addEventListener('click', closeParentNode);
+  } else {
+    domText.textContent = msg;
+  }
+};
+
+const errorDom = (msg) => {
+  deleteMsg();
+  const addDom = document.querySelector('.error_msg');
+  let domText = document.querySelector('.errorMsg');
+  if (!addDom) {
+    body.insertAdjacentHTML('beforeend', errorMessage());
+    domText = document.querySelector('.errorMsg');
+    domText.textContent = msg;
+    const btn = document.querySelector('.error_btn');
+    btn.addEventListener('click', closeParentNode);
+  } else {
+    domText.textContent = msg;
+  }
+};
+
+const deleteMsg = () => {
+  const errDom = document.querySelector('.error_msg');
+  const warnDom = document.querySelector('.warning_msg');
+  const successDom = document.querySelector('.success_msg');
+
+  if (errDom) errDom.remove();
+  if (warnDom) warnDom.remove();
+  if (successDom) successDom.remove();
+};
+
 export { postRequest, getRequest, randDarkColor, generateLightColorHex };

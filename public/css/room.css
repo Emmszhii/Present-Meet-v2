@@ -4,6 +4,30 @@
   margin: 0px;
   padding: 0px;
 }
+.warning_msg,
+.success_msg,
+.error_msg {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: absolute;
+  padding: 10px;
+  right: 10px;
+  bottom: 10px;
+  color: white;
+  text-shadow: 2px 2px black;
+}
+
+.warning_msg {
+  background-color: orange;
+}
+
+.success_msg {
+  background-color: green;
+}
+.error_msg {
+  background-color: red;
+}
 body {
   background-color: #000000;
 }
@@ -148,22 +172,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-/* End ScrollBar */
-/* Users Stream */
-/* .streams {
-  z-index: 1;
-  margin: 0 auto;
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-57%, -49%);
-  height: 90vh;
-  width: 86%;
-  overflow: hidden;
-  overflow-y: auto;
-  text-align: justify;
-  float: left;
-} */
 .streams {
   z-index: 1;
   margin: 0 auto;

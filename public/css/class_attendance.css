@@ -51,19 +51,14 @@ body {
 
 .warning_msg {
   background-color: orange;
-  /* color: white;
-  text-shadow: 2px 2px black; */
 }
 
 .success_msg {
   background-color: green;
-  /* color: white;
-  text-shadow: 2px 2px black; */
+
 }
 .error_msg {
   background-color: red;
-  /* color: white;
-  text-shadow: 2px 2px black; */
 }
 
 #preloader {

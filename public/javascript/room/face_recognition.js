@@ -34,6 +34,62 @@ const classListDom = () => {
   `;
 };
 
+// Teacher host
+const attendanceBtn = () => {
+  return `
+    <button class='button' id='attendance-btn'><i class='fa-solid fa-clipboard-user'></i></button>
+  `;
+};
+
+// attendance teacher handler
+const makeAttendanceHandler = (e) => {
+  document
+    .querySelector('.rightBtn')
+    .insertAdjacentHTML('afterbegin', attendanceBtn());
+
+  document
+    .getElementById('attendance-btn')
+    .addEventListener('click', attendance);
+};
+
+const attendance = async () => {
+  const btn = document.getElementById('attendance-btn');
+
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+
+    // rtm.channel.sendMessage({
+    //   text: JSON.stringify({ type: 'take_attendance_off' }),
+    // });
+  } else {
+    btn.classList.add('active');
+    // const data = await get_classroom();
+    // console.log(data);
+    // rtm.channel.sendMessage({
+    //   text: JSON.stringify({ type: 'take_attendance' }),
+    // });
+  }
+};
+
+const attendanceDom = () => {};
+
+const get_classroom = async () => {
+  const url = `/get_classroom`;
+  const data = await getRequest(url);
+  return data;
+};
+
+// Student
+const sendAttendance = async () => {
+  rtm.channel.sendMessage({
+    text: JSON.stringify({
+      type: 'attendance',
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+    }),
+  });
+};
+
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
   let seconds = time % 60;
@@ -127,6 +183,21 @@ const createCanvas = () => {
   }
 };
 
+const faceRecognitionHandler = () => {
+  document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
+
+  startCamera();
+
+  interval = setInterval(updateCountdown, 1000);
+
+  document
+    .getElementById('face_camera_btn')
+    .addEventListener('click', resetCamera);
+  document
+    .getElementById('face_recognize_btn')
+    .addEventListener('click', faceRecognized);
+};
+
 const faceRecognized = async () => {
   if (!userData.descriptor) return;
 
@@ -172,63 +243,4 @@ const get_descriptor = async () => {
   return data;
 };
 
-const sendAttendance = async () => {
-  rtm.channel.sendMessage({
-    text: JSON.stringify({
-      type: 'attendance',
-      first_name: userData.firstName,
-      last_name: userData.lastName,
-    }),
-  });
-};
-
-const faceRecognitionHandler = () => {
-  document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
-
-  startCamera();
-
-  interval = setInterval(updateCountdown, 1000);
-
-  document
-    .getElementById('face_camera_btn')
-    .addEventListener('click', resetCamera);
-  document
-    .getElementById('face_recognize_btn')
-    .addEventListener('click', faceRecognized);
-};
-
-// Teacher host
-const attendanceBtn = () => {
-  return `
-    <button class='button' id='attendance-btn'><i class='fa-solid fa-clipboard-user'></i></button>
-  `;
-};
-
-// attendance teacher, host handler
-const makeAttendance = (e) => {
-  document
-    .querySelector('.rightBtn')
-    .insertAdjacentHTML('afterbegin', attendanceBtn());
-
-  document
-    .getElementById('attendance-btn')
-    .addEventListener('click', attendance);
-};
-
-const attendance = () => {
-  const btn = document.getElementById('attendance-btn');
-
-  if (btn.classList.contains('active')) {
-    btn.classList.remove('active');
-    rtm.channel.sendMessage({
-      text: JSON.stringify({ type: 'take_attendance_off' }),
-    });
-  } else {
-    btn.classList.add('active');
-    rtm.channel.sendMessage({
-      text: JSON.stringify({ type: 'take_attendance' }),
-    });
-  }
-};
-
-export { faceRecognitionHandler, makeAttendance, get_descriptor };
+export { faceRecognitionHandler, makeAttendanceHandler, get_descriptor };

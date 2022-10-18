@@ -1,6 +1,5 @@
 const closeParentNode = (e) => {
   const dom = e.currentTarget.parentNode;
-  console.log(dom);
   if (dom) dom.remove();
 };
 
@@ -114,9 +113,9 @@ const addTable = () => {
     <table>
       <thead>
         <tr>
+          <th>Last Name</th>
           <th>First Name</th>
           <th>Middle Name</th>
-          <th>Last Name</th>
           <th class="no_border"></th>
         </tr>
       </thead>

@@ -3,7 +3,7 @@ const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
 const loader = document.getElementById('preloader');
 
-import { makeAttendance } from './face_recognition.js';
+import { makeAttendanceHandler } from './face_recognition.js';
 
 import {
   users,
@@ -11,7 +11,6 @@ import {
   handleChannelMessage,
   handleMemberJoin,
   handleMemberLeft,
-  addBotMessageToDom,
 } from './rtm.js';
 
 import {
@@ -118,7 +117,7 @@ const data_init = async () => {
 // initializing the agora sdk for joining the room and validating the user token for security joining
 const joinRoomInit = async () => {
   if (userData.type === 'teacher' || userData.type === 'host') {
-    makeAttendance();
+    makeAttendanceHandler();
   }
 
   // letting rtc.client become the instance with APP_ID
@@ -154,7 +153,6 @@ const joinRoomInit = async () => {
 
   // get all members in render it to the dom
   getMembers();
-  // addBotMessageToDom(`Welcome to the room ${userData.fullName}! 🤗`);
 
   // initialize setting the rtc
   rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });

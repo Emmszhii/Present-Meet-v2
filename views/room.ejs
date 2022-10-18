@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/room.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
@@ -12,6 +11,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="stylesheet" href="css/room.css" />
     <title>Present Meet</title>
     <script
       defer
@@ -42,19 +42,17 @@
         </section>
       </div>
 
-      <div class="modal-message">
-        <section id="messages__container">
-          <div id="messages"></div>
-          <form id="message__form">
-            <input
-              type="text"
-              name="message"
-              placeholder="Send a message...."
-              autocomplete="off"
-            />
-          </form>
-        </section>
-      </div>
+      <section id="messages__container">
+        <div id="messages"></div>
+        <form id="message__form">
+          <input
+            type="text"
+            name="message"
+            placeholder="Send a message...."
+            autocomplete="off"
+          />
+        </form>
+      </section>
 
       <section id="members__container" style="display: block">
         <div id="members__header">

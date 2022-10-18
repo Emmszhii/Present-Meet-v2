@@ -21,7 +21,7 @@ const handleMemberJoin = async (MemberId) => {
   updateMemberTotal(members);
 
   const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
-  addBotMessageToDom(`Welcome to the room ${name}! 🤗`);
+  console.log(`User ${name} will join the room`);
 };
 
 // add member dom when user join
@@ -73,7 +73,7 @@ const removeMemberFromDom = async (MemberId) => {
 
   memberWrapper.remove();
 
-  addBotMessageToDom(`${name} has left the room!`);
+  // addBotMessageToDom(`${name} has left the room!`);
 };
 
 // get members function
@@ -194,30 +194,6 @@ const addMessageToDom = (name, message) => {
   }
 };
 
-// bot message
-const addBotMessageToDom = (botMessage) => {
-  const messagesWrapper = document.getElementById('messages');
-
-  const newMessage = `
-    <div class='message__wrapper'>
-      <div class='message__body__bot'>
-        <strong class="message__author__bot">👽 Present Meet Bot</strong>
-        <p class='message__text__bot'>${botMessage}</p>
-      </div>
-    </div>
-  `;
-
-  messagesWrapper.insertAdjacentHTML('beforeend', newMessage);
-
-  const lastMessage = document.querySelector(
-    '#messages .message__wrapper:last-child'
-  );
-
-  if (lastMessage) {
-    lastMessage.scrollIntoView();
-  }
-};
-
 // rtm leave channel async function
 const leaveChannel = async () => {
   await rtm.channel.leave();
@@ -231,7 +207,6 @@ export {
   handleChannelMessage,
   handleMemberJoin,
   handleMemberLeft,
-  addBotMessageToDom,
   addMemberToDom,
   addMessageToDom,
   leaveChannel,

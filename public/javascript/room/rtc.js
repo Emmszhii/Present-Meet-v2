@@ -3,7 +3,7 @@ const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
 const loader = document.getElementById('preloader');
 
-import { makeAttendanceHandler } from './face_recognition.js';
+import { makeAttendanceHandler } from './attendance.js';
 
 import {
   users,
@@ -11,6 +11,7 @@ import {
   handleChannelMessage,
   handleMemberJoin,
   handleMemberLeft,
+  handleRtmTokenExpire,
 } from './rtm.js';
 
 import {
@@ -83,12 +84,6 @@ const getRtcToken = async () => {
   return data;
 };
 
-const getRtmToken = async () => {
-  const url = `/rtm/${userData.rtmId}`;
-  const data = await getRequest(url);
-  return data;
-};
-
 const data_init = async () => {
   fetch('/getInfo')
     .then((resp) => {
@@ -105,14 +100,14 @@ const data_init = async () => {
       userData.id = _id;
       userData.rtcId = _id;
       userData.rtmId = _id;
-      return fetch(`/rtc/${meetingId}/publisher/uid/${userData.rtcId}`);
+      return fetch(`/rtc/${meetingId}/publisher/uid`);
     })
     .then((resp) => {
       return resp.json();
     })
     .then((data) => {
       userData.rtcToken = data.rtcToken;
-      return fetch(`/rtm/${userData.rtmId}`);
+      return fetch(`/rtm`);
     })
     .then((resp) => {
       return resp.json();
@@ -161,12 +156,15 @@ const joinRoomInit = async () => {
   await rtm.channel.join();
 
   // setting the rtm channel on with handlers
-  rtm.channel.on('MemberJoined', handleMemberJoin);
-  rtm.channel.on('MemberLeft', handleMemberLeft);
-  rtm.channel.on('ChannelMessage', handleChannelMessage);
+  await rtm.channel.on('MemberJoined', handleMemberJoin);
+  await rtm.channel.on('MemberLeft', handleMemberLeft);
+  await rtm.channel.on('ChannelMessage', handleChannelMessage);
+  await rtm.channel.on('token-privilege-will-expire', handleRtmTokenExpire);
 
   // get all members in render it to the dom
   getMembers();
+
+  // console.log(checkSystemRequirements());
 
   // initialize setting the rtc
   rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
@@ -182,7 +180,7 @@ const joinRoomInit = async () => {
   // on user publish and left method
   await rtc.client.on('user-published', handleUserPublished);
   await rtc.client.on('user-left', handleUserLeft);
-  await rtc.client.on('token-privilege-will-expire', handleTokenExpire);
+  await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire);
 
   // set the users camera and mic
   settingsHandler();
@@ -190,11 +188,13 @@ const joinRoomInit = async () => {
   loader.style.display = 'none';
 };
 
-const handleTokenExpire = async () => {
-  // alert(
-  //   `token will expire and user will be redirect at homepage at 30 seconds`
-  // );
-  // window.location.href = '/';
+const handleRtcTokenExpire = async () => {
+  try {
+    const { rtcToken } = await getRtcToken();
+    await rtc.client.renewToken(rtcToken);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 // user joined the meeting handler

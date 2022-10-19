@@ -10,16 +10,15 @@ router.get('/room', ensureAuthenticated, (req, res) => {
   res.render('room');
 });
 
-// // fetch rtc token
 router.get(
-  '/rtc/:channel/:role/:tokentype/:id',
+  '/rtc/:channel/:role/:tokentype',
   ensureAuthenticated,
   nocache,
   generateRTCToken
 );
 
 // // fetch rtm token
-router.get('/rtm/:uid', ensureAuthenticated, nocache, generateRTMToken);
+router.get('/rtm', ensureAuthenticated, nocache, generateRTMToken);
 
 // quit the room
 router.get('/quit', (req, res) => {

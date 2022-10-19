@@ -34,51 +34,6 @@ const classListDom = () => {
   `;
 };
 
-// Teacher host
-const attendanceBtn = () => {
-  return `
-    <button class='button' id='attendance-btn'><i class='fa-solid fa-clipboard-user'></i></button>
-  `;
-};
-
-// attendance teacher handler
-const makeAttendanceHandler = (e) => {
-  document
-    .querySelector('.rightBtn')
-    .insertAdjacentHTML('afterbegin', attendanceBtn());
-
-  document
-    .getElementById('attendance-btn')
-    .addEventListener('click', attendance);
-};
-
-const attendance = async () => {
-  const btn = document.getElementById('attendance-btn');
-
-  if (btn.classList.contains('active')) {
-    btn.classList.remove('active');
-
-    // rtm.channel.sendMessage({
-    //   text: JSON.stringify({ type: 'take_attendance_off' }),
-    // });
-  } else {
-    btn.classList.add('active');
-    // const data = await get_classroom();
-    // console.log(data);
-    // rtm.channel.sendMessage({
-    //   text: JSON.stringify({ type: 'take_attendance' }),
-    // });
-  }
-};
-
-const attendanceDom = () => {};
-
-const get_classroom = async () => {
-  const url = `/get_classroom`;
-  const data = await getRequest(url);
-  return data;
-};
-
 // Student
 const sendAttendance = async () => {
   rtm.channel.sendMessage({
@@ -243,4 +198,4 @@ const get_descriptor = async () => {
   return data;
 };
 
-export { faceRecognitionHandler, makeAttendanceHandler, get_descriptor };
+export { faceRecognitionHandler, get_descriptor };

@@ -184,6 +184,7 @@ const settings_dom = () => {
   return `
     <div id="modal-settings" class="modal-settings">
       <div class="settings-modal">
+        <div class='svg_spinner'></div>
         <span class="refresh" id="refresh">
           <i class="fa fa-refresh"></i>
         </span>
@@ -239,6 +240,8 @@ const settingsHandler = async () => {
   document
     .getElementById('refresh')
     .addEventListener('click', refreshDeviceModal);
+
+  document.querySelector('.svg_spinner').style.display = 'none';
 };
 
 export {

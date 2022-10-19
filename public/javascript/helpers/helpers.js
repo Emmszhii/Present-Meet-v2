@@ -138,4 +138,23 @@ const deleteMsg = () => {
   if (successDom) successDom.remove();
 };
 
-export { postRequest, getRequest, randDarkColor, generateLightColorHex };
+const svgLoader = (container) => {
+  if (container.querySelector('.svg_spinner') === null) {
+    container.insertAdjacentHTML(
+      'beforeend',
+      `<div class='svg_spinner'></div>`
+    );
+    console.log(`this run`);
+  } else {
+    const dom = container.querySelector('.svg_spinner');
+    dom.remove();
+  }
+};
+
+export {
+  postRequest,
+  getRequest,
+  randDarkColor,
+  generateLightColorHex,
+  svgLoader,
+};

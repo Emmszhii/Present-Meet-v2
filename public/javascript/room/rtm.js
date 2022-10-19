@@ -10,6 +10,18 @@ import {
 
 const users = [];
 
+const getRtmToken = async () => {
+  const url = `/rtm`;
+  const data = await getRequest(url);
+  return data;
+};
+
+const handleRtmTokenExpire = async () => {
+  const { rtmToken } = await getRtmToken();
+  console.log(rtmToken);
+  rtm.client.renewToken(rtmToken);
+};
+
 // get members names and total and add it to the dom;
 // member joining handler
 const handleMemberJoin = async (MemberId) => {
@@ -210,4 +222,6 @@ export {
   addMemberToDom,
   addMessageToDom,
   leaveChannel,
+  getRtmToken,
+  handleRtmTokenExpire,
 };

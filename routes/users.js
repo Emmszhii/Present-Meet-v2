@@ -256,7 +256,6 @@ router.post('/profile', ensureAuthenticated, async (req, res) => {
     if (booleanPassword) {
       User.updateOne({ _id: req.user._id }, data, (error, result) => {
         if (error) return res.status(400).json({ err: error });
-        console.log(result);
         if (result.acknowledged)
           return res.status(200).json({ msg: 'User info has been updated' });
         if (!result.acknowledged)
@@ -301,7 +300,6 @@ router.post('/password', ensureAuthenticated, async (req, res) => {
   if (booleanPassword) {
     try {
       const hash = await generateHashPassword(newPw);
-      console.log(hash);
 
       Account.updateOne(
         { _id: req.user._id },

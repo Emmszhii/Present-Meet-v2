@@ -12,7 +12,6 @@ router.get('/', ensureAuthenticated, (req, res) => {
 
 // // fetch user information
 router.get('/getInfo', ensureAuthenticated, async (req, res) => {
-  console.log(req.user);
   const { _id, first_name, middle_name, last_name, type } = req.user;
   try {
     res.status(200).json({

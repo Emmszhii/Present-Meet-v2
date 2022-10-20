@@ -1,5 +1,6 @@
-import { userData, rtm } from './rtc.js';
+import { userData, rtm, localDevice } from './rtc.js';
 import { getRequest } from '../helpers/helpers.js';
+import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const useTinyModel = true;
 let track;
@@ -8,39 +9,79 @@ const startingSeconds = 60;
 let time = startingMinutes * startingSeconds;
 const end_time = 0;
 let interval;
+const backend = await faceapi.tf.getBackend();
+const interval_second = 1000;
+
+const faceRecognitionHandler = async () => {
+  try {
+    const { descriptor } = await get_descriptor();
+
+    if (descriptor) {
+      userData.descriptor = descriptor;
+    } else {
+      return warningMsg('No face registered by user');
+    }
+
+    document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
+
+    document.getElementById('backend').textContent = backend;
+
+    interval = setInterval(updateCountdown, 1000);
+
+    document
+      .querySelector('.close')
+      .addEventListener('click', closeFaceRecognition);
+
+    document
+      .getElementById('camera_btn')
+      .addEventListener('click', startCamera);
+
+    document
+      .getElementById('face_recognize_btn')
+      .addEventListener('click', faceRecognized);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    document.getElementById('loader_face').style.display = 'none';
+  }
+};
 
 const dom = () => {
   return `
     <div class='modal_face'>
-      <div class='modal_face_content'>
-        <div id="msg"></div>
+    <div class='modal_face_content'>
+      <div class='svg_spinner' id="loader_face"></div>
+      <span class='close'>&times;</span>
+        <div class='title'>
+          <p id='backend'></p>
+          <span><i class='fa-solid fa-question' title="If cpu is your backend it may take a while else it should be faster"></i></span>
+          </div>
+        <div id="msg">
+          <p id="video_title"></p>
+          <p id="error"></p>
+          <p id="success"></p>
+        </div>
         <div id='countdown'>1:00</div>
         <div class='face_container'></div>
-        <div class='buttons'>
-          <button id="face_camera_btn">Camera</button>
-          <button id='face_recognize_btn'>Recognize</button>
+        <div class='buttons face_recognition_btn'>
+          <button class='button' id='camera_btn'>
+            <i class='fa-solid fa-camera'></i>
+          </button>
+          <button class='button' id='face_recognize_btn'>
+            <i class='fa-solid fa-users-viewfinder'></i>
+          </button>
         </div>
       </div>
     </div>
   `;
 };
 
-const classListDom = () => {
-  return `
-    <div id='class_list'>
-      <div class='card' id='class_list'>
-      </div>
-    </div>
-  `;
-};
-
-// Student
-const sendAttendance = async () => {
+const sendAttendance = async (descriptor) => {
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance',
-      first_name: userData.firstName,
-      last_name: userData.lastName,
+      _id: userData._id,
+      descriptor,
     }),
   });
 };
@@ -55,7 +96,7 @@ const updateCountdown = () => {
   }
   time--;
 
-  if (time <= end_time) {
+  if (time < end_time) {
     stopTimer();
   }
 };
@@ -74,39 +115,46 @@ const stopTimer = () => {
 };
 
 const startCamera = () => {
-  const backend = faceapi.tf.getBackend();
-  console.log(backend);
+  document.getElementById('loader_face').style.display = 'block';
+  stopCamera();
+  removeFaceCanvas();
+
   const video = document.createElement('video');
-  video.width = '720';
-  video.height = '480';
   video.id = 'video';
   video.autoplay = true;
   video.muted = true;
 
   document.querySelector('.face_container').append(video);
 
-  navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-    video.srcObject = stream;
-    if (backend === 'webgl') face_detection();
-    track = stream.getTracks();
-  });
+  navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+    })
+    .then((stream) => {
+      video.srcObject = stream;
+      if (backend === 'webgl') face_detection();
+      track = stream.getTracks();
+    })
+    .catch((e) => {
+      console.log(e);
+      document
+        .getElementById('msg')
+        .insertAdjacentHTML('beforeend', deniedPermissionCamera());
+    })
+    .finally(() => {
+      document.getElementById('loader_face').style.display = 'none';
+    });
+};
+
+const deniedPermissionCamera = () => {
+  return `
+    <p>Something went wrong</p>
+    <p>You need to allow camera to use face recognition</p>
+  `;
 };
 
 const face_detection = () => {
   console.log(`run`);
-};
-
-const resetCamera = () => {
-  const video = document.getElementById('video');
-  const canvas = document.querySelector('canvas');
-  if (video) {
-    video.remove();
-    startCamera();
-  }
-  if (canvas) {
-    canvas.remove();
-    startCamera();
-  }
 };
 
 const stopCamera = () => {
@@ -117,78 +165,62 @@ const stopCamera = () => {
   }
 };
 
-const createCanvas = () => {
-  const video = document.getElementById('video');
-  const canvas = document.createElement('canvas');
-  canvas.width = video.width;
-  canvas.height = video.height;
-  const context = canvas.getContext('2d');
-
-  if (video) {
-    context.imageSmoothingEnabled = false;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const canvas = faceapi.createCanvasFromMedia(video);
-    canvas.id = 'canvas';
-    document.querySelector('.face_container').append(canvas);
-
-    stopCamera();
-  } else {
-    console.log(`start Camera first`);
-  }
+const removeFaceCanvas = () => {
+  const canvas = document.getElementById('user_face');
+  if (canvas) canvas.remove();
 };
 
-const faceRecognitionHandler = () => {
-  document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
-
-  startCamera();
-
-  interval = setInterval(updateCountdown, 1000);
-
-  document
-    .getElementById('face_camera_btn')
-    .addEventListener('click', resetCamera);
-  document
-    .getElementById('face_recognize_btn')
-    .addEventListener('click', faceRecognized);
+const closeFaceRecognition = (e) => {
+  const dom = document.querySelector('.modal_face');
+  if (dom) dom.remove();
 };
 
 const faceRecognized = async () => {
-  if (!userData.descriptor) return;
+  const loader = document.getElementById('loader_face');
+  loader.style.display = 'block';
+  try {
+    const video = document.getElementById('video');
 
-  const video = document.getElementById('video');
-  if (!video) return console.log(`please start the camera first`);
-  createCanvas();
-  const canvas = document.querySelector('canvas');
-  const msg = document.getElementById('msg');
+    // Guard clause
+    if (!userData.descriptor)
+      return warningMsg('User face recognition is not registered');
+    if (!video) return warningMsg(`Please start the camera first`);
 
-  const query = await faceapi
-    .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks(useTinyModel)
-    .withFaceDescriptors();
+    stopCamera();
+    const canvas = await faceapi.createCanvasFromMedia(video);
+    canvas.id = 'user_face';
+    document.querySelector('.face_container').append(canvas);
 
-  if (!query || query.length > 1 || query[0].descriptor) {
-    return (msg.textContent = 'Face not detected');
-  }
-  // if user not register their face description
+    const query = await faceapi
+      .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks(useTinyModel)
+      .withFaceDescriptors();
 
-  // convert string to float32array
-  const float = userData.descriptor.split(',');
-  const data = new Float32Array(float);
+    if (query.length === 0 || query.length > 1) {
+      return errorMsg('Invalid face. Please try again');
+    }
+    if (!query[0].descriptor) return errorMsg('Invalid Please Try again');
 
-  if (query[0].descriptor) {
-    const dist = faceapi.euclideanDistance(data, query[0].descriptor);
+    // convert string to float32array
+    const float = userData.descriptor.split(',');
+    const data = new Float32Array(float);
+
+    // if (query[0].descriptor) {
+    const dist = await faceapi.euclideanDistance(data, query[0].descriptor);
     console.log(dist);
     const threshold = 0.4;
     if (dist <= threshold) {
-      console.log(`match`);
+      successMsg(`User match`);
       sendAttendance();
       stopTimer();
     } else {
-      msg.textContent = 'Invalid match';
+      errorMsg('Not match. Please try again.');
     }
-  } else {
-    msg.textContent = 'Face does not recognized';
+    // }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    if (loader) loader.style.display = 'none';
   }
 };
 
@@ -198,4 +230,4 @@ const get_descriptor = async () => {
   return data;
 };
 
-export { faceRecognitionHandler, get_descriptor };
+export { faceRecognitionHandler };

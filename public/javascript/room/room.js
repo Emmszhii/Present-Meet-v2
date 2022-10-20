@@ -184,7 +184,7 @@ const settings_dom = () => {
   return `
     <div id="modal-settings" class="modal-settings">
       <div class="settings-modal">
-        <div class='svg_spinner'></div>
+        <div class='svg_spinner' id='loader_settings'></div>
         <span class="refresh" id="refresh">
           <i class="fa fa-refresh"></i>
         </span>
@@ -213,35 +213,36 @@ const settingsHandler = async () => {
   try {
     rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
     rtc.localTracks[1].play(`user-${userData.rtcId}`);
+
+    devices().then(() => {
+      if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
+      if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
+
+      const videoDom = document.getElementById('Video');
+      const audioDom = document.getElementById('Audio');
+      if (!videoDom) {
+        createSelectElement('Video', video_devices);
+      }
+      if (!audioDom) {
+        createSelectElement('Audio', audio_devices);
+      }
+    });
+
+    document.getElementById('setup-btn').addEventListener('click', () => {
+      document.querySelector(`#modal-settings`).remove();
+      document.getElementById('settings-btn').classList.remove('active');
+      clearLocalTracks();
+    });
+
+    document
+      .getElementById('refresh')
+      .addEventListener('click', refreshDeviceModal);
   } catch (e) {
+    console.log(e);
     permissionDeniedDom();
+  } finally {
+    document.querySelector('#loader_settings').style.display = 'none';
   }
-
-  devices().then(() => {
-    if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
-    if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
-
-    const videoDom = document.getElementById('Video');
-    const audioDom = document.getElementById('Audio');
-    if (!videoDom) {
-      createSelectElement('Video', video_devices);
-    }
-    if (!audioDom) {
-      createSelectElement('Audio', audio_devices);
-    }
-  });
-
-  document.getElementById('setup-btn').addEventListener('click', () => {
-    document.querySelector(`#modal-settings`).remove();
-    document.getElementById('settings-btn').classList.remove('active');
-    clearLocalTracks();
-  });
-
-  document
-    .getElementById('refresh')
-    .addEventListener('click', refreshDeviceModal);
-
-  document.querySelector('.svg_spinner').style.display = 'none';
 };
 
 export {

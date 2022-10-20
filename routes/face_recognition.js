@@ -8,22 +8,21 @@ const { Account, User, Student, Teacher } = require('../models/User');
 const { comparePassword } = require('./helpers/functions');
 
 router.get('/face-recognition', ensureAuthenticated, (req, res) => {
-  console.log(req.user);
-  console.log(req.user._id);
   res.render('face_recognition');
 });
 
 router.get('/getDescriptor', ensureAuthenticated, async (req, res) => {
   try {
     const student = await Student.findOne({ _id: req.user._id });
-    console.log(student);
     if (!student)
       return res
         .status(200)
-        .json({ warning: `Please register your face descriptor` });
+        .json({ msg: `Please register your face descriptor` });
 
     if (student.descriptor)
-      return res.status(200).json({ descriptor: student.descriptor });
+      return res
+        .status(200)
+        .json({ descriptor: student.descriptor, msg: 'ok' });
   } catch (e) {
     console.log(e);
     return res.status(400).json({ err: e });

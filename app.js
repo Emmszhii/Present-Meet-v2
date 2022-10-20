@@ -17,6 +17,9 @@ const db = require('./config/keys').MongoURI;
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is up and listening on PORT ${PORT}`);
+    });
     console.log(`MongoDB connected...`);
   })
   .catch((err) => {
@@ -67,8 +70,4 @@ app.use('/', require('./routes/class_attendance'));
 // 404
 app.use(function (req, res, next) {
   res.status(404).render('404', { title: 'Sorry, page not found' });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is up and listening on PORT ${PORT}`);
 });

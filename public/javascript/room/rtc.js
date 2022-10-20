@@ -24,6 +24,7 @@ import {
   settingsHandler,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
+import { faceRecognitionHandler } from './face_recognition.js';
 
 // User Local Data and Tokens
 const userData = {};
@@ -125,9 +126,11 @@ const data_init = async () => {
 
 // initializing the agora sdk for joining the room and validating the user token for security joining
 const joinRoomInit = async () => {
-  if (userData.type === 'teacher' || userData.type === 'host') {
+  if (userData.type === 'teacher') {
     makeAttendanceHandler();
   }
+
+  if (userData.type === 'student') faceRecognitionHandler();
 
   // letting rtc.client become the instance with APP_ID
   rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {

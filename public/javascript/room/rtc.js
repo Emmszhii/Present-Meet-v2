@@ -130,8 +130,6 @@ const joinRoomInit = async () => {
     makeAttendanceHandler();
   }
 
-  if (userData.type === 'student') faceRecognitionHandler();
-
   // letting rtc.client become the instance with APP_ID
   rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {
     logFilter: AgoraRTM.LOG_FILTER_WARNING,

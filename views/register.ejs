@@ -109,5 +109,10 @@
         </div>
       </div>
     </main>
+    <script>
+      document.getElementById(
+        'user-type'
+      ).value = `<%= typeof type != 'undefined' ? type : '' %>`;
+    </script>
   </body>
 </html>

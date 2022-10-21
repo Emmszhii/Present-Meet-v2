@@ -15,6 +15,7 @@ const attendanceDom = () => {
   return `
     <section id="attendance__container">
       <div class="svg_spinner"></div>
+      <div id='settings_attendance'></div>
       <div id="classroom"></div>
       <div id="classroom_info"></div>
       <div id="students"></div>
@@ -31,6 +32,25 @@ const makeAttendanceHandler = (e) => {
   document
     .getElementById('attendance-btn')
     .addEventListener('click', attendance);
+};
+
+const restrictToggleHandler = () => {
+  document
+    .getElementById('settings_attendance')
+    .insertAdjacentHTML('beforeend', restrictDom());
+};
+
+const restrictDom = () => {
+  return `
+    <label class='switch'>
+      <input type='checkbox'>
+      <span></span>
+    </label>
+  `;
+};
+
+const restrictMode = (e) => {
+  console.log(e);
 };
 
 const attendance = async () => {
@@ -117,7 +137,7 @@ const infoDom = (val) => {
     <h3 id='subject'>Subject : ${val.subject} </h3>
     <h3 id='year_level'>Year Level : ${val.year_level}</h3>
     <h3 id='section'>Section : ${val.section}</h3>
-    <h3 id='students_total'>Students Total: ${val.students.length}</h3>
+    <h3 id='students_total'>Student(s) Total : ${val.students.length}</h3>
   `;
 };
 

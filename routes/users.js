@@ -121,6 +121,7 @@ router.post('/register', async (req, res) => {
     res.render('register', {
       errors,
       first_name,
+      middle_name,
       last_name,
       birthday,
       type,

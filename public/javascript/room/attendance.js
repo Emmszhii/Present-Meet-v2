@@ -94,6 +94,7 @@ const restrictMode = (e) => {
     btn.value = 'on';
     btn.classList.toggle('on');
     btn.textContent = 'Restriction On';
+    attendanceCheckHandler();
   } else {
     btn.value = 'off';
     btn.classList.toggle('on');
@@ -122,7 +123,10 @@ const take_attendance = async (e) => {
 const attendanceChecker = () => {
   const id = document.getElementById('classroom_list').value;
   const restrictVal = document.getElementById('restrict').value;
-  if (restrictVal === 'on' && !id) return true;
+
+  const arrId = classroom[0].map((item) => item._id);
+
+  if (!arrId.includes(id) && restrictVal === 'on') return true;
   return false;
 };
 
@@ -210,6 +214,7 @@ const dropDownList = (info) => {
 };
 
 const listDropdown = (e) => {
+  attendanceCheckHandler();
   document.querySelector(`.svg_spinner`).style.display = 'block';
   const restrictBtn = document.getElementById('restrict');
   if (!restrictBtn.classList.contains('on')) {

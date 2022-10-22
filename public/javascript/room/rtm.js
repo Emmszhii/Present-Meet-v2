@@ -149,15 +149,14 @@ const handleChannelMessage = async (messageData, MemberId) => {
   }
 
   // if student
-  if (userData.type === 'host' || userData.type === 'student') {
-    // if a teacher or host decided to take attendance
-    if (data.type === 'take_attendance') {
-      faceRecognitionHandler();
-      console.log(`face recognition`);
+  if (userData.type === 'teacher') {
+    if (data.type === 'attendance_data') {
+      console.log(data);
     }
-    if (data.type === 'take_attendance_off') {
-      console.log(`off face recognition`);
-      // stopTimer();
+  }
+  if (userData.type === 'student') {
+    if (data.type === 'attendance_on') {
+      faceRecognitionHandler();
     }
   }
 };

@@ -5,12 +5,19 @@ import { errorMsg, successMsg, warningMsg } from './msg.js';
 const useTinyModel = true;
 let track;
 const startingMinutes = 1;
+const startingInterval = 1000;
 const startingSeconds = 60;
 let time = startingMinutes * startingSeconds;
 const end_time = 0;
 let interval;
-const backend = await faceapi.tf.getBackend();
-const interval_second = 1000;
+
+const backend = async () => {
+  try {
+    return await faceapi.tf.getBackend();
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 const faceRecognitionHandler = async () => {
   try {
@@ -24,9 +31,9 @@ const faceRecognitionHandler = async () => {
 
     document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
 
-    document.getElementById('backend').textContent = backend;
+    document.getElementById('backend').textContent = await backend();
 
-    interval = setInterval(updateCountdown, 1000);
+    interval = setInterval(updateCountdown, startingInterval);
 
     document
       .querySelector('.close')
@@ -76,12 +83,12 @@ const dom = () => {
   `;
 };
 
-const sendAttendance = async (descriptor) => {
+const sendAttendance = async (data) => {
   rtm.channel.sendMessage({
     text: JSON.stringify({
-      type: 'attendance',
-      _id: userData._id,
-      descriptor,
+      type: 'attendance_data',
+      _id: data._id,
+      descriptor: data.descriptor,
     }),
   });
 };
@@ -92,7 +99,7 @@ const updateCountdown = () => {
 
   const countdown = document.getElementById('countdown');
   if (countdown) {
-    countdown.innerHTML = `${minutes}:${seconds}`;
+    countdown.innerHTML = `${seconds}`;
   }
   time--;
 
@@ -211,7 +218,10 @@ const faceRecognized = async () => {
     const threshold = 0.4;
     if (dist <= threshold) {
       successMsg(`User match`);
-      sendAttendance();
+      sendAttendance({
+        descriptor: query[0].descriptor,
+        _id: userData._id,
+      });
       stopTimer();
     } else {
       errorMsg('Not match. Please try again.');
@@ -230,4 +240,10 @@ const get_descriptor = async () => {
   return data;
 };
 
-export { faceRecognitionHandler };
+export {
+  startingInterval,
+  startingMinutes,
+  startingSeconds,
+  end_time,
+  faceRecognitionHandler,
+};

@@ -1,8 +1,50 @@
 import { postRequest, getRequest, svgLoader } from '../helpers/helpers.js';
+import { rtc, rtm } from './rtc.js';
 import { users } from './rtm.js';
+import {
+  startingInterval,
+  startingMinutes,
+  startingSeconds,
+  end_time,
+} from './face_recognition.js';
 
 const classroom = [];
 const students = [];
+
+let time = startingMinutes * startingSeconds;
+let interval;
+
+const updateCountdown = () => {
+  const minutes = Math.floor(time / 60);
+  let seconds = time % 60;
+
+  const countdown = document.getElementById('take_attendance');
+  if (countdown) {
+    countdown.innerHTML = `${seconds}`;
+  }
+  time--;
+
+  if (time < end_time) {
+    stopTimer();
+  }
+};
+
+const makeAttendance = async () => {
+  await rtm.channel.sendMessage({
+    text: JSON.stringify({ type: 'attendance_on' }),
+  });
+};
+
+const stopTimer = () => {
+  clearInterval(interval);
+
+  const btn = document.getElementById('take_attendance');
+  if (btn.classList.contains('on')) {
+    btn.classList.remove('on');
+  }
+  btn.innerHTML = `<i class='fa-solid fa-check'></i>`;
+  time = startingMinutes * startingSeconds;
+};
 
 // Teacher host
 const attendanceBtn = () => {
@@ -24,7 +66,7 @@ const attendanceDom = () => {
 };
 
 // attendance teacher handler
-const makeAttendanceHandler = (e) => {
+const makeAttendanceHandler = () => {
   document
     .querySelector('.rightBtn')
     .insertAdjacentHTML('afterbegin', attendanceBtn());
@@ -38,19 +80,70 @@ const restrictToggleHandler = () => {
   document
     .getElementById('settings_attendance')
     .insertAdjacentHTML('beforeend', restrictDom());
+
+  document.getElementById('restrict').addEventListener('click', restrictMode);
+
+  document
+    .getElementById('take_attendance')
+    .addEventListener('click', take_attendance);
+};
+
+const restrictMode = (e) => {
+  const btn = e.currentTarget;
+  if (btn.value === 'off') {
+    btn.value = 'on';
+    btn.classList.toggle('on');
+    btn.textContent = 'Restriction On';
+  } else {
+    btn.value = 'off';
+    btn.classList.toggle('on');
+    btn.textContent = 'Restriction Off';
+    attendanceCheckHandler();
+  }
+};
+
+const take_attendance = async (e) => {
+  const btn = e.currentTarget;
+
+  if (btn.value === 'off') {
+    btn.value = 'on';
+    btn.classList.toggle('on');
+    btn.textContent = 'Attendance On';
+    interval = setInterval(updateCountdown, startingInterval);
+    makeAttendance();
+  } else {
+    btn.value = 'off';
+    btn.classList.toggle('on');
+    btn.textContent = 'Attendance Off';
+    stopTimer();
+  }
+};
+
+const attendanceChecker = () => {
+  const id = document.getElementById('classroom_list').value;
+  const restrictVal = document.getElementById('restrict').value;
+  if (restrictVal === 'on' && !id) return true;
+  return false;
+};
+
+const attendanceCheckHandler = () => {
+  const val = attendanceChecker();
+  if (val) {
+    document.getElementById('take_attendance').disabled = true;
+  } else {
+    document.getElementById('take_attendance').disabled = false;
+  }
 };
 
 const restrictDom = () => {
   return `
-    <label class='switch'>
-      <input type='checkbox'>
-      <span></span>
-    </label>
+    <div class='form-group'>
+      <button class='button-box off' id='restrict' value='off'>Restriction Off</button>
+    </div>
+    <div class='form-group'>
+      <button class='button-box off' id='take_attendance' value='off'>Attendance Off</button>
+    </div>
   `;
-};
-
-const restrictMode = (e) => {
-  console.log(e);
 };
 
 const attendance = async () => {
@@ -66,7 +159,7 @@ const attendance = async () => {
   } else {
     btn.classList.add('active');
     videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
-    const classroomDom = document.getElementById('classroom');
+    restrictToggleHandler();
 
     try {
       const { data, msg, err } = await get_classroom();
@@ -118,6 +211,13 @@ const dropDownList = (info) => {
 
 const listDropdown = (e) => {
   document.querySelector(`.svg_spinner`).style.display = 'block';
+  const restrictBtn = document.getElementById('restrict');
+  if (!restrictBtn.classList.contains('on')) {
+    restrictBtn.classList.toggle('on');
+    restrictBtn.value = 'on';
+    restrictBtn.textContent = 'Restriction On';
+  }
+
   const id = e.currentTarget.value;
   const val = searchDataInArr(classroom[0], id);
   const dom = document.getElementById('classroom_info');

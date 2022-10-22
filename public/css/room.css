@@ -38,7 +38,15 @@
 .close_msg {
   font-size: 1.5rem;
 }
-
+.button-box {
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.button-box:hover {
+  color: white;
+  background-color: black;
+}
 .svg_spinner {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;
   position: absolute;
@@ -495,6 +503,20 @@ select {
 }
 
 /* attendance */
+.on {
+  background-color: #2aca3e;
+  color: black;
+}
+
+#settings_attendance {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0px;
+}
+
 #attendance__container {
   z-index: 2;
   height: calc(100vh - 85px);

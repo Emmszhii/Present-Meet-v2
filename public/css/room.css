@@ -6,7 +6,8 @@
 }
 .warning_msg,
 .success_msg,
-.error_msg {
+.error_msg,
+.userJoin_msg {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -26,6 +27,10 @@
 }
 .error_msg {
   background-color: red;
+}
+.userJoin_msg {
+  text-shadow: 1px 1px black;
+  background: gray;
 }
 .close_btn {
   border: none;

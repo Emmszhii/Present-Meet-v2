@@ -1,5 +1,5 @@
-import { postRequest, getRequest, svgLoader } from '../helpers/helpers.js';
-import { rtc, rtm } from './rtc.js';
+import { postRequest, getRequest, controller } from '../helpers/helpers.js';
+import { rtc, rtm, userData } from './rtc.js';
 import { users } from './rtm.js';
 import {
   startingInterval,
@@ -31,7 +31,10 @@ const updateCountdown = () => {
 
 const makeAttendance = async () => {
   await rtm.channel.sendMessage({
-    text: JSON.stringify({ type: 'attendance_on' }),
+    text: JSON.stringify({
+      type: 'attendance_on',
+      _id: userData._id,
+    }),
   });
 };
 
@@ -56,7 +59,7 @@ const attendanceBtn = () => {
 const attendanceDom = () => {
   return `
     <section id="attendance__container">
-      <div class="svg_spinner"></div>
+      <div class="svg_spinner" id="attendance_loader"></div>
       <div id='settings_attendance'></div>
       <div id="classroom"></div>
       <div id="classroom_info"></div>
@@ -151,6 +154,8 @@ const restrictDom = () => {
 };
 
 const attendance = async () => {
+  const preloader = document.getElementById('preloader');
+  preloader.style.display = 'block';
   const btn = document.getElementById('attendance-btn');
   const videoCallContainer = document.querySelector('.videoCall');
   const attendanceContainer = document.getElementById('attendance__container');
@@ -160,9 +165,11 @@ const attendance = async () => {
     if (attendanceContainer) attendanceContainer.remove();
     classroom.length = 0;
     students.length = 0;
+    preloader.style.display = 'none';
   } else {
     btn.classList.add('active');
     videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
+    loaderHandler();
     restrictToggleHandler();
 
     try {
@@ -174,15 +181,18 @@ const attendance = async () => {
       if (msg) console.log(msg);
       if (err) console.log(err);
     } catch (e) {
+      if (e.name === 'TypeError') return;
       console.log(e);
+      console.log(e.name);
     } finally {
-      document.querySelector(`.svg_spinner`).style.display = 'none';
+      preloader.style.display = 'none';
     }
   }
 };
 
 const dropDownList = (info) => {
   const classroomDom = document.getElementById('classroom');
+  const classroomList = document.getElementById('classroom_list');
   const data = info;
 
   const select = document.createElement('select');
@@ -207,15 +217,27 @@ const dropDownList = (info) => {
   label.innerHTML = 'List of classroom available';
   label.htmlFor = 'classroom';
 
-  classroomDom.appendChild(label);
-  classroomDom.appendChild(select);
-
+  if (!classroomList) {
+    classroomDom.appendChild(label);
+    classroomDom.appendChild(select);
+  }
   select.addEventListener('change', listDropdown);
 };
 
+const loaderHandler = () => {
+  const loaderDom = document.getElementById('attendance_loader');
+  const contain = loaderDom.classList.contains('svg_spinner');
+  if (contain) {
+    loaderDom.classList.toggle('svg_spinner');
+  } else {
+    loaderDom.classList.toggle('svg_spinner');
+  }
+};
+
 const listDropdown = (e) => {
+  loaderHandler();
   attendanceCheckHandler();
-  document.querySelector(`.svg_spinner`).style.display = 'block';
+  // document.querySelector(`.svg_spinner`).style.display = 'block';
   const restrictBtn = document.getElementById('restrict');
   if (!restrictBtn.classList.contains('on')) {
     restrictBtn.classList.toggle('on');
@@ -272,7 +294,8 @@ const getStudents = async (id) => {
   } catch (e) {
     console.log(e);
   } finally {
-    document.querySelector(`.svg_spinner`).style.display = 'none';
+    loaderHandler();
+    // document.querySelector(`.svg_spinner`).style.display = 'none';
   }
 };
 
@@ -305,6 +328,7 @@ const get_classroom = async () => {
     const data = await getRequest(url);
     return data;
   } catch (e) {
+    if (e.name === 'AbortError') return;
     console.log(e);
   }
 };

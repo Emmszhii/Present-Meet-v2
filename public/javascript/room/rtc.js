@@ -25,6 +25,7 @@ import {
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { faceRecognitionHandler } from './face_recognition.js';
+import { errorMsg } from './msg.js';
 
 // User Local Data and Tokens
 const userData = {};
@@ -234,6 +235,7 @@ const handleUserPublished = async (user, mediaType) => {
   }
 
   try {
+    console.log(mediaType);
     // if media is VIDEO play their video in stream container
     if (mediaType === 'video') {
       user.videoTrack.play(`user-${user.uid}`);
@@ -382,7 +384,10 @@ const toggleScreen = async (e) => {
     cameraBtn.style.display = 'none';
 
     // remove the local video screen
-    document.getElementById(`user-container-${userData.rtcId}`).remove();
+    const userDom = document.getElementById(`user-container-${userData.rtcId}`);
+
+    if (userDom) userDom.remove();
+
     displayFrame.style.display = ' block';
 
     // display in big frame the player dom
@@ -399,7 +404,7 @@ const toggleScreen = async (e) => {
     rtc.localScreenTracks.play(`user-${userData.rtcId}`);
 
     // unpublish the video track
-    await rtc.client.unpublish([rtc.localTracks[1]]);
+    if (rtc.localTracks[1]) await rtc.client.unpublish([rtc.localTracks[1]]);
     // publish the screen track
     await rtc.client.publish([rtc.localScreenTracks]);
 
@@ -503,7 +508,14 @@ const joinStream = async () => {
     // localTracks[0] for audio and localTracks[1] for the video
     await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
   } catch (err) {
-    console.log(err);
+    const arrError = [
+      'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+    ];
+    if (arrError.includes(err.message)) {
+      errorMsg(
+        'Permission to use cam and mic are denied by user. User may not able to stream their audio, video, and stream'
+      );
+    }
   } finally {
     loader.style.display = 'none';
   }

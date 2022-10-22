@@ -21,6 +21,13 @@ const warningMsg = (msg) => {
   addCloseListener(type, msg);
 };
 
+const userJoinMsg = (msg) => {
+  resetMsg();
+  const type = `userJoin`;
+  body.insertAdjacentHTML('afterbegin', msgDom(type, msg));
+  addCloseListener(type, msg);
+};
+
 const addCloseListener = (type, title) => {
   document
     .getElementById(`close_${type}_${title}`)
@@ -35,6 +42,8 @@ const resetMsg = () => {
   const errorDom = document.querySelector('.error_msg');
   const warningDom = document.querySelector('.warning_msg');
   const successDom = document.querySelector('.success_msg');
+  const userJoinDom = document.querySelector('.userJoin_msg');
+  if (userJoinDom) userJoinDom.remove();
   if (errorDom) errorDom.remove();
   if (warningDom) warningDom.remove();
   if (successDom) successDom.remove();
@@ -51,4 +60,4 @@ const msgDom = (type, title) => {
   `;
 };
 
-export { errorMsg, successMsg, warningMsg };
+export { userJoinMsg, errorMsg, successMsg, warningMsg };

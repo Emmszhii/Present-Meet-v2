@@ -1,3 +1,4 @@
+import { errorMsg } from './msg.js';
 import {
   userData,
   device,
@@ -168,18 +169,6 @@ const refreshDeviceModal = () => {
   settingsHandler();
 };
 
-const permissionDeniedDom = () => {
-  const dom = document.querySelector('.text_settings');
-  const camBtn = document.getElementById('camera-btn');
-  const micBtn = document.getElementById('mic-btn');
-
-  if (camBtn) camBtn.title = 'Allow Camera permission first';
-  if (micBtn) micBtn.title = 'Allow Mic permission first';
-
-  if (dom)
-    dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
-};
-
 const settings_dom = () => {
   return `
     <div id="modal-settings" class="modal-settings">
@@ -228,21 +217,51 @@ const settingsHandler = async () => {
       }
     });
 
-    document.getElementById('setup-btn').addEventListener('click', () => {
-      document.querySelector(`#modal-settings`).remove();
-      document.getElementById('settings-btn').classList.remove('active');
-      clearLocalTracks();
-    });
+    document
+      .getElementById('setup-btn')
+      .addEventListener('click', setupBtnOnClick);
 
     document
       .getElementById('refresh')
       .addEventListener('click', refreshDeviceModal);
   } catch (e) {
-    console.log(e);
-    permissionDeniedDom();
+    const arrErr = [
+      'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+    ];
+    console.log(e.message);
+
+    if (arrErr.includes(e.message)) {
+      errorMsg(
+        'Permission to share user audio, video, stream are denied by user. User may not able to stream their audio, video, and stream'
+      );
+      permissionDeniedDom();
+    }
   } finally {
     document.querySelector('#loader_settings').style.display = 'none';
   }
+};
+
+const setupBtnOnClick = () => {
+  document.querySelector(`#modal-settings`).remove();
+  document.getElementById('settings-btn').classList.remove('active');
+  clearLocalTracks();
+};
+
+const permissionDeniedDom = () => {
+  const dom = document.querySelector('.text_settings');
+
+  if (dom)
+    dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
+
+  const joinBtn = document.getElementById('join-btn');
+  const setupBtn = document.getElementById('setup-btn');
+  const settingBtn = document.getElementById('settings-btn');
+  if (joinBtn) joinBtn.style.display = 'none';
+  if (setupBtn)
+    setupBtn.addEventListener('click', () => {
+      document.getElementById('modal-settings').remove();
+    });
+  if (settingBtn) settingBtn.classList.remove('active');
 };
 
 export {

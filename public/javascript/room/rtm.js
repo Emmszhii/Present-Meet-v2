@@ -1,5 +1,6 @@
 import { userData, rtm, player } from './rtc.js';
 import { faceRecognitionHandler } from './face_recognition.js';
+import { userJoinMsg, errorMsg, warningMsg, successMsg } from './msg.js';
 import {
   userIdInDisplayFrame,
   displayFrame,
@@ -33,7 +34,7 @@ const handleMemberJoin = async (MemberId) => {
   updateMemberTotal(members);
 
   const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
-  console.log(`User ${name} will join the room`);
+  userJoinMsg(`User ${name} has joined the room`);
 };
 
 // add member dom when user join

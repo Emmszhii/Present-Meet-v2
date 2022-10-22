@@ -64,12 +64,12 @@ const dom = () => {
           <span><i class='fa-solid fa-question' title="If cpu is your backend it may take a while else it should be faster"></i></span>
           </div>
         <div id="msg">
-          <p id="video_title"></p>
+          <p id="video_title">Face Recognition attendance</p>
           <p id="error"></p>
           <p id="success"></p>
         </div>
         <div id='countdown'>1:00</div>
-        <div class='face_container'></div>
+        <div class='face_container'>Please start camera</div>
         <div class='buttons face_recognition_btn'>
           <button class='button' id='camera_btn'>
             <i class='fa-solid fa-camera'></i>
@@ -123,41 +123,35 @@ const stopTimer = () => {
 
 const startCamera = () => {
   document.getElementById('loader_face').style.display = 'block';
+  document.querySelector('.face_container').innerHTML = '';
   stopCamera();
   removeFaceCanvas();
-
-  const video = document.createElement('video');
-  video.id = 'video';
-  video.autoplay = true;
-  video.muted = true;
-
-  document.querySelector('.face_container').append(video);
 
   navigator.mediaDevices
     .getUserMedia({
       video: true,
     })
     .then((stream) => {
+      const video = document.createElement('video');
+      video.id = 'video';
+      video.autoplay = true;
+      video.muted = true;
+      document.querySelector('.face_container').append(video);
+
       video.srcObject = stream;
       if (backend === 'webgl') face_detection();
       track = stream.getTracks();
     })
     .catch((e) => {
-      console.log(e);
-      document
-        .getElementById('msg')
-        .insertAdjacentHTML('beforeend', deniedPermissionCamera());
+      const arrError = ['Permission denied'];
+      console.log(e.message);
+      if (arrError.includes(e.message)) {
+        errorMsg('Camera Permission denied by user');
+      }
     })
     .finally(() => {
       document.getElementById('loader_face').style.display = 'none';
     });
-};
-
-const deniedPermissionCamera = () => {
-  return `
-    <p>Something went wrong</p>
-    <p>You need to allow camera to use face recognition</p>
-  `;
 };
 
 const face_detection = () => {
@@ -170,6 +164,7 @@ const stopCamera = () => {
     track[0] = stop();
     video.remove();
   }
+  3;
 };
 
 const removeFaceCanvas = () => {
@@ -228,7 +223,9 @@ const faceRecognized = async () => {
     }
     // }
   } catch (e) {
+    if (!video) errorMsg('Please start camera first to use face recognition');
     console.log(e);
+    console.log(e.message);
   } finally {
     if (loader) loader.style.display = 'none';
   }

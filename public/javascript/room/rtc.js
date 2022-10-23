@@ -1,7 +1,6 @@
 // initializing the variables
 const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
-const loader = document.getElementById('preloader');
 
 import { makeAttendanceHandler } from './attendance.js';
 
@@ -22,6 +21,7 @@ import {
   resetTheFrames,
   createSelectElement,
   settingsHandler,
+  roomLoaderHandler,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { faceRecognitionHandler } from './face_recognition.js';
@@ -187,7 +187,8 @@ const joinRoomInit = async () => {
   // set the users camera and mic
   settingsHandler();
   // if All are loaded loader will be gone
-  loader.style.display = 'none';
+  roomLoaderHandler();
+  // loader.style.display = 'none';
 };
 
 const handleRtcTokenExpire = async () => {
@@ -302,7 +303,6 @@ const toggleMic = async (e) => {
 
 // After disabling the share screen function then switch to Camera
 const switchToCamera = async () => {
-  await rtc.localScreenTracks.close();
   // reset the Display Frame
   displayFrame.style.display = null;
 
@@ -315,8 +315,8 @@ const switchToCamera = async () => {
     .addEventListener('click', expandVideoFrame);
 
   // mute the local tracks of the user
-  await rtc.localTracks[0].setMuted(true);
-  await rtc.localTracks[1].setMuted(true);
+  if (rtc.localTracks[0]) await rtc.localTracks[0].setMuted(true);
+  if (rtc.localTracks[1]) await rtc.localTracks[1].setMuted(true);
 
   // removing the active class
   document.getElementById(`mic-btn`).classList.remove('active');
@@ -341,6 +341,7 @@ const handleStopShareScreen = async () => {
 
   //unpublish the local screen tracks
   await rtc.client.unpublish([rtc.localScreenTracks]);
+  await rtc.localScreenTracks.close();
 
   // reset users frame
   resetTheFrames();
@@ -363,16 +364,19 @@ const toggleScreen = async (e) => {
     let error = false;
     // run rtc localScreenTracks
 
-    try {
-      rtc.localScreenTracks = await AgoraRTC.createScreenVideoTrack({
-        withAudio: 'auto',
-      }).catch(async (err) => {
-        // on buttons
-        rtc.sharingScreen = false;
-        screenBtn.classList.remove('active');
-        error = !error;
-      });
-    } catch (err) {}
+    rtc.localScreenTracks = await AgoraRTC.createScreenVideoTrack({
+      withAudio: 'auto',
+    }).catch(async (err) => {
+      const arrErr = [
+        'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+      ];
+
+      rtc.sharingScreen = false;
+      screenBtn.classList.remove('active');
+      error = !error;
+
+      if (arrErr.includes(err.message)) return;
+    });
 
     // if error is true this function will end
     if (error === true) return;
@@ -463,7 +467,7 @@ AgoraRTC.onCameraChanged = async (changedDevice) => {
 // joining the stream
 const joinStream = async () => {
   // display loader
-  loader.style.display = 'block';
+  roomLoaderHandler();
 
   // reset the button
   document.getElementsByClassName('mainBtn')[0].style.display = 'none';
@@ -517,7 +521,7 @@ const joinStream = async () => {
       );
     }
   } finally {
-    loader.style.display = 'none';
+    roomLoaderHandler();
   }
 };
 
@@ -545,12 +549,14 @@ const leaveStream = async (e) => {
 
   if (rtc.localScreenTracks) {
     await rtc.client.unpublish([rtc.localScreenTracks]);
+    await rtc.localScreenTracks.close();
     rtc.client.sharingScreen = false;
     cameraBtn.style.display = 'block';
     screenBtn.classList.remove('active');
   }
 
-  document.getElementById(`user-container-${userData.rtcId}`).remove();
+  const user = document.getElementById(`user-container-${userData.rtcId}`);
+  if (user) user.remove();
 
   if (userIdInDisplayFrame.val === `user-container-${userData.rtcId}`) {
     displayFrame.style.display = null;
@@ -575,7 +581,6 @@ const clearLocalTracks = () => {
 const devices = async () => {
   await AgoraRTC.getDevices().then((device) => {
     device.filter((dev) => {
-      // console.log(dev);
       if (dev.deviceId !== 'default' && dev.deviceId !== 'communications') {
         localDevice.push(dev);
       }

@@ -75,6 +75,11 @@ Enjoy using our service :D`;
   navigator.clipboard.writeText(text);
 };
 
+const roomLoaderHandler = () => {
+  const loader = document.getElementById('room_loader');
+  if (loader) loader.classList.toggle('svg_spinner');
+};
+
 // message and participant toggle
 const messagesToggle = (e) => {
   const btn = e.currentTarget;
@@ -269,6 +274,7 @@ export {
   videoFrames,
   userIdInDisplayFrame,
   meetingId,
+  roomLoaderHandler,
   membersToggle,
   messagesToggle,
   copyClipboard,

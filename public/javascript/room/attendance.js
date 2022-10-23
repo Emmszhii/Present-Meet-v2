@@ -1,4 +1,5 @@
 import { postRequest, getRequest, controller } from '../helpers/helpers.js';
+import { roomLoaderHandler } from './room.js';
 import { rtc, rtm, userData } from './rtc.js';
 import { users } from './rtm.js';
 import {
@@ -154,8 +155,7 @@ const restrictDom = () => {
 };
 
 const attendance = async () => {
-  const preloader = document.getElementById('preloader');
-  preloader.style.display = 'block';
+  roomLoaderHandler();
   const btn = document.getElementById('attendance-btn');
   const videoCallContainer = document.querySelector('.videoCall');
   const attendanceContainer = document.getElementById('attendance__container');
@@ -165,7 +165,7 @@ const attendance = async () => {
     if (attendanceContainer) attendanceContainer.remove();
     classroom.length = 0;
     students.length = 0;
-    preloader.style.display = 'none';
+    roomLoaderHandler();
   } else {
     btn.classList.add('active');
     videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
@@ -185,7 +185,7 @@ const attendance = async () => {
       console.log(e);
       console.log(e.name);
     } finally {
-      preloader.style.display = 'none';
+      roomLoaderHandler();
     }
   }
 };
@@ -226,12 +226,7 @@ const dropDownList = (info) => {
 
 const loaderHandler = () => {
   const loaderDom = document.getElementById('attendance_loader');
-  const contain = loaderDom.classList.contains('svg_spinner');
-  if (contain) {
-    loaderDom.classList.toggle('svg_spinner');
-  } else {
-    loaderDom.classList.toggle('svg_spinner');
-  }
+  if (loaderDom) loaderDom.classList.toggle('svg_spinner');
 };
 
 const listDropdown = (e) => {

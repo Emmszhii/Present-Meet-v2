@@ -236,7 +236,6 @@ const handleUserPublished = async (user, mediaType) => {
   }
 
   try {
-    console.log(mediaType);
     // if media is VIDEO play their video in stream container
     if (mediaType === 'video') {
       user.videoTrack.play(`user-${user.uid}`);

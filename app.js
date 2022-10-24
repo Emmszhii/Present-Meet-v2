@@ -66,6 +66,7 @@ app.use('/', require('./routes/users'));
 app.use('/', require('./routes/room'));
 app.use('/', require('./routes/face_recognition'));
 app.use('/', require('./routes/class_attendance'));
+app.use('/', require('./routes/room_attendance'));
 
 // 404
 app.use(function (req, res, next) {

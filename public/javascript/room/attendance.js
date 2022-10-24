@@ -8,6 +8,7 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
+import { errorMsg, warningMsg } from './msg.js';
 
 const classroom = [];
 const students = [];
@@ -30,11 +31,11 @@ const updateCountdown = () => {
   }
 };
 
-const makeAttendance = async () => {
-  await rtm.channel.sendMessage({
+const makeAttendance = () => {
+  rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance_on',
-      _id: userData._id,
+      id: userData._id,
     }),
   });
 };
@@ -43,6 +44,7 @@ const stopTimer = () => {
   clearInterval(interval);
 
   const btn = document.getElementById('take_attendance');
+  if (!btn) return;
   if (btn.classList.contains('on')) {
     btn.classList.remove('on');
   }
@@ -67,6 +69,41 @@ const attendanceDom = () => {
       <div id="students"></div>
     </section>
   `;
+};
+
+const checkStudentDescriptor = async (data) => {
+  const { MemberId, displayName, descriptor } = data;
+
+  const dbStudentDescriptor = await getStudentDescriptor(MemberId);
+
+  const dbFloatArr = dbStudentDescriptor.split(',');
+  const studentDescriptor = new Float32Array(dbFloatArr);
+  const queryFloatArr = descriptor.split(',');
+  const query = new Float32Array(queryFloatArr);
+
+  try {
+    const dist = await faceapi.euclideanDistance(studentDescriptor, query);
+    const threshold = 0.4;
+    if (dist <= threshold) {
+      console.log(`registering attendance`);
+    } else {
+      warningMsg(`User ${displayName} request is invalid`);
+    }
+  } catch (e) {
+    errorMsg(`Invalid request of user ${displayName}`);
+    console.log(e);
+  }
+};
+
+const getStudentDescriptor = async (id) => {
+  try {
+    const url = `student-descriptor/${id}`;
+    const { data, err } = await getRequest(url);
+    if (err) return err;
+    if (data) return data;
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 // attendance teacher handler
@@ -328,4 +365,4 @@ const get_classroom = async () => {
   }
 };
 
-export { makeAttendanceHandler };
+export { makeAttendanceHandler, checkStudentDescriptor };

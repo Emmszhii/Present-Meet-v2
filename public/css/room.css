@@ -4,6 +4,7 @@
   margin: 0px;
   padding: 0px;
 }
+/* msg dom */
 .warning_msg,
 .success_msg,
 .error_msg,
@@ -52,6 +53,7 @@
   color: white;
   background-color: black;
 }
+/* Loader */
 .svg_spinner {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;
   background-color: rgba(0, 0, 0, 0.5);
@@ -70,15 +72,6 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
-}
-/* loader */
-#preloader {
-  background: #000 url('/public/img/bigLoader.gif') no-repeat center center;
-  background-size: 30%;
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  z-index: 100;
 }
 /* Buttons */
 .footerBtn {
@@ -649,6 +642,9 @@ select {
   .settings-modal {
     width: 50%;
   }
+  .modal_face_content {
+    width: 80%;
+  }
 }
 @media (max-width: 768px) {
   #stream__box {
@@ -677,6 +673,9 @@ select {
     font-size: 1rem;
     padding: 10px 15px;
     margin: auto 5px;
+  }
+  .modal_face_content {
+    width: 90%;
   }
 }
 @media (max-width: 480px) {

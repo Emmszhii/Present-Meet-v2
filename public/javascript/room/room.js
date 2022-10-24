@@ -9,6 +9,7 @@ import {
   clearLocalTracks,
   player,
   devices,
+  rtm,
 } from './rtc.js';
 
 // getting meeting Link
@@ -269,6 +270,33 @@ const permissionDeniedDom = () => {
   if (settingBtn) settingBtn.classList.remove('active');
 };
 
+const muteStream = async () => {
+  const micBtn = document.getElementById('mic-btn');
+  const camBtn = document.getElementById('camera-btn');
+  if (rtc.localScreenTracks) {
+    await rtc.client.unpublish([rtc.localScreenTracks]);
+    await rtc.localScreenTracks.close();
+    camBtn.style.display = 'block';
+    document.getElementById('screen-btn').classList.remove('active');
+    hideDisplayFrame();
+    rtm.channel.sendMessage({
+      text: JSON.stringify({
+        type: 'user_screen_share_close',
+        uid: userData.rtcId,
+      }),
+    });
+  }
+
+  if (micBtn.classList.contains('active')) {
+    document.getElementById('mic-btn').classList.remove('active');
+    await rtc.localTracks[0].setMuted(true);
+  }
+  if (camBtn.classList.contains('active')) {
+    document.getElementById('camera-btn').classList.remove('active');
+    await rtc.localTracks[1].setMuted(true);
+  }
+};
+
 export {
   displayFrame,
   videoFrames,
@@ -285,4 +313,5 @@ export {
   createSelectElement,
   refreshDeviceModal,
   settingsHandler,
+  muteStream,
 };

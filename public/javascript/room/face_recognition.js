@@ -1,6 +1,7 @@
-import { userData, rtm, localDevice } from './rtc.js';
+import { userData, rtc, rtm, localDevice } from './rtc.js';
 import { getRequest } from '../helpers/helpers.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
+import { muteStream } from './room.js';
 
 const useTinyModel = true;
 let track;
@@ -19,8 +20,10 @@ const backend = async () => {
   }
 };
 
-const faceRecognitionHandler = async () => {
+const faceRecognitionHandler = async (teacherId) => {
   try {
+    muteStream();
+
     const { descriptor } = await get_descriptor();
 
     if (descriptor) {
@@ -31,7 +34,11 @@ const faceRecognitionHandler = async () => {
 
     document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
 
-    document.getElementById('backend').textContent = await backend();
+    document.querySelector('.modal_face_content').dataset.value = teacherId;
+
+    document.getElementById(
+      'backend'
+    ).textContent = `User's Backend : ${await backend()}`;
 
     interval = setInterval(updateCountdown, startingInterval);
 
@@ -164,7 +171,6 @@ const stopCamera = () => {
     track[0] = stop();
     video.remove();
   }
-  3;
 };
 
 const removeFaceCanvas = () => {
@@ -174,6 +180,7 @@ const removeFaceCanvas = () => {
 
 const closeFaceRecognition = (e) => {
   const dom = document.querySelector('.modal_face');
+  stopTimer();
   if (dom) dom.remove();
 };
 
@@ -214,8 +221,9 @@ const faceRecognized = async () => {
     if (dist <= threshold) {
       successMsg(`User match`);
       sendAttendance({
-        descriptor: query[0].descriptor,
-        _id: userData._id,
+        descriptor: query[0].descriptor.join(','),
+        displayName: userData.displayName,
+        id: userData._id,
       });
       stopTimer();
     } else {
@@ -223,7 +231,8 @@ const faceRecognized = async () => {
     }
     // }
   } catch (e) {
-    if (!video) errorMsg('Please start camera first to use face recognition');
+    if (!video)
+      return errorMsg('Please start camera first to use face recognition');
     console.log(e);
     console.log(e.message);
   } finally {

@@ -71,4 +71,25 @@ router.post('/descriptor', ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/student-descriptor/:id', ensureAuthenticated, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const student = await Student.findOne({ _id: id });
+    const user = await User.findOne({ _id: id });
+
+    if (!student) return res.status(400).json({ err: `No student found` });
+    if (!student.descriptor)
+      return res.status(200).json({
+        err: `Student ${user.last_name}, ${user.first_name} didn't registered their face descriptor in the database`,
+      });
+
+    if (student.descriptor) {
+      return res.status(200).json({ data: student.descriptor });
+    }
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 module.exports = router;

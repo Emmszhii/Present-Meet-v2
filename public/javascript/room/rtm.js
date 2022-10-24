@@ -8,6 +8,7 @@ import {
   expandVideoFrame,
   hideDisplayFrame,
 } from './room.js';
+import { checkStudentDescriptor } from './attendance.js';
 
 const users = [];
 
@@ -124,8 +125,8 @@ const handleChannelMessage = async (messageData, MemberId) => {
   if (data.type === 'user_screen_share') {
     const user = `user-container-${data.uid}`;
     const dom = document.getElementById(user);
-
     const child = displayFrame.children[0];
+
     if (child) {
       document.getElementById('streams__container').appendChild(child);
     }
@@ -139,8 +140,8 @@ const handleChannelMessage = async (messageData, MemberId) => {
       displayFrame.insertAdjacentHTML('beforeend', player(data.uid));
       document
         .getElementById(`user-container-${data.uid}`)
-        .addEventListener('click', expandVideoFrame)
-        .scrollIntoView();
+        .scrollIntoView()
+        .addEventListener('click', expandVideoFrame);
     }
   }
 
@@ -152,12 +153,14 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // if student
   if (userData.type === 'teacher') {
     if (data.type === 'attendance_data') {
-      console.log(data);
+      const { descriptor } = data;
+      checkStudentDescriptor({ descriptor, MemberId });
     }
   }
+
   if (userData.type === 'student') {
     if (data.type === 'attendance_on') {
-      faceRecognitionHandler();
+      faceRecognitionHandler(MemberId);
     }
   }
 };
@@ -167,7 +170,7 @@ const sendMessage = async (e) => {
   e.preventDefault();
 
   const message = e.target.message.value;
-  if (message === '') return;
+  if (message.trim() === '') return;
 
   rtm.channel.sendMessage({
     text: JSON.stringify({

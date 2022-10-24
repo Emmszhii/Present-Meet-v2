@@ -162,8 +162,7 @@ const loaderHandler = () => {
 
 const loaderDom = () => {
   return `
-  <div id="preloader">
-  </div>
+  <div class='svg_spinner' id="preloader"></div>
 `;
 };
 

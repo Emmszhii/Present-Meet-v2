@@ -5,6 +5,7 @@ import {
   closeModal,
   openModalChangePw,
   closeModalChangePw,
+  loaderHandler,
 } from './profile.js';
 
 // event listeners
@@ -23,3 +24,7 @@ document.getElementById('confirm').addEventListener('click', updateUser);
 document
   .getElementById('change_pw_btn')
   .addEventListener('click', updatePassword);
+
+window.addEventListener('load', () => {
+  loaderHandler();
+});

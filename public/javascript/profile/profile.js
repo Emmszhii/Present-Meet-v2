@@ -1,4 +1,12 @@
+import { postRequest } from '../helpers/helpers.js';
+
+const loaderHandler = () => {
+  const loader = document.getElementById('profile_loader');
+  if (loader) loader.classList.toggle('svg_spinner');
+};
+
 const updateUser = async () => {
+  loaderHandler();
   const firstName = document.getElementById('first_name').value;
   const middleName = document.getElementById('middle_name').value;
   const lastName = document.getElementById('last_name').value;
@@ -14,29 +22,21 @@ const updateUser = async () => {
     password: password.value,
   };
   try {
-    const resp = await fetch('/profile', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(info),
-    });
-    const data = await resp.json();
-    if (data.msg) {
-      msgHandler(data.msg);
-    } else {
-      errorHandler(data.err);
-    }
+    const url = `/profile`;
+    const { msg, err } = await postRequest(url, info);
+    if (msg) msgHandler(msg);
+    if (err) errorHandler(err);
   } catch (e) {
     console.log(e);
   } finally {
     password.value = '';
     closeModal();
+    loaderHandler();
   }
 };
 
 const updatePassword = async () => {
+  loaderHandler();
   const oldPw = document.getElementById('change_password');
   const newPw = document.getElementById('change_password1');
   const confirmPw = document.getElementById('change_password2');
@@ -45,22 +45,17 @@ const updatePassword = async () => {
     newPassword: newPw.value,
     newPassword1: confirmPw.value,
   };
-
-  const resp = await fetch('/password', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(password),
-  });
-  const data = await resp.json();
-  if (data.msg) {
-    msgHandler(data.msg);
-  } else {
-    errorHandler(data.err);
+  try {
+    const url = `/password`;
+    const { msg, err } = await postRequest(url, password);
+    if (msg) msgHandler(msg);
+    if (err) errorHandler(err);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    closeModalChangePw();
+    loaderHandler();
   }
-  closeModalChangePw();
 };
 
 const errorHandler = (err) => {
@@ -130,4 +125,5 @@ export {
   closeModal,
   openModalChangePw,
   closeModalChangePw,
+  loaderHandler,
 };

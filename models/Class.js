@@ -15,7 +15,9 @@ const classroomSchema = new mongoose.Schema(
     subject: String,
     year_level: String,
     section: String,
-    attendance_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
+    attendance_id: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Attendance' },
+    ],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }

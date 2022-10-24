@@ -307,9 +307,9 @@ router.post('/password', ensureAuthenticated, async (req, res) => {
         { password: hash },
         (error, result) => {
           if (error) res.status(400).json({ err: 'Something went wrong' });
-          if (result.acknowledged)
+          if (result.acknowledged) {
             return res.status(200).json({ msg: `Password has been changed` });
-          return res.status(400).json({ err: `Something gone wrong` });
+          }
         }
       );
     } catch (e) {

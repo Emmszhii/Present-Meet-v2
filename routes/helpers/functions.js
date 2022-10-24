@@ -52,6 +52,14 @@ const generateHashPassword = async (password) => {
   }
 };
 
+const isSameDay = (a, b) => {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+};
+
 module.exports = {
   capitalize,
   validateName,
@@ -59,4 +67,5 @@ module.exports = {
   validateEmpty,
   comparePassword,
   generateHashPassword,
+  isSameDay,
 };

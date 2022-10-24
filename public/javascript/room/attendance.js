@@ -206,6 +206,7 @@ const attendance = async () => {
   } else {
     btn.classList.add('active');
     videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
+
     loaderHandler();
     restrictToggleHandler();
 
@@ -225,6 +226,12 @@ const attendance = async () => {
       roomLoaderHandler();
     }
   }
+};
+
+const createAttendance = async (id) => {
+  const url = `/create-attendance`;
+  const data = await postRequest(url, id);
+  return data;
 };
 
 const dropDownList = (info) => {

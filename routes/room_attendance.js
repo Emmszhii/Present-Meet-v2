@@ -11,7 +11,15 @@ const {
   validateEmpty,
   comparePassword,
 } = require('./helpers/functions');
+const { Account, User } = require('../models/User');
+const { Teacher } = require('../models/Class');
 
-router.get;
+router.get('/create-attendance', ensureAuthenticated, async (req, res) => {
+  const teacher = Teacher.findOne({ _id: req.user._id });
+
+  console.log(teacher);
+
+  res.status(200).json({ data: `created` });
+});
 
 module.exports = router;

@@ -22,6 +22,7 @@ import {
   createSelectElement,
   settingsHandler,
   roomLoaderHandler,
+  checkIfUserDom,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { faceRecognitionHandler } from './face_recognition.js';
@@ -245,6 +246,7 @@ const handleUserPublished = async (user, mediaType) => {
       user.audioTrack.play();
     }
   } catch (err) {
+    const arrErr = [''];
     console.log(err);
   }
 };
@@ -481,15 +483,7 @@ const joinStream = async () => {
     await rtc.localTracks[1].on('track-ended', videoTrackEnded);
 
     // add the player into the DOM
-    document
-      .getElementById('streams__container')
-      .insertAdjacentHTML(
-        'beforeend',
-        player(userData.rtcId, userData.fullName)
-      );
-    document
-      .getElementById(`user-container-${userData.rtcId}`)
-      .addEventListener('click', expandVideoFrame);
+    checkIfUserDom(userData.id, userData.fullName);
 
     if (device.localAudio) {
       await rtc.localTracks[0].setDevice(device.localAudio).then(() => {
@@ -510,6 +504,14 @@ const joinStream = async () => {
     // publish the video for other users to see
     // localTracks[0] for audio and localTracks[1] for the video
     await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+
+    rtm.channel.sendMessage({
+      text: JSON.stringify({
+        type: `user_join`,
+        rtcId: userData.id,
+        name: userData.fullName,
+      }),
+    });
   } catch (err) {
     const arrError = [
       'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',

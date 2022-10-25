@@ -22,6 +22,20 @@ let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
 const userIdInDisplayFrame = { val: null };
 
+const checkIfUserDom = (id, name) => {
+  const user = document.getElementById(`user-container-${id}`);
+  if (!user) {
+    // add the player into the DOM
+    document
+      .getElementById('streams__container')
+      .insertAdjacentHTML('beforeend', player(id, name));
+    document
+      .getElementById(`user-container-${id}`)
+      .addEventListener('click', expandVideoFrame);
+  }
+  return;
+};
+
 // Expand VideoFrame Function
 const expandVideoFrame = (e) => {
   let child = displayFrame.children[0];
@@ -314,4 +328,5 @@ export {
   refreshDeviceModal,
   settingsHandler,
   muteStream,
+  checkIfUserDom,
 };

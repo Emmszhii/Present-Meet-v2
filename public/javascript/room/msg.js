@@ -21,7 +21,7 @@ const warningMsg = (msg) => {
   addCloseListener(type, msg);
 };
 
-const userJoinMsg = (msg) => {
+const userNotificationMsg = (msg) => {
   resetMsg();
   const type = `userJoin`;
   body.insertAdjacentHTML('afterbegin', msgDom(type, msg));
@@ -60,4 +60,4 @@ const msgDom = (type, title) => {
   `;
 };
 
-export { userJoinMsg, errorMsg, successMsg, warningMsg };
+export { userNotificationMsg, errorMsg, successMsg, warningMsg };

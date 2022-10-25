@@ -1,12 +1,18 @@
 import { userData, rtm, player } from './rtc.js';
 import { faceRecognitionHandler } from './face_recognition.js';
-import { userJoinMsg, errorMsg, warningMsg, successMsg } from './msg.js';
+import {
+  userNotificationMsg,
+  errorMsg,
+  warningMsg,
+  successMsg,
+} from './msg.js';
 import {
   userIdInDisplayFrame,
   displayFrame,
   resetTheFrames,
   expandVideoFrame,
   hideDisplayFrame,
+  checkIfUserDom,
 } from './room.js';
 import { checkStudentDescriptor } from './attendance.js';
 
@@ -35,7 +41,7 @@ const handleMemberJoin = async (MemberId) => {
   updateMemberTotal(members);
 
   const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
-  userJoinMsg(`User ${name} has joined the room`);
+  userNotificationMsg(`User ${name} has joined the room`);
 };
 
 // add member dom when user join
@@ -86,8 +92,6 @@ const removeMemberFromDom = async (MemberId) => {
     memberWrapper.getElementsByClassName('member_name')[0].textContent;
 
   memberWrapper.remove();
-
-  // addBotMessageToDom(`${name} has left the room!`);
 };
 
 // get members function
@@ -110,6 +114,10 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // Add dom message element
   if (data.type === 'chat') {
     addMessageToDom(data.displayName, data.message);
+  }
+
+  if (data.type === 'user_join') {
+    checkIfUserDom(data.rtcId, data.name);
   }
 
   // If user left delete them in the stream

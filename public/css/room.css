@@ -73,6 +73,19 @@ body {
   position: relative;
   overflow: hidden;
 }
+
+/* raiseHand */
+.raise_hand {
+  position: absolute;
+  background: #494949;
+  color: white;
+  text-shadow: 1px 1px black;
+  top: 10%;
+  left: 10px;
+  padding: 10px;
+  z-index: 10;
+}
+
 /* Buttons */
 .footerBtn {
   z-index: 2;

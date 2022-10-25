@@ -131,14 +131,14 @@ const handleChannelMessage = async (messageData, MemberId) => {
   }
 
   if (data.type === 'raise_hand_on') {
-    raiseHands.push({ _id: data._id, name });
-    console.log(raiseHands);
+    raiseHands.push({ _id: data._id, fullName: data.name });
+    raiseHandHandler();
   }
 
   if (data.type === 'raise_hand_off') {
     const index = raiseHands.findIndex((user) => user._id === data.id);
     raiseHands.splice(index);
-    console.log(raiseHands);
+    raiseHandHandler();
   }
 
   // if other user share a screen expand them in display frame
@@ -183,6 +183,38 @@ const handleChannelMessage = async (messageData, MemberId) => {
       faceRecognitionHandler(MemberId);
     }
   }
+};
+
+const raiseHandHandler = () => {
+  console.log(raiseHands);
+  const body = document.querySelector('.videoCall');
+  const dom = document.querySelector('.raise_hand');
+  const firstUser = raiseHands[0];
+  const secondUser = raiseHands[1];
+
+  if (!dom && firstUser) {
+    body.insertAdjacentHTML('beforeend', raiseHandDom(firstUser.fullName));
+  }
+  const users = document.querySelector('.users');
+  if (dom && secondUser) {
+    users.innerHTML = `${firstUser.fullName} and ${secondUser}\n is rasing their hand <i class="fa-solid fa-hand"></i>`;
+  }
+  if (dom && raiseHands.length > 2) {
+    users.innerHTML = `${firstUser.fullName}, ${secondUser}\nand other's is raising their hand <i class="fa-solid fa-hand"></i> `;
+  }
+  if (raiseHands.length === 0) {
+    if (dom) dom.remove();
+  }
+};
+
+const raiseHandDom = (name) => {
+  return `
+    <div class="raise_hand">
+      <p class="users">${name} is raising a hand 
+        <i class="fa-solid fa-hand"></i>
+      </p>
+    </div>
+  `;
 };
 
 // function to send message

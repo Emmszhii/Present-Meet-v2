@@ -234,10 +234,10 @@ body {
   width: 300px;
   height: 200px;
   position: relative;
-  background-image: url('../img/logo.png');
+  background-image: url('../img/logo-white.svg');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%;
+  background-size: 100%;
 }
 .video-player {
   height: 100%;

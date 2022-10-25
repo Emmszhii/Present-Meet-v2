@@ -18,26 +18,18 @@ let interval;
 
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
+  time--;
+  console.log(time);
   let seconds = time % 60;
 
   const countdown = document.getElementById('take_attendance');
   if (countdown) {
-    countdown.innerHTML = `${seconds}`;
+    countdown.innerHTML = `Attendance taking... ${seconds}`;
   }
-  time--;
 
-  if (time < end_time) {
+  if (time <= end_time) {
     stopTimer();
   }
-};
-
-const makeAttendance = () => {
-  rtm.channel.sendMessage({
-    text: JSON.stringify({
-      type: 'attendance_on',
-      id: userData._id,
-    }),
-  });
 };
 
 const stopTimer = () => {
@@ -48,7 +40,8 @@ const stopTimer = () => {
   if (btn.classList.contains('on')) {
     btn.classList.remove('on');
   }
-  btn.innerHTML = `<i class='fa-solid fa-check'></i>`;
+  btn.innerHTML = `Attendance <span><i class='fa-solid fa-check'></i></span>`;
+  btn.value = 'off';
   time = startingMinutes * startingSeconds;
 };
 
@@ -126,7 +119,7 @@ const restrictToggleHandler = () => {
 
   document
     .getElementById('take_attendance')
-    .addEventListener('click', take_attendance);
+    .addEventListener('click', takeAttendanceHandler);
 };
 
 const restrictMode = (e) => {
@@ -144,24 +137,37 @@ const restrictMode = (e) => {
   }
 };
 
-const take_attendance = async (e) => {
+const takeAttendanceHandler = async (e) => {
   const btn = e.currentTarget;
 
   if (btn.value === 'off') {
     btn.value = 'on';
     btn.classList.toggle('on');
-    btn.textContent = 'Attendance On';
     interval = setInterval(updateCountdown, startingInterval);
-    makeAttendance();
+    sendToStudentAttendance();
   } else {
     btn.value = 'off';
     btn.classList.toggle('on');
-    btn.textContent = 'Attendance Off';
     stopTimer();
   }
 };
 
-const attendanceChecker = () => {
+const sendToStudentAttendance = () => {
+  rtm.channel.sendMessage({
+    text: JSON.stringify({
+      type: 'attendance_on',
+      id: userData._id,
+    }),
+  });
+};
+
+const checkDbAttendance = async () => {
+  const url = `/get-attendance`;
+  const postData = '';
+  const { data, msg, err } = await fetch(url);
+};
+
+const restrictionChecker = () => {
   const id = document.getElementById('classroom_list').value;
   const restrictVal = document.getElementById('restrict').value;
 
@@ -172,7 +178,7 @@ const attendanceChecker = () => {
 };
 
 const attendanceCheckHandler = () => {
-  const val = attendanceChecker();
+  const val = restrictionChecker();
   if (val) {
     document.getElementById('take_attendance').disabled = true;
   } else {

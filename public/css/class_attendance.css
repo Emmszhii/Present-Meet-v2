@@ -393,3 +393,14 @@ td:last-child {
   background-color: black;
   color: white;
 }
+
+@media (max-width: 768px) {
+  .class_list {
+    width: 30vw;
+    font-size: 1rem;
+  }
+  #add_list,
+  #main_list {
+    width: 80%;
+  }
+}

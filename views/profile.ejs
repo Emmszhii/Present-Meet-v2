@@ -9,7 +9,7 @@
       type="image/x-icon"
     />
     <title>Present Meet</title>
-    <link rel="stylesheet" href="css/register.css" />
+    <link rel="stylesheet" href="css/profile.css" />
     <script type="module" src="javascript/profile/controller.js"></script>
   </head>
   <body>
@@ -17,8 +17,9 @@
     <main>
       <div id="form">
         <div class="card">
+          <%- include('partials/title') %>
           <div id="messages"></div>
-          <div class="intro"><h2>Edit Profile</h2></div>
+          <div class="intro">Edit Profile</div>
           <form id="info">
             <div class="form-group">
               <label for="first_name">First Name</label>

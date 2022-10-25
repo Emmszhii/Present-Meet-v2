@@ -1,25 +1,47 @@
-<%- include('partials/header') %>
-<link rel="stylesheet" href="css/login.css" />
-<main>
-  <div class="card">
-    <div class="intro">Login</div>
-    <%- include('partials/messages') %>
-    <form action="/login" id="user-login" method="post">
-      <input type="email" name="email" id="email" value="" autocomplete="off" />
-      <label for="email">Email</label>
-      <input
-        type="password"
-        name="password"
-        id="password-input"
-        value=""
-        autocomplete="off"
-      />
-      <label for="password">Password</label>
-      <button type="submit" class="button">Login</button>
-    </form>
-
-    <p>No account? <a href="/register">Sign up</a> now!</p>
-  </div>
-</main>
-
-<%- include('partials/footer') %>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="icon"
+      href="/public/img/logo-no-background.svg"
+      type="image/x-icon"
+    />
+    <title>Present Meet</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <%- include('partials/title') %>
+        <div class="intro">Login</div>
+        <%- include('partials/messages') %>
+        <form action="/login" id="user-login" method="post">
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value=""
+            autocomplete="off"
+          />
+          <label for="email">Email</label>
+          <input
+            type="password"
+            name="password"
+            id="password-input"
+            value=""
+            autocomplete="off"
+          />
+          <label for="password">Password</label>
+          <button type="submit" class="button">Login</button>
+        </form>
+        <p>No account? <a href="/register">Sign up</a> now!</p>
+      </div>
+    </main>
+  </body>
+</html>

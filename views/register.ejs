@@ -9,12 +9,17 @@
       type="image/x-icon"
     />
     <title>Present Meet</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    />
     <link rel="stylesheet" href="css/register.css" />
   </head>
   <body>
     <main>
       <div id="form">
         <div class="card">
+          <%- include('partials/title') %>
           <div class="intro"><h3>Register</h3></div>
           <%- include('partials/messages') %>
           <form action="/register" id="user-info" method="post">

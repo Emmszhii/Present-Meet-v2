@@ -14,9 +14,11 @@
 
 a {
   text-decoration: none;
+  cursor: pointer;
 }
 a:hover {
-  text-decoration: none;
+  color: black;
+  text-decoration: underline;
 }
 
 body {
@@ -27,13 +29,27 @@ body {
   height: 100vh;
 }
 
+.title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.title > h1 > span {
+  color: blue;
+}
+.title > p {
+  font-size: 1.2rem;
+  text-align: center;
+}
+
 main {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   color: black;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   flex-direction: column;
 }
 
@@ -46,11 +62,21 @@ main {
   text-align: center;
 }
 
+.logo {
+  background: url('/public/img/logo-no-background.svg') no-repeat center center
+    transparent;
+  background-size: 100%;
+  width: 10%;
+  height: 10%;
+}
+
 input {
   width: 100%;
   text-align: center;
   border: none;
   border-bottom: 2px solid black;
+  padding: 5px 10px;
+  font-size: 1.4rem;
 }
 
 input:focus {
@@ -80,6 +106,7 @@ input:focus {
   width: 100%;
   text-align: center;
   justify-content: center;
+  font-size: 1.4rem;
 }
 
 .button:hover {

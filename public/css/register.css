@@ -17,14 +17,41 @@
   z-index: 100;
 }
 body {
+  background-color: black;
   font-size: 1rem;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+.title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
 }
 
+.title > h1 > span {
+  color: blue;
+}
+.title > p {
+  font-size: 1.2rem;
+  text-align: center;
+}
 main {
-  overflow: hidden;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   flex-direction: column;
-  width: 100vw;
+}
+
+#form {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-size: 1.5rem;
 }
 
 .intro {
@@ -38,17 +65,10 @@ main {
   padding: 20px;
   border-radius: 3px;
   width: 30%;
+  height: 90%;
   margin: 10px;
-}
-
-#form {
-  background-color: black;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: black;
-  font-size: 1.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #modal-confirm,

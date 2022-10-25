@@ -76,7 +76,8 @@ const resetTheFrames = () => {
 };
 
 // Copy Meeting ID function
-const copyClipboard = () => {
+const copyClipboard = (e) => {
+  const btn = e.currentTarget;
   const link = window.location.href;
   const text = `Present Meet
 A video conferencing web app with face recognition attendance.
@@ -87,7 +88,16 @@ Here's the invitation link :
 ${link}
 
 Enjoy using our service :D`;
+
   navigator.clipboard.writeText(text);
+  btn.classList.toggle('copy');
+  btn.classList.toggle('check');
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.toggle('check');
+    btn.classList.toggle('copy');
+    btn.disabled = false;
+  }, 3000);
 };
 
 const roomLoaderHandler = () => {

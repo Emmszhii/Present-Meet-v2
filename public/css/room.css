@@ -151,16 +151,41 @@ body {
 
 .copy {
   color: #fff;
+  text-shadow: 1px 1px black;
   background-color: #494949;
   width: 50px;
   height: 50px;
   display: flex;
   place-content: center;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.check {
+  color: white;
+  text-shadow: 1px 1px black;
+  background-color: #494949;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  place-content: center;
+  place-items: center;
+  border-radius: 3px;
+  font-size: 1.2rem;
+  cursor: default;
+}
+.copy::before {
+  content: '\f0c5';
+  font: var(--fa-font-solid);
 }
 .copy:active {
   border: 1px solid black;
+}
+.check::before {
+  content: '\f00c';
+  font: var(--fa-font-solid);
+  cursor: default;
 }
 .mainBtn {
   display: flex;
@@ -689,6 +714,9 @@ select {
   .modal_face_content {
     width: 90%;
   }
+  .link {
+    font-size: 1rem;
+  }
 }
 @media (max-width: 480px) {
   .settings-modal {
@@ -701,5 +729,8 @@ select {
   #quit-btn {
     font-size: 0.9rem;
     padding: 5px 10px;
+  }
+  .link {
+    font-size: 0.9rem;
   }
 }

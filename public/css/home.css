@@ -9,6 +9,22 @@ body {
   background-color: #e8ecef;
 }
 
+.copy::before {
+  content: '\f0c5';
+  font: var(--fa-font-solid);
+}
+
+.copy:hover {
+  color: white;
+  background-color: black;
+}
+
+.check::before {
+  content: '\f00c';
+  font: var(--fa-font-solid);
+  cursor: default;
+}
+
 .text {
   text-align: center;
   display: flex;
@@ -118,17 +134,11 @@ input:focus::placeholder {
 }
 
 .icon {
+  padding: 5px;
   border: 0;
   background: transparent;
   cursor: pointer;
 }
-
-.icon:active {
-  color: white;
-  background-color: black;
-  border: 0;
-}
-
 .buttons {
   margin: 10px;
 }

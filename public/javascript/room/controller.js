@@ -17,6 +17,7 @@ import {
   copyClipboard,
   hideDisplayFrame,
   settingsToggle,
+  raiseHand,
 } from './room.js';
 
 // Event Listeners
@@ -48,9 +49,12 @@ document
 document
   .getElementById('stream__box')
   .addEventListener('click', hideDisplayFrame);
-// // when a user forced close they will be deleted to the dom
+// raise hand
+document.getElementById('raise-hand').addEventListener('click', raiseHand);
+
+// when a user forced close they will be deleted to the dom
 window.addEventListener('beforeunload', leaveChannel);
-// // when users click esc btn close the msg & members modal
+// when users click esc btn close the msg & members modal
 document.addEventListener('keydown', (e) => {
   const membersModal = document.getElementById('members__container');
   const messagesModal = document.getElementById('messages__container');

@@ -586,9 +586,7 @@ select {
   color: white;
   background: black;
 }
-
 /* Face recognition */
-
 .modal_face {
   z-index: 3;
   position: fixed;

@@ -17,6 +17,7 @@ import {
 import { checkStudentDescriptor } from './attendance.js';
 
 const users = [];
+const raiseHands = [];
 
 const getRtmToken = async () => {
   const url = `/rtm`;
@@ -127,6 +128,17 @@ const handleChannelMessage = async (messageData, MemberId) => {
     if (userIdInDisplayFrame.val === `user-container-${data.uid}`) {
       hideDisplayFrame();
     }
+  }
+
+  if (data.type === 'raise_hand_on') {
+    raiseHands.push({ _id: data._id, name });
+    console.log(raiseHands);
+  }
+
+  if (data.type === 'raise_hand_off') {
+    const index = raiseHands.findIndex((user) => user._id === data.id);
+    raiseHands.splice(index);
+    console.log(raiseHands);
   }
 
   // if other user share a screen expand them in display frame

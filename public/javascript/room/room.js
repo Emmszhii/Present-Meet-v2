@@ -50,9 +50,9 @@ const expandVideoFrame = (e) => {
   resetTheFrames();
 };
 
-for (let i = 0; videoFrames.length > i; i++) {
-  videoFrames[i].addEventListener('click', expandVideoFrame);
-}
+// for (let i = 0; videoFrames.length > i; i++) {
+//   videoFrames[i].addEventListener('click', expandVideoFrame);
+// }
 
 // Hide Display Frame Function
 const hideDisplayFrame = () => {
@@ -311,6 +311,30 @@ const muteStream = async () => {
   }
 };
 
+const raiseHand = async (e) => {
+  const btn = e.currentTarget;
+
+  if (btn.classList.contains('active')) {
+    btn.classList.toggle('active');
+    rtm.channel.sendMessage({
+      text: JSON.stringify({
+        type: 'raise_hand_off',
+        name: userData.fullName,
+        _id: userData.id,
+      }),
+    });
+  } else {
+    btn.classList.toggle('active');
+    rtm.channel.sendMessage({
+      text: JSON.stringify({
+        type: 'raise_hand_on',
+        name: userData.fullName,
+        _id: userData.id,
+      }),
+    });
+  }
+};
+
 export {
   displayFrame,
   videoFrames,
@@ -329,4 +353,5 @@ export {
   settingsHandler,
   muteStream,
   checkIfUserDom,
+  raiseHand,
 };

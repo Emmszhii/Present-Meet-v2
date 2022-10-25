@@ -68,7 +68,7 @@ const dom = () => {
       <span class='close'>&times;</span>
         <div class='title'>
           <p id='backend'></p>
-          <span><i class='fa-solid fa-question' title="If cpu is your backend it may take a while else it should be faster"></i></span>
+          <span>webgl > cpu <i class='fa-solid fa-question' title="If cpu is your backend it may take a while else it should be faster"></i></span>
           </div>
         <div id="msg">
           <p id="video_title">Face Recognition attendance</p>
@@ -102,13 +102,13 @@ const sendAttendance = async (data) => {
 
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
+  time--;
   let seconds = time % 60;
 
   const countdown = document.getElementById('countdown');
   if (countdown) {
-    countdown.innerHTML = `${seconds}`;
+    countdown.innerHTML = `Closing this window in : ${seconds}`;
   }
-  time--;
 
   if (time < end_time) {
     stopTimer();

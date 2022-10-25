@@ -246,8 +246,11 @@ const handleUserPublished = async (user, mediaType) => {
       user.audioTrack.play();
     }
   } catch (err) {
-    const arrErr = [''];
-    console.log(err);
+    const arrErr = [
+      `rtc.js:250 Cannot read properties of undefined (reading 'play')`,
+    ];
+    if (arrErr.includes(err.message)) return;
+    console.log(err.message);
   }
 };
 
@@ -375,8 +378,8 @@ const toggleScreen = async (e) => {
       rtc.sharingScreen = false;
       screenBtn.classList.remove('active');
       error = !error;
-
       if (arrErr.includes(err.message)) return;
+      console.log(err.message);
     });
 
     // if error is true this function will end
@@ -551,7 +554,7 @@ const leaveStream = async (e) => {
   if (rtc.localScreenTracks) {
     await rtc.client.unpublish([rtc.localScreenTracks]);
     await rtc.localScreenTracks.close();
-    rtc.client.sharingScreen = false;
+    rtc.sharingScreen = false;
     cameraBtn.style.display = 'block';
     screenBtn.classList.remove('active');
   }

@@ -154,10 +154,6 @@ input:focus::placeholder {
   color: transparent;
 }
 
-.form-group {
-  /* margin-top: 5px; */
-}
-
 #user-type-div {
   display: flex;
   justify-content: center;

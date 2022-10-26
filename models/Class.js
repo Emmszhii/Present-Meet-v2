@@ -25,10 +25,9 @@ const classroomSchema = new mongoose.Schema(
 
 const attendanceSchema = new mongoose.Schema(
   {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom' },
-    date: Date,
     present: Array,
     absent: Array,
+    late: Array,
   },
   { timestamps: true }
 );

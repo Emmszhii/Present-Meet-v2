@@ -1,5 +1,5 @@
 import { postRequest, getRequest, controller } from '../helpers/helpers.js';
-import { roomLoaderHandler } from './room.js';
+import { roomLoaderHandler, meetingId } from './room.js';
 import { rtc, rtm, userData } from './rtc.js';
 import { users } from './rtm.js';
 import {
@@ -141,10 +141,11 @@ const takeAttendanceHandler = async (e) => {
   const btn = e.currentTarget;
 
   if (btn.value === 'off') {
+    createAttendanceHandler();
+    studentFaceRecognition();
+    interval = setInterval(updateCountdown, startingInterval);
     btn.value = 'on';
     btn.classList.toggle('on');
-    interval = setInterval(updateCountdown, startingInterval);
-    sendToStudentAttendance();
   } else {
     btn.value = 'off';
     btn.classList.toggle('on');
@@ -152,7 +153,7 @@ const takeAttendanceHandler = async (e) => {
   }
 };
 
-const sendToStudentAttendance = () => {
+const studentFaceRecognition = () => {
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance_on',
@@ -161,10 +162,29 @@ const sendToStudentAttendance = () => {
   });
 };
 
-const checkDbAttendance = async () => {
-  const url = `/get-attendance`;
-  const postData = '';
-  const { data, msg, err } = await fetch(url);
+const createAttendanceHandler = async () => {
+  const restrict = document.getElementById('restrict').value;
+  const id = document.getElementById('classroom_list').value;
+  const url = `/create-attendance/${restrict}`;
+  try {
+    if (restrict === 'on') {
+      const postData = { meetingId, id };
+      console.log(postData);
+      const { data, msg, err } = await postRequest(url, postData);
+      console.log(data);
+      console.log(msg);
+      console.log(err);
+    } else {
+      console.log(id);
+      const postData = { meetingId };
+      const { data, msg, err } = await postRequest(url, postData);
+      console.log(data);
+      console.log(msg);
+      console.log(err);
+    }
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const restrictionChecker = () => {
@@ -232,12 +252,6 @@ const attendance = async () => {
       roomLoaderHandler();
     }
   }
-};
-
-const createAttendance = async (id) => {
-  const url = `/create-attendance`;
-  const data = await postRequest(url, id);
-  return data;
 };
 
 const dropDownList = (info) => {

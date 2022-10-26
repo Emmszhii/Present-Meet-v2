@@ -130,7 +130,6 @@ router.post('/update-class', ensureAuthenticated, async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ err: e });
   }
 });
 
@@ -273,8 +272,61 @@ router.post('/delete-student', ensureAuthenticated, async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ err: e });
   }
 });
+
+router.post(
+  '/create-attendance/:restrict',
+  ensureAuthenticated,
+  async (req, res) => {
+    const restrict = req.params.restrict;
+    const { meetingId, id: classId } = req.body;
+    console.log(restrict, meetingId, classId);
+
+    if (restrict !== 'on' && restrict !== 'off')
+      return res.status(400).json({ err: `Invalid restriction request` });
+    if (!meetingId)
+      return res.status(400).json({ err: `Invalid channel request` });
+
+    try {
+      if (restrict === 'on') {
+        console.log(req.user._id);
+        const teacher = await Teacher.findOne({ _id: req.user._id });
+        if (!teacher) return res.status(400).json({ err: `Invalid request` });
+
+        const classroom = await Classroom.findOne({ _id: classId });
+        if (!classroom) return res.status(400).json({ err: `Invalid request` });
+        if (classroom.students.length === 0)
+          return res.status(400).json({ err: `No student registered` });
+
+        await Classroom.findOne({ _id: classId })
+          .populate({
+            path: 'attendance_id',
+          })
+          .then((data) => {
+            const attendance = data.attendance_id;
+            console.log(attendance);
+            console.log(attendance.length);
+            console.log('new : ' + attendance[attendance.length - 1]);
+          });
+
+        const attendance = new Attendance();
+        classroom.attendance_id.push(attendance._id);
+        await attendance.save();
+        await classroom.save();
+      }
+
+      res.status(200).json({
+        data: {
+          restrict,
+          meetingId,
+          classId,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
 
 module.exports = router;

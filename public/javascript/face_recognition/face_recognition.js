@@ -286,13 +286,13 @@ const stopVideo = () => {
 };
 
 const createPostButton = async () => {
-  const buttons = document.querySelector('.buttons');
+  const buttons = document.getElementById('functionBtn');
   const button = document.createElement('button');
   button.classList.add('button');
   button.innerHTML = 'Submit';
   button.id = 'submit-btn';
 
-  buttons.append(button);
+  buttons.appendChild(button);
   button.addEventListener('click', showConfirm);
 };
 

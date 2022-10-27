@@ -255,15 +255,6 @@ input:focus::placeholder {
   color: transparent;
 }
 /* End Modal */
-@media (max-width: 1600px) {
-  /* main {
-    display: block;
-    font-size: 1.1rem;
-  }
-  #upload-img {
-    width: 100%;
-  } */
-}
 @media (max-width: 1366px) {
   main {
     font-size: 1.2rem;
@@ -294,8 +285,4 @@ input:focus::placeholder {
   main {
     font-size: 1.5rem;
   }
-  /* .attendance-camera {
-    width: 400px;
-    height: 600px;
-  } */
 }

@@ -10,6 +10,7 @@ const {
   validateNameEmpty,
   validateEmpty,
   comparePassword,
+  timeSince,
 } = require('./helpers/functions');
 const { ObjectId } = require('mongodb');
 
@@ -281,7 +282,6 @@ router.post(
   async (req, res) => {
     const restrict = req.params.restrict;
     const { meetingId, id: classId } = req.body;
-    console.log(restrict, meetingId, classId);
 
     if (restrict !== 'on' && restrict !== 'off')
       return res.status(400).json({ err: `Invalid restriction request` });
@@ -290,7 +290,6 @@ router.post(
 
     try {
       if (restrict === 'on') {
-        console.log(req.user._id);
         const teacher = await Teacher.findOne({ _id: req.user._id });
         if (!teacher) return res.status(400).json({ err: `Invalid request` });
 
@@ -299,15 +298,38 @@ router.post(
         if (classroom.students.length === 0)
           return res.status(400).json({ err: `No student registered` });
 
-        await Classroom.findOne({ _id: classId })
+        const { minutes, seconds } = await Classroom.findOne({ _id: classId })
           .populate({
             path: 'attendance_id',
           })
           .then((data) => {
             const attendance = data.attendance_id;
-            console.log(attendance);
-            console.log(attendance.length);
-            console.log('new : ' + attendance[attendance.length - 1]);
+            const lastAttendance = attendance[attendance.length - 1];
+            const created = lastAttendance.createdAt;
+            const today = new Date().toISOString();
+            const difference = new Date(today) - created;
+
+            // const diff = timeSince(created);
+            const seconds = difference / 1000;
+            let interval = seconds / 60;
+            if (interval > 1 && seconds > 60) {
+              const minutes = Math.floor(seconds / 60);
+              return { minutes };
+            }
+            return { seconds };
+          });
+
+        if (minutes < 15)
+          return res.status(400).json({
+            err: `Request Timeout! Request again after ${
+              15 - minutes
+            } minute(s)`,
+          });
+        if (seconds)
+          return res.status(400).json({
+            err: `Request Timeout! Request again after ${
+              60 - seconds
+            } second(s)`,
           });
 
         const attendance = new Attendance();

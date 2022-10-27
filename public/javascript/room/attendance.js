@@ -141,7 +141,8 @@ const takeAttendanceHandler = async (e) => {
   const btn = e.currentTarget;
 
   if (btn.value === 'off') {
-    createAttendanceHandler();
+    const { err, msg, data } = await createAttendanceHandler();
+    if (err) return errorMsg(err);
     studentFaceRecognition();
     interval = setInterval(updateCountdown, startingInterval);
     btn.value = 'on';
@@ -169,18 +170,12 @@ const createAttendanceHandler = async () => {
   try {
     if (restrict === 'on') {
       const postData = { meetingId, id };
-      console.log(postData);
       const { data, msg, err } = await postRequest(url, postData);
-      console.log(data);
-      console.log(msg);
-      console.log(err);
+      return { err, msg, data };
     } else {
-      console.log(id);
       const postData = { meetingId };
       const { data, msg, err } = await postRequest(url, postData);
-      console.log(data);
-      console.log(msg);
-      console.log(err);
+      return { err, msg, data };
     }
   } catch (e) {
     console.log(e);

@@ -223,7 +223,7 @@ a {
   }
   .card {
     width: 40%;
-    height: 90%;
+    height: 90vh;
     overflow-x: hidden;
     overflow-y: auto;
   }

@@ -88,42 +88,6 @@ const getRtcToken = async () => {
 };
 
 const data_init = async () => {
-  // fetch('/getInfo')
-  //   .then((resp) => {
-  //     return resp.json();
-  //   })
-  //   .then((data) => {
-  //     const { _id, first_name, middle_name, last_name, type, AGORA_APP_ID } =
-  //       data;
-  //     userData.type = type;
-  //     userData.APP_ID = AGORA_APP_ID;
-  //     userData.firstName = first_name;
-  //     userData.lastName = last_name;
-  //     userData.fullName = `${first_name} ${last_name}`;
-  //     userData.id = _id;
-  //     userData.rtcId = _id;
-  //     userData.rtmId = _id;
-  //     return fetch(`/rtc/${meetingId}/publisher/uid`);
-  //   })
-  //   .then((resp) => {
-  //     return resp.json();
-  //   })
-  //   .then((data) => {
-  //     userData.rtcToken = data.rtcToken;
-  //     return fetch(`/rtm`);
-  //   })
-  //   .then((resp) => {
-  //     return resp.json();
-  //   })
-  //   .then((data) => {
-  //     userData.rtmToken = data.rtmToken;
-  //   })
-  //   .catch((e) => {
-  //     console.log(e);
-  //   })
-  //   .finally(() => {
-  //     joinRoomInit();
-  //   });
   try {
     const infoUrl = `/getInfo`;
     const { _id, first_name, middle_name, last_name, type, AGORA_APP_ID } =

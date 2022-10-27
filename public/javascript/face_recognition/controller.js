@@ -5,6 +5,7 @@ import {
   photoHandler,
   fetchPrevDescriptor,
   informationHandler,
+  cameraDeviceHandler,
 } from './face_recognition.js';
 
 document
@@ -21,10 +22,8 @@ window.addEventListener('load', () => {
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
   ])
-    .then(() => {
-      // faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-      // faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
-      // faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    .then(async () => {
+      await cameraDeviceHandler();
       fetchPrevDescriptor();
       informationHandler();
     })

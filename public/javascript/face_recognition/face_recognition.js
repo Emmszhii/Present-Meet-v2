@@ -1,4 +1,11 @@
 import { postRequest } from '../helpers/helpers.js';
+import { getCameraDevices } from '../helpers/devices.js';
+import {
+  userNotificationMsg,
+  errorMsg,
+  successMsg,
+  warningMsg,
+} from './msg.js';
 
 const preloader = document.getElementById('preloader');
 const camera = document.querySelector('.attendance-camera');
@@ -6,10 +13,17 @@ let track;
 const useTinyModel = true;
 const refUser = [];
 let intervalFace;
+const cameraDevices = [];
 
 const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
   inputSize: 416,
 });
+
+const cameraDeviceHandler = async () => {
+  const cameras = await getCameraDevices();
+  if (!cameraDevices) return;
+  cameraDevices.push(cameras);
+};
 
 const fetchPrevDescriptor = async () => {
   const res = await fetch('/getDescriptor', { method: 'get' });
@@ -19,20 +33,15 @@ const fetchPrevDescriptor = async () => {
       const split = data.descriptor.split(',');
       const float32 = new Float32Array(split);
       refUser.push([{ descriptor: float32 }]);
-      msgHandler('Previous face description is now added.');
+      successMsg('Previous face description is now added.');
     }
-    if (data.warning) {
-      warningHandler(data.warning);
-    }
+    if (data.warning) warningMsg(data.warning);
   }
-  if (res.status === 400) {
-    errorHandler(data.err);
-  }
+  if (res.status === 400) errorMsg(data.err);
 };
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
-  resetMessages();
   const backend = faceapi.tf.getBackend();
   preloader.style.display = 'block';
   const vid = document.createElement('video');
@@ -70,8 +79,10 @@ const startVideoHandler = async () => {
     .catch((e) => {
       if (e.name === 'NotAllowedError') {
         const dom = document.getElementById('video_error');
-        if (!dom)
+        if (!dom) {
           informationDom(`video_error`, `Video: Permission Denied by user`);
+          errorMsg('Video: Permission Denied by user');
+        }
       }
     })
     .finally(() => {
@@ -106,7 +117,6 @@ const faceDetection = (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
-  resetMessages();
   preloader.style.display = 'block';
   const video = document.getElementById('video');
   const landmarks = document.getElementById('face_landmarks');
@@ -141,7 +151,7 @@ const photoHandler = async () => {
       // if no detection function done
       if (detection.length < 1 || detection.length > 1) {
         stopVideo();
-        errorHandler('Image are invalid. Please Try again!');
+        errorMsg('Image are invalid. Please Try again!');
         return startVideoHandler();
       }
       // if face is detected
@@ -157,15 +167,15 @@ const photoHandler = async () => {
       // input user array
       refUser.push(detection);
       // msg
-      msgHandler(
+      successMsg(
         'If you are satisfied with this photo try to recognize else retry'
       );
     } else {
-      errorHandler('Start the camera first!');
+      errorMsg('Start the camera first!');
     }
   } catch (err) {
     console.log(err);
-    errorHandler(err);
+    errorMsg(err);
   } finally {
     preloader.style.display = 'none';
   }
@@ -173,14 +183,12 @@ const photoHandler = async () => {
 
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
-  resetMessages();
   preloader.style.display = 'block';
   const video = document.getElementById('video');
   try {
     if (video) {
-      if (refUser.length === 0) {
-        return errorHandler('No Reference Image !');
-      }
+      if (refUser.length === 0) return errorMsg('No Reference Image!');
+
       let img1 = refUser[0];
       let img2;
 
@@ -199,7 +207,7 @@ const recognizeHandler = async () => {
       // if no detection
       if (detection.length < 1 || detection.length > 1) {
         stopVideo();
-        errorHandler('Face invalid, try again');
+        errorMsg('Face invalid, try again');
         return startVideoHandler();
       }
 
@@ -207,8 +215,8 @@ const recognizeHandler = async () => {
 
       stopVideo();
       // guard clause
-      if (!img1) return errorHandler(`Record your face first!`);
-      if (!img2) return errorHandler(`Face not recognize`);
+      if (!img1) return errorMsg(`Record your face first!`);
+      if (!img2) return errorMsg(`Face not recognize`);
 
       img1 = img1[0].descriptor;
       img2 = img2.descriptor;
@@ -216,7 +224,7 @@ const recognizeHandler = async () => {
       // comparing the 2 image
       comparePerson(img1, img2);
     } else {
-      errorHandler('Start the camera first!');
+      errorMsg('Start the camera first!');
     }
   } catch (e) {
     console.log(e);
@@ -227,23 +235,22 @@ const recognizeHandler = async () => {
 
 // compare the person
 const comparePerson = async (referenceImg, queryImg) => {
-  resetMessages();
   // guard clause if input is null
-  if (!referenceImg) return errorHandler('Please register an image first');
-  if (!queryImg) return errorHandler('Query img is invalid');
+  if (!referenceImg) return errorMsg('Please register an image first');
+  if (!queryImg) return errorMsg('Query img is invalid');
   // if both are defined run the face recognition
   if (queryImg) {
     // matching B query
     const distance = 0.4;
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
     if (dist <= distance) {
-      msgHandler(`Face are match!`);
+      successMsg(`Face are match! Please submit it to register`);
       createPostButton();
     } else {
-      errorHandler('Face does not Match!');
+      errorMsg('Face does not Match!');
     }
   } else {
-    errorHandler('No face detected!');
+    errorMsg('No face detected!');
   }
 };
 
@@ -271,39 +278,6 @@ const stopVideo = () => {
   if (intervalFace) clearInterval(intervalFace);
 };
 
-const resetMessages = () => {
-  const err = document.getElementById('err');
-  const msg = document.getElementById('msg');
-  const warning = document.getElementById('warning');
-  if (err) err.remove();
-  if (msg) msg.remove();
-  if (warning) warning.remove();
-};
-
-const errorHandler = (err) => {
-  const p = document.createElement('p');
-  p.textContent = err;
-  p.id = 'err';
-
-  document.getElementById('messages').appendChild(p);
-};
-
-const warningHandler = (warning) => {
-  const p = document.createElement('p');
-  p.textContent = warning;
-  p.id = 'warning';
-
-  document.getElementById('messages').appendChild(p);
-};
-
-const msgHandler = (msg) => {
-  const p = document.createElement('p');
-  p.textContent = msg;
-  p.id = 'msg';
-
-  document.getElementById('messages').appendChild(p);
-};
-
 const createPostButton = async () => {
   const buttons = document.querySelector('.buttons');
   const button = document.createElement('button');
@@ -316,7 +290,6 @@ const createPostButton = async () => {
 };
 
 const showConfirm = () => {
-  resetMessages();
   const modal = document.getElementById('modal-confirm');
   const confirmBtn = document.getElementById('confirm');
   const cancelBtn = document.getElementById('cancel');
@@ -341,10 +314,10 @@ const postToServer = async (e) => {
     const url = `/descriptor`;
     const post_data = { descriptor, password: password.value };
     const data = await postRequest(url, post_data);
-    if (data.err) return errorHandler(data.err);
+    if (data.err) return errorMsg(data.err);
     if (data.msg) window.location.href = data.msg;
   } catch (err) {
-    return errorHandler(err);
+    return errorMsg(err);
   } finally {
     hideConfirm();
   }
@@ -388,12 +361,10 @@ export {
   startVideoHandler,
   photoHandler,
   stopVideo,
-  resetMessages,
   recognizeHandler,
-  errorHandler,
-  msgHandler,
   comparePerson,
   createPostButton,
   postToServer,
   informationHandler,
+  cameraDeviceHandler,
 };

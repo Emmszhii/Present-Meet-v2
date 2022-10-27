@@ -8,6 +8,9 @@
 body {
   background-color: #e8ecef;
   font-size: 1rem;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 main {
@@ -17,15 +20,81 @@ main {
   font-size: 1rem;
 }
 
+/* Start Messages */
+.warning_msg,
+.success_msg,
+.error_msg,
+.user_notification_msg {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: absolute;
+  padding: 10px;
+  top: 10px;
+  left: 10px;
+  color: white;
+  text-shadow: 2px 2px black;
+  z-index: 10;
+}
+.user_notification_msg {
+  text-shadow: 1px 1px black;
+  background: gray;
+}
+.warning_msg {
+  background-color: orange;
+}
+.success_msg {
+  background-color: green;
+}
+.error_msg {
+  background-color: red;
+}
+
+.close_btn {
+  border: none;
+  background: transparent;
+}
+.close_btn:hover {
+  background-color: black;
+  color: white;
+}
+.close_msg {
+  font-size: 1.5rem;
+}
+.button-box {
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.button-box:hover {
+  color: white;
+  background-color: black;
+}
+/* End Messages */
+/* Loader */
 #preloader {
-  background: #000 url('/public/img/bigLoader.gif') no-repeat center center;
-  background-size: 30%;
+  background: url('/public/img/spinner.svg') no-repeat center center transparent;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-size: 50%;
   height: 100%;
   width: 100%;
+  top: 0;
+  left: 0;
   position: fixed;
   z-index: 100;
 }
-
+.loader {
+  background: url('/public/img/spinner.svg') no-repeat center center transparent;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-size: 50%;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 100;
+}
+/* End loader */
 /* Messages */
 
 #msg {
@@ -76,8 +145,15 @@ main {
 .buttons {
   display: flex;
   justify-content: space-between;
-  width: 40%;
-  margin: 20px;
+  gap: 10px;
+  margin: 5px 10px;
+}
+
+.buttons_confirm {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 10px;
+  gap: 10px;
 }
 
 .button {
@@ -144,7 +220,6 @@ canvas {
 }
 
 /* modal */
-
 #modal-confirm {
   display: none;
   position: fixed;
@@ -208,46 +283,19 @@ input:focus::placeholder {
   main {
     font-size: 1.2rem;
   }
-  .buttons {
-    width: 70%;
-  }
 }
 @media (max-width: 1000px) {
   main {
     font-size: 1.3rem;
   }
   #modal-content {
-    width: 60%;
+    width: 50%;
   }
-  .buttons {
-    width: 75%;
-  }
-  /* #home {
-    width: 8%;
-  } */
 }
 
 @media (max-width: 768px) {
   main {
     font-size: 1.4rem;
-  }
-  .buttons {
-    width: 80%;
-  }
-  .attendance-camera {
-    width: 400px;
-    height: 600px;
-  }
-  #modal-content {
-    width: 65%;
-  }
-}
-@media (max-width: 480px) {
-  main {
-    font-size: 1.5rem;
-  }
-  .buttons {
-    width: 90%;
   }
   .attendance-camera {
     width: 400px;
@@ -256,7 +304,13 @@ input:focus::placeholder {
   #modal-content {
     width: 70%;
   }
-  /* #home {
-    width: 10%;
-  } */
+}
+@media (max-width: 480px) {
+  main {
+    font-size: 1.5rem;
+  }
+  .attendance-camera {
+    width: 400px;
+    height: 600px;
+  }
 }

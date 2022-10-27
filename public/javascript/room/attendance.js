@@ -348,14 +348,6 @@ const infoDom = (val) => {
   `;
 };
 
-// const searchDataInArr = (arr, id) => {
-//   for (const [index, value] of arr.entries()) {
-//     if (id === value._id) {
-//       return value;
-//     }
-//   }
-// };
-
 const getStudents = async (id) => {
   const studentsDom = document.getElementById('students');
   studentsDom.innerHTML = ``;
@@ -375,7 +367,6 @@ const getStudents = async (id) => {
     console.log(e);
   } finally {
     loaderHandler();
-    // document.querySelector(`.svg_spinner`).style.display = 'none';
   }
 };
 

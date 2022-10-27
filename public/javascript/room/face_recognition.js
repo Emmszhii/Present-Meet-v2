@@ -181,7 +181,7 @@ const removeFaceCanvas = () => {
   if (canvas) canvas.remove();
 };
 
-const closeFaceRecognition = (e) => {
+const closeFaceRecognition = () => {
   const dom = document.querySelector('.modal_face');
   stopTimer();
   if (dom) dom.remove();

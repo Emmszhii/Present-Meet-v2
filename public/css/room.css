@@ -4,11 +4,11 @@
   margin: 0px;
   padding: 0px;
 }
-/* msg dom */
+/* Start Messages */
 .warning_msg,
 .success_msg,
 .error_msg,
-.userJoin_msg {
+.user_notification_msg {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -20,6 +20,10 @@
   text-shadow: 2px 2px black;
   z-index: 10;
 }
+.user_notification_msg {
+  text-shadow: 1px 1px black;
+  background: gray;
+}
 .warning_msg {
   background-color: orange;
 }
@@ -29,10 +33,7 @@
 .error_msg {
   background-color: red;
 }
-.userJoin_msg {
-  text-shadow: 1px 1px black;
-  background: gray;
-}
+
 .close_btn {
   border: none;
   background: transparent;
@@ -53,6 +54,7 @@
   color: white;
   background-color: black;
 }
+/* End Messages */
 /* Loader */
 .svg_spinner {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;

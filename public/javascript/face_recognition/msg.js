@@ -1,4 +1,4 @@
-const body = document.querySelector('.videoCall');
+const body = document.body;
 
 const errorMsg = (msg) => {
   resetMsg();
@@ -32,7 +32,6 @@ const addCloseListener = (type, title) => {
   document
     .getElementById(`close_${type}_${title}`)
     .addEventListener('click', (e) => {
-      console.log(e);
       const dom = e.currentTarget.parentNode;
       if (dom) dom.remove();
     });
@@ -42,7 +41,7 @@ const resetMsg = () => {
   const errorDom = document.querySelector('.error_msg');
   const warningDom = document.querySelector('.warning_msg');
   const successDom = document.querySelector('.success_msg');
-  const userJoinDom = document.querySelector('.userJoin_msg');
+  const userJoinDom = document.querySelector('.user_notification_msg');
   if (userJoinDom) userJoinDom.remove();
   if (errorDom) errorDom.remove();
   if (warningDom) warningDom.remove();
@@ -60,4 +59,4 @@ const msgDom = (type, title) => {
   `;
 };
 
-export { userNotificationMsg, errorMsg, successMsg, warningMsg };
+export { userNotificationMsg, errorMsg, successMsg, warningMsg, resetMsg };

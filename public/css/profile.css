@@ -4,6 +4,57 @@
   padding: 0px;
   margin: 0px;
 }
+/* Start Messages */
+.warning_msg,
+.success_msg,
+.error_msg,
+.user_notification_msg {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: absolute;
+  padding: 10px;
+  top: 10px;
+  left: 10px;
+  color: white;
+  text-shadow: 2px 2px black;
+  z-index: 10;
+}
+.user_notification_msg {
+  text-shadow: 1px 1px black;
+  background: gray;
+}
+.warning_msg {
+  background-color: orange;
+}
+.success_msg {
+  background-color: green;
+}
+.error_msg {
+  background-color: red;
+}
+
+.close_btn {
+  border: none;
+  background: transparent;
+}
+.close_btn:hover {
+  background-color: black;
+  color: white;
+}
+.close_msg {
+  font-size: 1.5rem;
+}
+.button-box {
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.button-box:hover {
+  color: white;
+  background-color: black;
+}
+/* End Messages */
 /* Loader */
 .svg_spinner {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;
@@ -126,11 +177,16 @@ main {
 
 .button {
   padding: 10px 15px;
-  border: none;
+  border: 1px solid black;
   border-radius: 5px;
+  background-color: transparent;
+  color: black;
+  cursor: pointer;
+}
+
+.button:hover {
   background-color: black;
   color: white;
-  cursor: pointer;
 }
 
 #buttons {
@@ -218,79 +274,25 @@ a {
   main {
     width: 40%;
   }
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-    height: 100vh;
-  }
-  #user-face {
-    width: 100%;
-  }
-  .card {
-    width: 70%;
-    height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
   #modal-content {
     width: 50%;
-  } */
+  }
 }
 @media (max-width: 1366px) {
   main {
     width: 50%;
   }
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  .card {
-    width: 70%;
-  }
   #modal-content {
-    width: 60%;
-  } */
+    width: 30%;
+  }
 }
 @media (max-width: 768px) {
   main {
     width: 90%;
   }
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  .card {
-    width: 90%;
-  }
   #modal-content {
-    width: 70%;
-  } */
-}
-@media (max-width: 480px) {
-  /* main {
-    overflow: hidden;
+    width: 80%;
   }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  #modal-content {
-    width: 800%;
-  } */
 }
 
 @media (max-height: 900px) {

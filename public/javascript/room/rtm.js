@@ -15,6 +15,7 @@ import {
   checkIfUserDom,
 } from './room.js';
 import { checkStudentDescriptor } from './attendance.js';
+import { searchDataInArr } from '../helpers/helpers.js';
 
 const users = [];
 const raiseHands = [];
@@ -173,14 +174,19 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // if student
   if (userData.type === 'teacher') {
     if (data.type === 'attendance_data') {
-      const { descriptor } = data;
-      checkStudentDescriptor({ descriptor, MemberId });
+      const { descriptor, displayName } = data;
+      checkStudentDescriptor({ descriptor, MemberId, displayName });
     }
   }
 
   if (userData.type === 'student') {
     if (data.type === 'attendance_on') {
-      faceRecognitionHandler(MemberId);
+      const students = data.students;
+      const include = searchDataInArr(students, userData.id);
+      if (data.restrictVal === 'on' && include) {
+        faceRecognitionHandler(MemberId);
+      }
+      if (data.restrictVal === 'off') faceRecognitionHandler(MemberId);
     }
   }
 };

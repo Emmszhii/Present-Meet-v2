@@ -296,58 +296,70 @@ router.post(
         const classroom = await Classroom.findOne({ _id: classId });
         if (!classroom) return res.status(400).json({ err: `Invalid request` });
         if (classroom.students.length === 0)
-          return res.status(400).json({ err: `No student registered` });
+          return res.status(400).json({ err: `No student(s) registered` });
 
-        const { minutes, seconds } = await Classroom.findOne({ _id: classId })
-          .populate({
-            path: 'attendance_id',
-          })
-          .then((data) => {
-            const attendance = data.attendance_id;
-            const lastAttendance = attendance[attendance.length - 1];
-            const created = lastAttendance.createdAt;
-            const today = new Date().toISOString();
-            const difference = new Date(today) - created;
+        // restrict creating multiple attendance
 
-            // const diff = timeSince(created);
-            const seconds = difference / 1000;
-            let interval = seconds / 60;
-            if (interval > 1 && seconds > 60) {
-              const minutes = Math.floor(seconds / 60);
-              return { minutes };
-            }
-            return { seconds };
-          });
+        // const { minutes, seconds } = await Classroom.findOne({ _id: classId })
+        //   .populate({
+        //     path: 'attendance_id',
+        //   })
+        //   .then((data) => {
+        //     const attendance = data.attendance_id;
+        //     const lastAttendance = attendance[attendance.length - 1];
+        //     const created = lastAttendance.createdAt;
+        //     const today = new Date().toISOString();
+        //     const difference = new Date(today) - created;
 
-        if (minutes < 15)
-          return res.status(400).json({
-            err: `Request Timeout! Request again after ${
-              15 - minutes
-            } minute(s)`,
-          });
-        if (seconds)
-          return res.status(400).json({
-            err: `Request Timeout! Request again after ${
-              60 - seconds
-            } second(s)`,
-          });
+        //     // const diff = timeSince(created);
+        //     const seconds = difference / 1000;
+        //     let interval = seconds / 60;
+        //     if (interval > 1 && seconds > 60) {
+        //       const minutes = Math.floor(seconds / 60);
+        //       return { minutes };
+        //     }
+        //     return { seconds };
+        //   });
+
+        // if (minutes < 15)
+        //   return res.status(400).json({
+        //     err: `Request Timeout! Request again after ${
+        //       15 - minutes
+        //     } minute(s)`,
+        //   });
+        // if (seconds)
+        //   return res.status(400).json({
+        //     err: `Request Timeout! Request again after ${
+        //       60 - seconds
+        //     } second(s)`,
+        //   });
 
         const attendance = new Attendance();
         classroom.attendance_id.push(attendance._id);
         await attendance.save();
         await classroom.save();
-      }
 
-      res.status(200).json({
-        data: {
-          restrict,
-          meetingId,
-          classId,
-        },
-      });
+        return res.status(200).json({
+          data: {
+            attendance_id: attendance._id,
+          },
+        });
+      } else {
+        res.status(200).json({ msg: `Not yet implemented` });
+      }
     } catch (e) {
       console.log(e);
     }
+  }
+);
+
+router.post(
+  '/add-student-attendance',
+  ensureAuthenticated,
+  async (req, res) => {
+    const { attendance_id, classroom_id, student_id } = req.body;
+
+    res.status(200).json({ data: { attendance_id, classroom_id, student_id } });
   }
 );
 

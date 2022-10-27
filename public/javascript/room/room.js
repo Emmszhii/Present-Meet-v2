@@ -33,7 +33,6 @@ const checkIfUserDom = (id, name) => {
       .getElementById(`user-container-${id}`)
       .addEventListener('click', expandVideoFrame);
   }
-  return;
 };
 
 // Expand VideoFrame Function

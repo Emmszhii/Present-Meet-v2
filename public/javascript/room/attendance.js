@@ -1,4 +1,8 @@
-import { postRequest, getRequest, controller } from '../helpers/helpers.js';
+import {
+  postRequest,
+  getRequest,
+  searchDataInArr,
+} from '../helpers/helpers.js';
 import { roomLoaderHandler, meetingId } from './room.js';
 import { rtc, rtm, userData } from './rtc.js';
 import { users } from './rtm.js';
@@ -8,7 +12,7 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
-import { errorMsg, warningMsg } from './msg.js';
+import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const classroom = [];
 const students = [];
@@ -19,7 +23,6 @@ let interval;
 const updateCountdown = () => {
   const minutes = Math.floor(time / 60);
   time--;
-  console.log(time);
   let seconds = time % 60;
 
   const countdown = document.getElementById('take_attendance');
@@ -78,13 +81,31 @@ const checkStudentDescriptor = async (data) => {
     const dist = await faceapi.euclideanDistance(studentDescriptor, query);
     const threshold = 0.4;
     if (dist <= threshold) {
-      console.log(`registering attendance`);
+      const attendance = {
+        classroom_id: userData.classroom_id,
+        attendance_id: userData.attendance_id,
+        student_id: MemberId,
+      };
+      const { data, err, msg } = await addStudentAttendance(attendance);
+      console.log(data, err, msg);
+
+      successMsg(`Registering ${displayName} attendance`);
     } else {
       warningMsg(`User ${displayName} request is invalid`);
     }
   } catch (e) {
     errorMsg(`Invalid request of user ${displayName}`);
     console.log(e);
+  }
+};
+
+const addStudentAttendance = async (info) => {
+  try {
+    const url = `/add-student-attendance`;
+    const { data, err, msg } = await postRequest(url, info);
+    return { data, err, msg };
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -143,6 +164,7 @@ const takeAttendanceHandler = async (e) => {
   if (btn.value === 'off') {
     const { err, msg, data } = await createAttendanceHandler();
     if (err) return errorMsg(err);
+    if (data) userData.attendance_id = data.attendance_id;
     studentFaceRecognition();
     interval = setInterval(updateCountdown, startingInterval);
     btn.value = 'on';
@@ -155,10 +177,14 @@ const takeAttendanceHandler = async (e) => {
 };
 
 const studentFaceRecognition = () => {
+  const restrictVal = document.getElementById('restrict').value;
+
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance_on',
       id: userData._id,
+      students: students[0],
+      restrictVal,
     }),
   });
 };
@@ -169,6 +195,7 @@ const createAttendanceHandler = async () => {
   const url = `/create-attendance/${restrict}`;
   try {
     if (restrict === 'on') {
+      userData.classroom_id = id;
       const postData = { meetingId, id };
       const { data, msg, err } = await postRequest(url, postData);
       return { err, msg, data };
@@ -227,7 +254,6 @@ const attendance = async () => {
   } else {
     btn.classList.add('active');
     videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
-
     loaderHandler();
     restrictToggleHandler();
 
@@ -322,13 +348,13 @@ const infoDom = (val) => {
   `;
 };
 
-const searchDataInArr = (arr, id) => {
-  for (const [index, value] of arr.entries()) {
-    if (id === value._id) {
-      return value;
-    }
-  }
-};
+// const searchDataInArr = (arr, id) => {
+//   for (const [index, value] of arr.entries()) {
+//     if (id === value._id) {
+//       return value;
+//     }
+//   }
+// };
 
 const getStudents = async (id) => {
   const studentsDom = document.getElementById('students');

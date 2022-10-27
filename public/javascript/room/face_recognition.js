@@ -91,11 +91,14 @@ const dom = () => {
 };
 
 const sendAttendance = async (data) => {
+  const { descriptor, id, displayName } = data;
+
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance_data',
-      _id: data._id,
-      descriptor: data.descriptor,
+      descriptor,
+      id,
+      displayName,
     }),
   });
 };
@@ -222,7 +225,7 @@ const faceRecognized = async () => {
       successMsg(`User match`);
       sendAttendance({
         descriptor: query[0].descriptor.join(','),
-        displayName: userData.displayName,
+        displayName: userData.fullName,
         id: userData._id,
       });
       stopTimer();

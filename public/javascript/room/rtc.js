@@ -248,6 +248,7 @@ const handleUserPublished = async (user, mediaType) => {
   } catch (err) {
     const arrErr = [
       `rtc.js:250 Cannot read properties of undefined (reading 'play')`,
+      `Cannot read properties of undefined (reading 'play')`,
     ];
     if (arrErr.includes(err.message)) return;
     console.log(err.message);

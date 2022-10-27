@@ -69,10 +69,19 @@ function generateLightColorHex() {
   return color;
 }
 
+const searchDataInArr = (arr, id) => {
+  for (const [index, value] of arr.entries()) {
+    if (id === value._id) {
+      return value;
+    }
+  }
+};
+
 export {
   controller,
   postRequest,
   getRequest,
   randDarkColor,
   generateLightColorHex,
+  searchDataInArr,
 };

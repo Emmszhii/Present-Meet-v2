@@ -164,84 +164,23 @@ a {
 }
 
 @media (max-width: 1600px) {
-  /* #form {
-    width: 100vw;
-    height: 100vh;
-  } */
-  /* #user-face {
-    width: 100%;
-  } */
-  /* .card {
-    width: 70%;
-  } */
-  /* #modal-content {
-    width: 50%;
-  } */
   main {
     width: 40%;
   }
 }
 @media (max-width: 1366px) {
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  #modal-content {
-    width: 60%;
-  } */
-  /* .card {
-    width: 75%;
-  } */
   main {
     width: 50%;
   }
 }
 @media (max-width: 768px) {
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  .card {
-    width: 90%;
-  }
-  #modal-content {
-    width: 70%;
-  } */
-  /* .card {
-    width: 90%;
-  } */
   main {
     width: 90%;
   }
 }
-@media (max-width: 480px) {
-  /* main {
-    overflow: hidden;
-  }
-  #form {
-    width: 100vw;
-  }
-  #user-face {
-    width: 100%;
-  }
-  #modal-content {
-    width: 800%;
-  } */
-}
 
 @media (max-height: 900px) {
   .card {
-    /* height: 90%; */
     overflow-y: auto;
   }
 }

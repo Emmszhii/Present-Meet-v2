@@ -216,6 +216,9 @@ a {
 
 @media (max-width: 1600px) {
   main {
+    width: 40%;
+  }
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -227,16 +230,19 @@ a {
   }
   .card {
     width: 70%;
-    /* height: 90vh; */
-    /* overflow-x: hidden; */
-    /* overflow-y: auto; */
+    height: 90vh;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   #modal-content {
     width: 50%;
-  }
+  } */
 }
 @media (max-width: 1366px) {
   main {
+    width: 50%;
+  }
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -250,10 +256,13 @@ a {
   }
   #modal-content {
     width: 60%;
-  }
+  } */
 }
 @media (max-width: 768px) {
   main {
+    width: 90%;
+  }
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -267,10 +276,10 @@ a {
   }
   #modal-content {
     width: 70%;
-  }
+  } */
 }
 @media (max-width: 480px) {
-  main {
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -281,7 +290,7 @@ a {
   }
   #modal-content {
     width: 800%;
-  }
+  } */
 }
 
 @media (max-height: 900px) {

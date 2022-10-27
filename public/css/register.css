@@ -216,12 +216,16 @@ a {
   }
   #form {
     width: 100vw;
+    height: 100vh;
   }
   #user-face {
     width: 100%;
   }
   .card {
     width: 40%;
+    height: 90%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   #modal-content {
     width: 50%;

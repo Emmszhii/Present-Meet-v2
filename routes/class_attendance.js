@@ -359,6 +359,12 @@ router.post(
   async (req, res) => {
     const { attendance_id, classroom_id, student_id } = req.body;
 
+    try {
+      // const students = await Classroom.findOne({_id: })
+    } catch (e) {
+      console.log(e);
+    }
+
     res.status(200).json({ data: { attendance_id, classroom_id, student_id } });
   }
 );

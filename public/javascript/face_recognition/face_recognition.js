@@ -21,7 +21,14 @@ const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
 
 const cameraDeviceHandler = async () => {
   const cameras = await getCameraDevices();
-  if (!cameraDevices) return;
+  if (!cameraDevices) return errorMsg('No Camera devices found');
+  const select = document.getElementById('camera_device');
+  for (const [index, device] of cameras.entries()) {
+    const option = document.createElement('option');
+    option.value = device.label;
+    option.text = device.label;
+    select.appendChild(option);
+  }
   cameraDevices.push(cameras);
 };
 

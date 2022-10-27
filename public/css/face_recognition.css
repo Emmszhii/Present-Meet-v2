@@ -1,10 +1,10 @@
+/* Start init */
 * {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
-
 body {
   background-color: #e8ecef;
   font-size: 1rem;
@@ -12,13 +12,54 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-
 main {
   width: 100%;
   height: 100%;
   display: flex;
   font-size: 1rem;
 }
+/* End init */
+
+/* Nav bar */
+.nav_bar {
+  background-color: black;
+  width: 100vw;
+  height: 7vh;
+  position: relative;
+}
+.left_navbar {
+  float: left;
+  height: 100%;
+}
+.left_navbar > button {
+  height: 100%;
+  top: 0;
+  left: 0;
+  color: white;
+  position: absolute;
+}
+.right_navbar {
+  float: right;
+  height: 100%;
+}
+.right_navbar > button {
+  height: 100%;
+  top: 0;
+  right: 0;
+  color: white;
+  position: absolute;
+}
+
+.left_navbar > button:hover,
+.right_navbar > button:hover {
+  background: gray;
+  color: black;
+}
+#main {
+  position: relative;
+  display: flex;
+}
+/* End Nav bar */
 
 /* Start Messages */
 .warning_msg,
@@ -95,67 +136,27 @@ main {
   z-index: 100;
 }
 /* End loader */
-/* Messages */
-
-#msg {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 3px;
-  background-color: green;
-  font-size: 1.4rem;
-  color: white;
-  text-shadow: 1px 1px black;
-  text-align: center;
+/* Start Devices */
+#devices {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-
-#err {
+#devices > select {
   padding: 5px 10px;
-  border-radius: 3px;
-  border: none;
-  background-color: red;
-  font-size: 1.4rem;
-  color: white;
-  text-shadow: 1px 1px black;
-  text-align: center;
 }
-
-#warning {
-  padding: 5px 10px;
-  border-radius: 3px;
-  border: none;
-  background-color: orange;
-  font-size: 1.4rem;
-  color: white;
-  text-shadow: 1px 1px black;
-  text-align: center;
-}
-
+/* End devices */
 /* face recognition buttons */
-#home {
-  top: 10px;
-  right: 10px;
-  position: absolute;
-  cursor: pointer;
-}
-
 #attendance-btn {
   font-size: 1.1rem;
 }
-
 .buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 10px;
   margin: 5px 10px;
 }
-
-.buttons_confirm {
-  display: flex;
-  justify-content: space-between;
-  margin: 5px 10px;
-  gap: 10px;
-}
-
 .button {
   background-color: transparent;
   font-size: 1.2rem;
@@ -164,26 +165,15 @@ main {
   border: 1px solid black;
   cursor: pointer;
 }
-
 .button:hover {
   background-color: black;
   color: white;
 }
-
 /* face recognition section */
 .text {
   text-align: center;
-  margin: 20px;
+  margin: 5px;
   font-size: 1.2rem;
-}
-
-#user-face {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
 }
 
 .attendance-camera {
@@ -209,7 +199,6 @@ canvas {
   width: 100%;
   height: 100%;
 }
-
 /* bounding boxes */
 #overlay {
   position: absolute;
@@ -219,7 +208,13 @@ canvas {
   height: 100%;
 }
 
-/* modal */
+/* Start Modal */
+.buttons_confirm {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 10px;
+  gap: 10px;
+}
 #modal-confirm {
   display: none;
   position: fixed;
@@ -231,7 +226,6 @@ canvas {
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.5);
 }
-
 #modal-content {
   position: absolute;
   top: 50%;
@@ -246,8 +240,7 @@ canvas {
   align-items: center;
   flex-direction: column;
 }
-
-input {
+#modal-content > input {
   width: 80%;
   text-align: center;
   border: none;
@@ -261,23 +254,15 @@ input {
 input:focus::placeholder {
   color: transparent;
 }
-
-/* pointer events none */
-.disabled-btn {
-  pointer-events: none;
-}
-
+/* End Modal */
 @media (max-width: 1600px) {
-  main {
+  /* main {
     display: block;
     font-size: 1.1rem;
   }
   #upload-img {
     width: 100%;
-  }
-  #user-face {
-    width: 100%;
-  }
+  } */
 }
 @media (max-width: 1366px) {
   main {
@@ -297,12 +282,12 @@ input:focus::placeholder {
   main {
     font-size: 1.4rem;
   }
-  .attendance-camera {
-    width: 400px;
-    height: 600px;
-  }
   #modal-content {
     width: 70%;
+  }
+  .attendance-camera {
+    width: 500px;
+    height: 550px;
   }
 }
 @media (max-width: 480px) {
@@ -311,6 +296,6 @@ input:focus::placeholder {
   }
   .attendance-camera {
     width: 400px;
-    height: 600px;
+    height: 550px;
   }
 }

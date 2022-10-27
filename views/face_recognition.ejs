@@ -25,25 +25,35 @@
   </head>
   <body>
     <div id="preloader"></div>
-    <main>
-      <section id="user-face">
-        <div class="text"></div>
+    <div class="nav_bar">
+      <div class="buttons left_navbar">
         <button class="button" id="home" onclick="location.href='/'">
           <i class="fa fa-home"></i>
         </button>
-        <!-- validation messages -->
-        <div id="messages"></div>
-        <!-- Camera and canvas -->
-        <div class="attendance-camera"></div>
-        <div class="buttons">
-          <button class="button" id="camera-btn">Camera</button>
-          <button class="button" id="photo-btn">Photo</button>
-          <button class="button" id="recognize-btn">Recognize</button>
-        </div>
-        <!-- devices -->
-        <div id="devices"></div>
-      </section>
-    </main>
+      </div>
+      <div class="buttons right_navbar"></div>
+    </div>
+    <div class="text"></div>
+    <section class="video_frame">
+      <!-- Video Camera -->
+      <div class="attendance-camera"></div>
+      <!-- devices -->
+      <div id="devices">
+        <label for="devices">Camera devices : </label>
+        <select name="devices" id="camera_device"></select>
+      </div>
+      <div class="buttons">
+        <button class="button" id="camera-btn">Camera</button>
+        <button class="button" id="photo-btn">Photo</button>
+        <button class="button" id="recognize-btn">Recognize</button>
+      </div>
+    </section>
+    <!-- <main> -->
+    <!-- <section id="user-face"> -->
+    <!-- Camera and canvas -->
+
+    <!-- </section> -->
+    <!-- </main> -->
     <div id="modal-confirm">
       <div id="modal-content">
         <label for="password">Password</label>

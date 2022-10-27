@@ -164,28 +164,25 @@ a {
 }
 
 @media (max-width: 1600px) {
-  main {
-    overflow: hidden;
-  }
-  #form {
+  /* #form {
     width: 100vw;
     height: 100vh;
-  }
-  #user-face {
+  } */
+  /* #user-face {
     width: 100%;
-  }
-  .card {
-    width: 40%;
-    height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-  #modal-content {
+  } */
+  /* .card {
+    width: 70%;
+  } */
+  /* #modal-content {
     width: 50%;
+  } */
+  main {
+    width: 40%;
   }
 }
 @media (max-width: 1366px) {
-  main {
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -194,15 +191,18 @@ a {
   #user-face {
     width: 100%;
   }
-  .card {
-    width: 70%;
-  }
   #modal-content {
     width: 60%;
+  } */
+  /* .card {
+    width: 75%;
+  } */
+  main {
+    width: 50%;
   }
 }
 @media (max-width: 768px) {
-  main {
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -216,10 +216,16 @@ a {
   }
   #modal-content {
     width: 70%;
+  } */
+  /* .card {
+    width: 90%;
+  } */
+  main {
+    width: 90%;
   }
 }
 @media (max-width: 480px) {
-  main {
+  /* main {
     overflow: hidden;
   }
   #form {
@@ -230,10 +236,10 @@ a {
   }
   #modal-content {
     width: 800%;
-  }
+  } */
 }
 
-@media (max-height: 9000px) {
+@media (max-height: 900px) {
   .card {
     /* height: 90%; */
     overflow-y: auto;

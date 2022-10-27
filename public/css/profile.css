@@ -226,10 +226,10 @@ a {
     width: 100%;
   }
   .card {
-    width: 40%;
-    height: 90vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    width: 70%;
+    /* height: 90vh; */
+    /* overflow-x: hidden; */
+    /* overflow-y: auto; */
   }
   #modal-content {
     width: 50%;

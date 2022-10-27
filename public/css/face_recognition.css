@@ -286,16 +286,16 @@ input:focus::placeholder {
     width: 70%;
   }
   .attendance-camera {
-    width: 500px;
-    height: 550px;
+    width: 400px;
+    height: 600px;
   }
 }
 @media (max-width: 480px) {
   main {
     font-size: 1.5rem;
   }
-  .attendance-camera {
+  /* .attendance-camera {
     width: 400px;
-    height: 550px;
-  }
+    height: 600px;
+  } */
 }

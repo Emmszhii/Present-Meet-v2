@@ -11,18 +11,19 @@ router.get('/face-recognition', ensureAuthenticated, (req, res) => {
   res.render('face_recognition');
 });
 
-router.get('/getDescriptor', ensureAuthenticated, async (req, res) => {
+router.get('/get-descriptor', ensureAuthenticated, async (req, res) => {
   try {
     const student = await Student.findOne({ _id: req.user._id });
     if (!student)
       return res
         .status(200)
-        .json({ msg: `Please register your face descriptor` });
+        .json({ warning: `Please register your face descriptor` });
 
     if (student.descriptor)
-      return res
-        .status(200)
-        .json({ descriptor: student.descriptor, msg: 'ok' });
+      return res.status(200).json({
+        descriptor: student.descriptor,
+        msg: 'User face descriptor is now added',
+      });
   } catch (e) {
     console.log(e);
     return res.status(400).json({ err: e });
@@ -32,7 +33,6 @@ router.get('/getDescriptor', ensureAuthenticated, async (req, res) => {
 router.post('/descriptor', ensureAuthenticated, async (req, res) => {
   const descriptor = req.body.descriptor;
   const password = req.body.password;
-
   if (descriptor.trim() === ``)
     return res.status(400).json({ err: 'Face is not valid' });
   if (password.trim() === ``)
@@ -47,24 +47,22 @@ router.post('/descriptor', ensureAuthenticated, async (req, res) => {
     if (!account) return res.status(400).json({ err: `Invalid request` });
 
     const booleanPassword = await comparePassword(password, account.password);
-
-    if (booleanPassword) {
-      Student.updateOne(
-        { _id: req.user._id },
-        {
-          _id: req.user._id,
-          descriptor: descriptor,
-        },
-        { upsert: true },
-        (err) => {
-          if (err) return console.log(err);
-          return res.status(200).json({ msg: `/` });
-          // res.redirect('/');
-        }
-      );
-    } else {
+    if (booleanPassword)
       return res.status(400).json({ err: `Invalid Password` });
-    }
+
+    Student.updateOne(
+      { _id: req.user._id },
+      {
+        _id: req.user._id,
+        descriptor: descriptor,
+      },
+      { upsert: true },
+      (err) => {
+        if (err) return res.status(400).json({ err });
+        return res.status(200).json({ msg: `/` });
+        // res.redirect('/');
+      }
+    );
   } catch (e) {
     console.log(e);
   }

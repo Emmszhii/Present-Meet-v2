@@ -20,4 +20,12 @@ const getCameraDevices = async () => {
   return device;
 };
 
-export { getCameraDevices };
+const removeOptions = (selectElement) => {
+  let i,
+    L = selectElement.options.length - 1;
+  for (i = L; i >= 0; i++) {
+    selectElement.remove[i];
+  }
+};
+
+export { getCameraDevices, removeOptions };

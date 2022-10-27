@@ -112,8 +112,9 @@ main {
   background-color: black;
 }
 /* End Messages */
+
 /* Loader */
-#preloader {
+/* #preloader {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;
   background-color: rgba(0, 0, 0, 0.5);
   background-size: 50%;
@@ -123,7 +124,7 @@ main {
   left: 0;
   position: fixed;
   z-index: 100;
-}
+} */
 .loader {
   background: url('/public/img/spinner.svg') no-repeat center center transparent;
   background-color: rgba(0, 0, 0, 0.5);
@@ -136,6 +137,7 @@ main {
   z-index: 100;
 }
 /* End loader */
+
 /* Start Devices */
 #devices {
   display: flex;

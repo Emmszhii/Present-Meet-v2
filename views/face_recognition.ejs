@@ -24,7 +24,7 @@
     ></script>
   </head>
   <body>
-    <div id="preloader"></div>
+    <!-- <div id="preloader"></div> -->
     <div class="nav_bar">
       <div class="buttons left_navbar">
         <button class="button" id="home" onclick="location.href='/'">
@@ -37,24 +37,16 @@
     <div class="attendance-camera"></div>
     <div id="devices">
       <label for="devices">Camera devices : </label>
-      <select name="devices" id="camera_device"></select>
+      <select name="devices" id="camera_device">
+        <option value="" disabled selected hidden>Turn on camera first</option>
+      </select>
     </div>
     <div class="buttons" id="functionBtn">
       <button class="button" id="camera-btn">Camera</button>
       <button class="button" id="photo-btn">Photo</button>
       <button class="button" id="recognize-btn">Recognize</button>
     </div>
-    <!-- <section class="video_frame"> -->
-    <!-- Video Camera -->
-
-    <!-- devices -->
-    <!-- </section> -->
-    <!-- <main> -->
-    <!-- <section id="user-face"> -->
-    <!-- Camera and canvas -->
-
-    <!-- </section> -->
-    <!-- </main> -->
+    <!-- MODAL -->
     <div id="modal-confirm">
       <div id="modal-content">
         <label for="password">Password</label>

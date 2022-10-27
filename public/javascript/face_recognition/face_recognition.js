@@ -1,56 +1,84 @@
-import { postRequest } from '../helpers/helpers.js';
-import { getCameraDevices } from '../helpers/devices.js';
+import { getRequest, postRequest } from '../helpers/helpers.js';
+import { getCameraDevices, removeOptions } from '../helpers/devices.js';
 import {
   userNotificationMsg,
   errorMsg,
   successMsg,
   warningMsg,
 } from './msg.js';
+import { loader } from './loader.js';
 
-const preloader = document.getElementById('preloader');
 const camera = document.querySelector('.attendance-camera');
 let track;
 const useTinyModel = true;
-const refUser = [];
+const refUser = {
+  descriptor: null,
+  queryDescriptor: null,
+};
 let intervalFace;
-const cameraDevices = [];
+const devices = {
+  videoDevice: null,
+  selectedVideoId: null,
+};
 
 const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
   inputSize: 416,
 });
 
+const onChangeCameraDevice = (e) => {
+  loader();
+  const valueId = e.currentTarget.value;
+  devices.selectedVideoId = valueId;
+  const constraint = { video: { deviceId: valueId } };
+  try {
+    navigator.mediaDevices.getUserMedia(constraint).then((mediaStream) => {
+      const video = document.getElementById('video');
+      video.srcObject = mediaStream;
+    });
+  } catch (err) {
+    console.log(err.message);
+  } finally {
+    loader();
+  }
+};
+
 const cameraDeviceHandler = async () => {
   const cameras = await getCameraDevices();
-  if (!cameraDevices) return errorMsg('No Camera devices found');
+  devices.videoDevice = cameras;
+  if (!cameras) return errorMsg('No Camera devices found');
   const select = document.getElementById('camera_device');
   for (const [index, device] of cameras.entries()) {
     const option = document.createElement('option');
-    option.value = device.label;
+    option.value = device.deviceId;
     option.text = device.label;
     select.appendChild(option);
   }
-  cameraDevices.push(cameras);
+  select.value = devices.videoDevice[0].deviceId;
 };
 
 const fetchPrevDescriptor = async () => {
-  const res = await fetch('/getDescriptor', { method: 'get' });
-  const data = await res.json();
-  if (res.status === 200) {
-    if (data.descriptor) {
-      const split = data.descriptor.split(',');
-      const float32 = new Float32Array(split);
-      refUser.push([{ descriptor: float32 }]);
-      successMsg('Previous face description is now added.');
-    }
-    if (data.warning) warningMsg(data.warning);
+  const url = `/get-descriptor`;
+  const { descriptor, err, msg, warning } = await getRequest(url);
+  if (err) return console.log(e);
+  if (warning) return warningMsg(warning);
+  if (descriptor) {
+    const split = descriptor.split(',');
+    const float32Arr = new Float32Array(split);
+    // refUser.push([{ descriptor: float32Arr }]);
+    refUser.descriptor = float32Arr;
+    successMsg(msg);
   }
-  if (res.status === 400) errorMsg(data.err);
 };
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
-  const backend = faceapi.tf.getBackend();
-  preloader.style.display = 'block';
+  loader();
+  devices.videoDevice = null;
+  const selected = document.getElementById('camera_device');
+  selected.innerHTML = ``;
+  await cameraDeviceHandler();
+  if (devices.selectedVideoId) selected.value = devices.selectedVideoId;
+  const backend = await faceapi.tf.getBackend();
   const vid = document.createElement('video');
   vid.id = 'video';
   vid.width = '1920';
@@ -81,7 +109,11 @@ const startVideoHandler = async () => {
       if (backend === 'webgl') faceDetection(500);
 
       const text = document.getElementById('video_text');
-      if (!text) informationDom('video_text', `Video: Working`);
+      if (!text) {
+        informationDom('video_text', `Video: Working`);
+      } else {
+        text.textContent = 'Video: Working';
+      }
     })
     .catch((e) => {
       if (e.name === 'NotAllowedError') {
@@ -93,7 +125,7 @@ const startVideoHandler = async () => {
       }
     })
     .finally(() => {
-      preloader.style.display = 'none';
+      loader();
     });
 };
 
@@ -111,7 +143,7 @@ const faceDetection = (ms) => {
     // interval
     intervalFace = setInterval(async () => {
       const detections = await faceapi
-        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .detectAllFaces(video, tinyFaceOption)
         .withFaceLandmarks(useTinyModel);
 
       const resizedDetections = faceapi.resizeResults(detections, displaySize);
@@ -124,140 +156,117 @@ const faceDetection = (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
-  preloader.style.display = 'block';
+  loader();
   const video = document.getElementById('video');
   const landmarks = document.getElementById('face_landmarks');
   if (landmarks) landmarks.remove();
   try {
-    if (video) {
-      const img = document.createElement('canvas');
-      img.id = 'img';
-      img.width = video.width;
-      img.height = video.height;
-      const context = img.getContext('2d');
-      const imgDom = document.getElementById('img');
-      if (!imgDom) camera.append(img);
+    if (!video) return errorMsg('Start the camera first!');
+    const img = document.createElement('canvas');
+    img.id = 'img';
+    img.width = video.width;
+    img.height = video.height;
+    const context = img.getContext('2d');
+    context.imageSmoothingEnabled = false;
+    context.drawImage(video, 0, 0, video.width, video.height);
+    const imgDom = document.getElementById('img');
+    if (!imgDom) camera.append(img);
 
-      const displaySize = { width: video.width, height: video.height };
+    const displaySize = { width: video.width, height: video.height };
 
-      context.imageSmoothingEnabled = false;
-      context.drawImage(video, 0, 0, video.width, video.height);
+    const canvas = await faceapi.createCanvasFromMedia(video);
+    canvas.id = 'canvas';
+    camera.append(canvas);
+    // const id = document.getElementById('canvas');
+    // face api detection
+    const detection = await faceapi
+      .detectAllFaces(canvas, tinyFaceOption)
+      .withFaceLandmarks(useTinyModel)
+      .withFaceDescriptors();
 
-      const canvas = faceapi.createCanvasFromMedia(video);
-      canvas.id = 'canvas';
-      camera.append(canvas);
-
-      const id = document.getElementById('canvas');
-
-      // face api detection
-      const detection = await faceapi
-        .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptors();
-
-      // if no detection function done
-      if (detection.length < 1 || detection.length > 1) {
-        stopVideo();
-        errorMsg('Image are invalid. Please Try again!');
-        return startVideoHandler();
-      }
-      // if face is detected
-      // stop video play
+    // if no detection function done
+    if (detection.length < 1 || detection.length > 1) {
       stopVideo();
-      // display face landmarks
-      faceapi.matchDimensions(canvas, displaySize);
-      const resizedDetections = faceapi.resizeResults(detection, displaySize);
-      faceapi.draw.drawDetections(canvas, resizedDetections);
-      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-      // reset array
-      refUser.length = [];
-      // input user array
-      refUser.push(detection);
-      // msg
-      successMsg(
-        'If you are satisfied with this photo try to recognize else retry'
-      );
-    } else {
-      errorMsg('Start the camera first!');
+      errorMsg('Image are invalid. Please Try again!');
+      return startVideoHandler();
     }
+    // if face is detected
+    // stop video play
+    stopVideo();
+    // display face landmarks
+    faceapi.matchDimensions(canvas, displaySize);
+    const resizedDetections = faceapi.resizeResults(detection, displaySize);
+    faceapi.draw.drawDetections(canvas, resizedDetections);
+    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    // reset array
+    // refUser.length = [];
+    // input user array
+    // refUser.push(detection);
+    refUser.descriptor = detection[0].descriptor;
+    // msg
+    successMsg(
+      'If you are satisfied with this photo try to recognize else retry'
+    );
   } catch (err) {
     console.log(err);
-    errorMsg(err);
   } finally {
-    preloader.style.display = 'none';
+    loader();
   }
 };
 
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
-  preloader.style.display = 'block';
-  const video = document.getElementById('video');
   try {
-    if (video) {
-      if (refUser.length === 0) return errorMsg('No Reference Image!');
+    loader();
+    const video = document.getElementById('video');
+    if (!video) return errorMsg('Start the camera first!');
+    if (refUser.length === 0) return errorMsg('No Reference Image!');
+    const img1 = refUser.descriptor;
 
-      let img1 = refUser[0];
-      let img2;
-
-      const canvas = faceapi.createCanvasFromMedia(video);
-      canvas.id = 'canvas';
-      camera.append(canvas);
-
-      const id = document.getElementById('canvas');
-
-      // face api detection
-      const detection = await faceapi
-        .detectAllFaces(id, tinyFaceOption)
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptors();
-
-      // if no detection
-      if (detection.length < 1 || detection.length > 1) {
-        stopVideo();
-        errorMsg('Face invalid, try again');
-        return startVideoHandler();
-      }
-
-      img2 = detection[0];
-
+    const canvas = faceapi.createCanvasFromMedia(video);
+    canvas.id = 'canvas';
+    camera.append(canvas);
+    // const id = document.getElementById('canvas');
+    // face api detection
+    const detection = await faceapi
+      .detectAllFaces(canvas, tinyFaceOption)
+      .withFaceLandmarks(useTinyModel)
+      .withFaceDescriptors();
+    // if no detection or some faces are detected
+    if (detection.length < 1 || detection.length > 1) {
       stopVideo();
-      // guard clause
-      if (!img1) return errorMsg(`Record your face first!`);
-      if (!img2) return errorMsg(`Face not recognize`);
-
-      img1 = img1[0].descriptor;
-      img2 = img2.descriptor;
-
-      // comparing the 2 image
-      comparePerson(img1, img2);
-    } else {
-      errorMsg('Start the camera first!');
+      errorMsg('Face invalid, try again');
+      return startVideoHandler();
     }
+    const img2 = detection[0].descriptor;
+    stopVideo();
+    // guard clause
+    if (!img1) return errorMsg(`Record your face first!`);
+    if (!img2) return errorMsg(`Face not recognize`);
+    // comparing the 2 image
+    await comparePerson(img1, img2);
   } catch (e) {
     console.log(e);
   } finally {
-    preloader.style.display = 'none';
+    loader();
   }
 };
 
 // compare the person
 const comparePerson = async (referenceImg, queryImg) => {
   // guard clause if input is null
-  if (!referenceImg) return errorMsg('Please register an image first');
-  if (!queryImg) return errorMsg('Query img is invalid');
+  if (!referenceImg) return errorMsg('Please register a face first');
+  if (!queryImg) return errorMsg('No face detected!');
   // if both are defined run the face recognition
-  if (queryImg) {
-    // matching B query
-    const distance = 0.4;
-    const dist = faceapi.euclideanDistance(referenceImg, queryImg);
-    if (dist <= distance) {
-      successMsg(`Face are match! Please submit it to register`);
-      createPostButton();
-    } else {
-      errorMsg('Face does not Match!');
-    }
+
+  // matching B query
+  const distance = 0.4;
+  const dist = faceapi.euclideanDistance(referenceImg, queryImg);
+  if (dist <= distance) {
+    successMsg(`Face are match! Please submit it to register`);
+    createPostButton();
   } else {
-    errorMsg('No face detected!');
+    errorMsg('Face does not Match!');
   }
 };
 
@@ -268,8 +277,8 @@ const informationDom = (id, text) => {
   return document.querySelector(`.text`).insertAdjacentHTML('beforeend', dom);
 };
 
-const informationHandler = () => {
-  const backend = faceapi.tf.getBackend();
+const informationHandler = async () => {
+  const backend = await faceapi.tf.getBackend();
   informationDom(`backend`, `Browser backend: ${backend}`);
 };
 
@@ -277,6 +286,8 @@ const informationHandler = () => {
 const stopVideo = () => {
   const video = document.getElementById('video');
   const face_landmarks = document.getElementById('face_landmarks');
+  const video_text = document.getElementById(`video_text`);
+  if (video_text) video_text.textContent = 'Video: Stopped';
   if (video) {
     track[0].stop();
     video.remove();
@@ -312,55 +323,26 @@ const hideConfirm = () => {
   document.getElementById('password').value = '';
 };
 
-const postToServer = async (e) => {
-  e.preventDefault();
+const postToServer = async () => {
+  // e.preventDefault();
   const password = document.getElementById('password');
   try {
-    const id = refUser[0];
-    const descriptor = id[0].descriptor.toString();
+    // const id = refUser[0];
+    // const descriptor = id[0].descriptor.toString();
+    const descriptor = refUser.descriptor.toString();
     const url = `/descriptor`;
     const post_data = { descriptor, password: password.value };
-    const data = await postRequest(url, post_data);
-    if (data.err) return errorMsg(data.err);
-    if (data.msg) window.location.href = data.msg;
+    const { err, msg } = await postRequest(url, post_data);
+    if (err) return errorMsg(err);
+    if (msg) window.location.href = msg;
   } catch (err) {
-    return errorMsg(err);
+    console.log(err.message);
   } finally {
     hideConfirm();
   }
 };
 
-// const getUserCameraDevices = () => {
-//   return navigator.mediaDevices.enumerateDevices().then((devices) => {
-//     console.log(devices);
-//     return devices.filter((item) => item.kind === 'videoinput');
-//   });
-// };
-
-// getUserCameraDevices().then((i) => createSelectElement('Video', i));
-
-// const createSelectElement = (name, val) => {
-//   // dynamic select
-//   const select = document.createElement('select');
-//   select.name = name;
-//   select.id = name;
-//   for (let i = 0; val.length > i; i++) {
-//     const option = document.createElement('option');
-//     option.value = val[i].label;
-//     option.text = val[i].label;
-//     select.appendChild(option);
-//   }
-
-//   const label = document.createElement('label');
-//   label.id = name;
-//   label.innerHTML = name;
-//   label.htmlFor = name;
-
-//   document.getElementById('devices').appendChild(label).appendChild(select);
-// };
-
 export {
-  preloader,
   camera,
   track,
   refUser,
@@ -374,4 +356,5 @@ export {
   postToServer,
   informationHandler,
   cameraDeviceHandler,
+  onChangeCameraDevice,
 };

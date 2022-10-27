@@ -1,5 +1,5 @@
 import { getRequest, postRequest, randDarkColor } from '../helpers/helpers.js';
-import { successDom, warningDom, errorDom, deleteMsg } from './helper.js';
+import { successDom, warningDom, errorDom, deleteMsg } from './msg.js';
 import {
   students_data,
   fetchStudents,

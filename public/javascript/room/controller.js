@@ -81,6 +81,7 @@ window.addEventListener('load', () => {
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    data_init(),
   ])
     .then(() => {
       console.log(`face api module success`);
@@ -88,6 +89,4 @@ window.addEventListener('load', () => {
     .catch((err) => {
       console.log(err);
     });
-
-  data_init();
 });

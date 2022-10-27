@@ -1,36 +1,41 @@
 import {
-  preloader,
   recognizeHandler,
   startVideoHandler,
   photoHandler,
   fetchPrevDescriptor,
   informationHandler,
-  cameraDeviceHandler,
+  onChangeCameraDevice,
 } from './face_recognition.js';
+import { loader } from './loader.js';
 
-document
-  .getElementById('recognize-btn')
-  .addEventListener('click', recognizeHandler);
 document
   .getElementById('camera-btn')
   .addEventListener('click', startVideoHandler);
 document.getElementById('photo-btn').addEventListener('click', photoHandler);
+document
+  .getElementById('recognize-btn')
+  .addEventListener('click', recognizeHandler);
+
+// implement onchange camera device
+document
+  .getElementById('camera_device')
+  .addEventListener('change', onChangeCameraDevice);
 
 window.addEventListener('load', () => {
+  loader();
   Promise.all([
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
-    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    fetchPrevDescriptor(),
   ])
     .then(async () => {
-      await cameraDeviceHandler();
-      fetchPrevDescriptor();
-      informationHandler();
+      await informationHandler();
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      preloader.style.display = 'none';
+      loader();
     });
 });

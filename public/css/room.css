@@ -153,13 +153,12 @@ body {
   left: 10px;
   cursor: pointer;
 }
-
-.copy {
+#link-btn {
+  width: 50px;
+  height: 50px;
   color: #fff;
   text-shadow: 1px 1px black;
   background-color: #494949;
-  width: 50px;
-  height: 50px;
   display: flex;
   place-content: center;
   place-items: center;
@@ -168,16 +167,6 @@ body {
   font-size: 1.2rem;
 }
 .check {
-  color: white;
-  text-shadow: 1px 1px black;
-  background-color: #494949;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  place-content: center;
-  place-items: center;
-  border-radius: 3px;
-  font-size: 1.2rem;
   cursor: default;
 }
 .copy::before {
@@ -190,37 +179,29 @@ body {
 .check::before {
   content: '\f00c';
   font: var(--fa-font-solid);
-  cursor: default;
 }
 .mainBtn {
   display: flex;
-  position: fixed;
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
-#join-btn {
-  background-color: #2aca3e;
-  font-size: 18px;
+.mainBtn > button {
   padding: 15px 25px;
+  font-size: 18px;
+  color: black;
+  /* text-shadow: 1px 1px black; */
   border: none;
-  color: #fff;
-  text-shadow: 1px 1px black;
-  bottom: 0.9rem;
-  border-radius: 8px;
   cursor: pointer;
   margin: 10px;
+  border-radius: 3px;
+  bottom: 0.9rem;
+}
+#join-btn {
+  background-color: #2aca3e;
 }
 #quit-btn {
   background-color: red;
-  font-size: 18px;
-  padding: 15px 25px;
-  border: none;
-  color: #fff;
-  text-shadow: 1px 1px black;
-  bottom: 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 10px;
 }
 #setup-btn {
   background-color: #2aca3e;
@@ -688,6 +669,11 @@ select {
     width: 80%;
   }
 }
+@media (max-width: 1300px) {
+  #screen-btn {
+    display: none;
+  }
+}
 @media (max-width: 768px) {
   #stream__box {
     height: 85vh;
@@ -707,11 +693,7 @@ select {
   .settings-modal {
     width: 80%;
   }
-  #screen-btn {
-    display: none;
-  }
-  #join-btn,
-  #quit-btn {
+  .mainBtn > button {
     font-size: 1rem;
     padding: 5px 10px;
     margin: auto 5px;
@@ -722,6 +704,10 @@ select {
   .link {
     font-size: 0.9rem;
   }
+  #link-btn {
+    width: 40px;
+    height: 40px;
+  }
 }
 @media (max-width: 480px) {
   .settings-modal {
@@ -730,8 +716,7 @@ select {
   .videoLink {
     width: 28%;
   }
-  #join-btn,
-  #quit-btn {
+  .mainBtn > button {
     font-size: 0.9rem;
     padding: 3px 8px;
   }

@@ -25,20 +25,53 @@ const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
   inputSize: 416,
 });
 
-const onChangeCameraDevice = (e) => {
-  loader();
-  const valueId = e.currentTarget.value;
-  devices.selectedVideoId = valueId;
-  const constraint = { video: { deviceId: valueId } };
+const backend = async () => {
+  return await faceapi.tf.getBackend();
+};
+
+const onChangeCameraDevice = async (e) => {
   try {
-    navigator.mediaDevices.getUserMedia(constraint).then((mediaStream) => {
-      const video = document.getElementById('video');
-      video.srcObject = mediaStream;
-    });
+    loader();
+    const valueId = e.currentTarget.value;
+    devices.selectedVideoId = valueId;
+    await videoUserMedia();
   } catch (err) {
     console.log(err.message);
   } finally {
     loader();
+  }
+};
+
+const videoUserMedia = async () => {
+  const text = document.getElementById('video_text');
+  const dom = document.getElementById('video_error');
+  const deviceValue = document.getElementById('camera_device').value;
+  const video = document.getElementById('video');
+
+  let constraint = { video: true };
+  if (devices.selectedVideoId)
+    constraint = { video: { deviceId: deviceValue } };
+
+  try {
+    const media = await navigator.mediaDevices.getUserMedia(constraint);
+    video.srcObject = media;
+    track = media.getTracks();
+
+    if (!text) {
+      informationDom('video_text', `Video: Working`);
+    } else {
+      text.textContent = 'Video: Working';
+    }
+  } catch (err) {
+    const errArr = ['NotAllowedError'];
+    if (errArr.includes(err.message)) {
+      if (!dom) {
+        informationDom(`video_error`, `Video: Permission Denied by user`);
+        errorMsg('Video: Permission Denied by user');
+      }
+      return;
+    }
+    console.log(err.message);
   }
 };
 
@@ -64,81 +97,61 @@ const fetchPrevDescriptor = async () => {
   if (descriptor) {
     const split = descriptor.split(',');
     const float32Arr = new Float32Array(split);
-    // refUser.push([{ descriptor: float32Arr }]);
     refUser.descriptor = float32Arr;
     successMsg(msg);
   }
 };
 
+const clearVideoAndCanvas = () => {
+  const img = document.getElementById('img');
+  if (img) img.remove();
+  const submit = document.getElementById('submit-btn');
+  if (submit) submit.remove();
+  const overlay = document.getElementById('overlay');
+  if (overlay) overlay.remove();
+  const canvas = document.getElementById('canvas');
+  if (canvas) canvas.remove();
+};
+
 // VIDEO HANDLER
 const startVideoHandler = async () => {
   loader();
-  devices.videoDevice = null;
-  const selected = document.getElementById('camera_device');
-  selected.innerHTML = ``;
-  await cameraDeviceHandler();
-  if (devices.selectedVideoId) selected.value = devices.selectedVideoId;
-  const backend = await faceapi.tf.getBackend();
-  const vid = document.createElement('video');
-  vid.id = 'video';
-  vid.width = '1920';
-  vid.height = '1080';
-  vid.autoplay = true;
-  vid.muted = true;
+  try {
+    devices.videoDevice = null;
+    const selected = document.getElementById('camera_device');
+    selected.innerHTML = ``;
+    selected.value = devices.selectedVideoId;
+    await cameraDeviceHandler();
+    const vid = document.createElement('video');
+    vid.id = 'video';
+    vid.width = '1920';
+    vid.height = '1080';
+    vid.autoplay = true;
+    vid.muted = true;
 
-  const img = document.getElementById('img');
-  if (img) img.remove();
-
-  const submit = document.getElementById('submit-btn');
-  if (submit) submit.remove();
-
-  const overlay = document.getElementById('overlay');
-  if (overlay) overlay.remove();
-
-  const canvas = document.getElementById('canvas');
-  if (canvas) canvas.remove();
-
-  const video = document.getElementById('video');
-  if (!video) camera.insertBefore(vid, camera.firstChild);
-
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then((stream) => {
-      vid.srcObject = stream;
-      track = stream.getTracks();
-      if (backend === 'webgl') faceDetection(500);
-
-      const text = document.getElementById('video_text');
-      if (!text) {
-        informationDom('video_text', `Video: Working`);
-      } else {
-        text.textContent = 'Video: Working';
-      }
-    })
-    .catch((e) => {
-      if (e.name === 'NotAllowedError') {
-        const dom = document.getElementById('video_error');
-        if (!dom) {
-          informationDom(`video_error`, `Video: Permission Denied by user`);
-          errorMsg('Video: Permission Denied by user');
-        }
-      }
-    })
-    .finally(() => {
-      loader();
-    });
+    clearVideoAndCanvas();
+    const video = document.getElementById('video');
+    if (!video) camera.insertBefore(vid, camera.firstChild);
+    await videoUserMedia();
+    if ((await backend()) === 'webgl') await faceDetection(100);
+  } catch (err) {
+    console.log(err.message);
+  } finally {
+    loader();
+  }
 };
 
-const faceDetection = (ms) => {
+const faceDetection = async (ms) => {
   const video = document.getElementById(`video`);
   const displaySize = { width: video.width, height: video.height };
-
-  video.addEventListener('play', () => {
-    const canvas = faceapi.createCanvasFromMedia(video);
+  video.addEventListener('play', async () => {
+    const faceLandmarks = document.getElementById('face_landmarks');
+    if (faceLandmarks) return;
+    const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'face_landmarks';
-    camera.append(canvas);
 
-    faceapi.matchDimensions(canvas, displaySize);
+    camera.append(canvas);
+    await faceapi.matchDimensions(canvas, displaySize);
 
     // interval
     intervalFace = setInterval(async () => {
@@ -146,10 +159,14 @@ const faceDetection = (ms) => {
         .detectAllFaces(video, tinyFaceOption)
         .withFaceLandmarks(useTinyModel);
 
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
+      const resizedDetections = await faceapi.resizeResults(
+        detections,
+        displaySize
+      );
+
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-      faceapi.draw.drawDetections(canvas, resizedDetections);
-      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      await faceapi.draw.drawDetections(canvas, resizedDetections);
+      await faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     }, ms);
   });
 };
@@ -173,12 +190,10 @@ const photoHandler = async () => {
     if (!imgDom) camera.append(img);
 
     const displaySize = { width: video.width, height: video.height };
-
     const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'canvas';
     camera.append(canvas);
-    // const id = document.getElementById('canvas');
-    // face api detection
+
     const detection = await faceapi
       .detectAllFaces(canvas, tinyFaceOption)
       .withFaceLandmarks(useTinyModel)
@@ -198,12 +213,8 @@ const photoHandler = async () => {
     const resizedDetections = faceapi.resizeResults(detection, displaySize);
     faceapi.draw.drawDetections(canvas, resizedDetections);
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    // reset array
-    // refUser.length = [];
-    // input user array
-    // refUser.push(detection);
+    // store user descriptor
     refUser.descriptor = detection[0].descriptor;
-    // msg
     successMsg(
       'If you are satisfied with this photo try to recognize else retry'
     );
@@ -220,7 +231,7 @@ const recognizeHandler = async () => {
     loader();
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
-    if (refUser.length === 0) return errorMsg('No Reference Image!');
+    if (refUser.length === 0) return errorMsg('No reference descriptor!');
     const img1 = refUser.descriptor;
 
     const canvas = faceapi.createCanvasFromMedia(video);
@@ -240,9 +251,6 @@ const recognizeHandler = async () => {
     }
     const img2 = detection[0].descriptor;
     stopVideo();
-    // guard clause
-    if (!img1) return errorMsg(`Record your face first!`);
-    if (!img2) return errorMsg(`Face not recognize`);
     // comparing the 2 image
     await comparePerson(img1, img2);
   } catch (e) {
@@ -254,11 +262,9 @@ const recognizeHandler = async () => {
 
 // compare the person
 const comparePerson = async (referenceImg, queryImg) => {
-  // guard clause if input is null
-  if (!referenceImg) return errorMsg('Please register a face first');
-  if (!queryImg) return errorMsg('No face detected!');
-  // if both are defined run the face recognition
-
+  if (!ArrayBuffer.isView(referenceImg))
+    return errorMsg(`Record your face descriptor first!`);
+  if (!ArrayBuffer.isView(queryImg)) return errorMsg(`Face not recognize`);
   // matching B query
   const distance = 0.4;
   const dist = faceapi.euclideanDistance(referenceImg, queryImg);
@@ -270,16 +276,15 @@ const comparePerson = async (referenceImg, queryImg) => {
   }
 };
 
+const informationHandler = async () => {
+  const backend = await faceapi.tf.getBackend();
+  informationDom(`backend`, `Browser backend: ${backend}`);
+};
 const informationDom = (id, text) => {
   const dom = `
   <p id='${id}'>${text}</p>
   `;
   return document.querySelector(`.text`).insertAdjacentHTML('beforeend', dom);
-};
-
-const informationHandler = async () => {
-  const backend = await faceapi.tf.getBackend();
-  informationDom(`backend`, `Browser backend: ${backend}`);
 };
 
 // stop video when capturing

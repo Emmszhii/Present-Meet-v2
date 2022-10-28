@@ -713,14 +713,14 @@ select {
   #join-btn,
   #quit-btn {
     font-size: 1rem;
-    padding: 10px 15px;
+    padding: 5px 10px;
     margin: auto 5px;
   }
   .modal_face_content {
     width: 90%;
   }
   .link {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 }
 @media (max-width: 480px) {
@@ -733,9 +733,9 @@ select {
   #join-btn,
   #quit-btn {
     font-size: 0.9rem;
-    padding: 5px 10px;
+    padding: 3px 8px;
   }
   .link {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 }

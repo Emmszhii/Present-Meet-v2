@@ -17,6 +17,7 @@ const { ObjectId } = require('mongodb');
 // mongoose model
 const { Account, User } = require('../models/User');
 const { Teacher, Classroom, Attendance } = require('../models/Class');
+const { students } = require('./helpers/presentAttendance');
 
 router.get('/class-attendance', ensureAuthenticated, (req, res) => {
   if (req.user.type !== 'teacher') return res.redirect('*');
@@ -360,12 +361,40 @@ router.post(
     const { attendance_id, classroom_id, student_id } = req.body;
 
     try {
-      // const students = await Classroom.findOne({_id: })
+      const classroom = await Classroom.findOne({ _id: classroom_id });
+      if (!classroom)
+        return res.status(400).json({ err: `No classroom found` });
+
+      const student = await Classroom.findOne({ _id: classroom_id }).populate({
+        path: 'students',
+        match: { _id: student_id },
+      });
+      if (!student)
+        return res
+          .status(400)
+          .json({ err: `Student not found in the database` });
+
+      const attendance = await Attendance.findOne({ _id: attendance_id });
+      if (!attendance)
+        return res
+          .status(400)
+          .json({ err: `No attendance file created in the database` });
+
+      attendance.present.push(student_id);
+      await attendance.save();
+
+      const data = await students(attendance_id);
+      const queryStudent = student.students[0];
+      const firstName = queryStudent.first_name;
+      const lastName = queryStudent.last_name;
+      console.log(data);
+      return res.status(200).json({
+        data,
+        msg: `Student ${lastName}, ${firstName} has been saved to the attendance`,
+      });
     } catch (e) {
       console.log(e);
     }
-
-    res.status(200).json({ data: { attendance_id, classroom_id, student_id } });
   }
 );
 

@@ -192,8 +192,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
 };
 
 const raiseHandHandler = () => {
-  console.log(raiseHands);
-  const body = document.querySelector('.videoCall');
+  const body = document.body;
   const dom = document.querySelector('.raise_hand');
   const firstUser = raiseHands[0];
   const secondUser = raiseHands[1];

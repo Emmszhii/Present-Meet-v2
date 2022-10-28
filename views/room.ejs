@@ -35,87 +35,87 @@
   <body>
     <div class="svg_spinner" id="room_loader"></div>
 
-    <div class="videoCall">
-      <div class="streams">
-        <section id="stream__container">
-          <div id="stream__box"></div>
-          <div id="streams__container">
-            <!-- <div class="video__container" id="user-container-232">
+    <!-- <div class="videoCall"> -->
+    <div class="streams">
+      <section id="stream__container">
+        <div id="stream__box"></div>
+        <div id="streams__container">
+          <!-- <div class="video__container" id="user-container-232">
               <div class="video-player" id="user-12323">1</div>
             </div> -->
-          </div>
-        </section>
+        </div>
+      </section>
+    </div>
+
+    <section id="messages__container">
+      <div id="messages"></div>
+      <form id="message__form">
+        <input
+          type="text"
+          name="message"
+          placeholder="Send a message...."
+          autocomplete="off"
+        />
+      </form>
+    </section>
+
+    <section id="members__container" style="display: block">
+      <div id="members__header">
+        <p>Participants</p>
+        <strong id="members__count">0</strong>
       </div>
+      <div id="member__list"></div>
+    </section>
 
-      <section id="messages__container">
-        <div id="messages"></div>
-        <form id="message__form">
-          <input
-            type="text"
-            name="message"
-            placeholder="Send a message...."
-            autocomplete="off"
-          />
-        </form>
-      </section>
-
-      <section id="members__container" style="display: block">
-        <div id="members__header">
-          <p>Participants</p>
-          <strong id="members__count">0</strong>
-        </div>
-        <div id="member__list"></div>
-      </section>
-
-      <div class="footerBtn">
-        <div class="videoLink">
-          <!-- Button for copying the room ID -->
-          <button class="icon copy" id="link-btn" type="button">
-            <!-- <i class="fa-solid fa-copy"></i> -->
-          </button>
-          <!-- Left side for the ink of the room -->
-          <p class="link"></p>
-        </div>
-        <!-- Main Button at middle-->
-        <div class="middleBtn">
-          <button class="button" id="mic-btn">
-            <i class="fa-solid fa-microphone"></i>
-          </button>
-          <button class="button" id="camera-btn">
-            <i class="fa-solid fa-video"></i>
-          </button>
-          <button class="button" id="screen-btn">
-            <i class="fa-solid fa-desktop"></i>
-          </button>
-          <button class="button" id="raise-hand">
-            <i class="fa-solid fa-hand"></i>
-          </button>
-          <!-- <button><i class="fa-solid fa-ellipsis-vertical"></i></button> -->
-          <button class="button" id="leave-btn">
-            <i class="fa-solid fa-phone"></i>
-          </button>
-        </div>
-        <!-- Right side button for messaging and the participants list -->
-        <div class="rightBtn">
-          <button class="button active" id="settings-btn">
-            <i class="fa-solid fa-cog"></i>
-          </button>
-          <button class="button active" id="users-btn">
-            <i class="fa-solid fa-users"></i>
-          </button>
-          <button class="button" id="chat-btn">
-            <i class="fa-solid fa-envelope"></i>
-          </button>
-        </div>
-        <!-- Joining stream -->
-        <div class="mainBtn">
-          <button id="join-btn">Join Stream</button>
-          <!-- Leaving Stream -->
-          <button onclick="location.href='/quit'" type="button" id="quit-btn">
-            Quit Room
-          </button>
-        </div>
+    <div class="footerBtn">
+      <div class="videoLink">
+        <!-- Button for copying the room ID -->
+        <button class="icon copy" id="link-btn" type="button">
+          <!-- <i class="fa-solid fa-copy"></i> -->
+        </button>
+        <!-- Left side for the ink of the room -->
+        <p class="link"></p>
+      </div>
+      <!-- Main Button at middle-->
+      <div class="middleBtn">
+        <button class="button" id="mic-btn">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <button class="button" id="camera-btn">
+          <i class="fa-solid fa-video"></i>
+        </button>
+        <button class="button" id="screen-btn">
+          <i class="fa-solid fa-desktop"></i>
+        </button>
+        <button class="button" id="raise-hand">
+          <i class="fa-solid fa-hand"></i>
+        </button>
+        <!-- <button><i class="fa-solid fa-ellipsis-vertical"></i></button> -->
+        <button class="button" id="leave-btn">
+          <i class="fa-solid fa-phone"></i>
+        </button>
+      </div>
+      <!-- Right side button for messaging and the participants list -->
+      <div class="rightBtn">
+        <button class="button active" id="settings-btn">
+          <i class="fa-solid fa-cog"></i>
+        </button>
+        <button class="button active" id="users-btn">
+          <i class="fa-solid fa-users"></i>
+        </button>
+        <button class="button" id="chat-btn">
+          <i class="fa-solid fa-envelope"></i>
+        </button>
+      </div>
+      <!-- Joining stream -->
+      <div class="mainBtn">
+        <button id="join-btn">Join Stream</button>
+        <!-- Leaving Stream -->
+        <button onclick="location.href='/quit'" type="button" id="quit-btn">
+          Quit Room
+        </button>
       </div>
     </div>
+    <!-- </div> -->
   </body>
 </html>

@@ -1,4 +1,4 @@
-const body = document.querySelector('.videoCall');
+const body = document.body;
 
 const errorMsg = (msg) => {
   resetMsg();

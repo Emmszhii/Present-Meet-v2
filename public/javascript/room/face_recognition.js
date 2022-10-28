@@ -23,7 +23,7 @@ const backend = async () => {
 const faceRecognitionHandler = async (teacherId) => {
   try {
     muteStream();
-
+    const url = `/get-descriptor`;
     const { descriptor } = await get_descriptor();
 
     if (descriptor) {
@@ -32,7 +32,7 @@ const faceRecognitionHandler = async (teacherId) => {
       return warningMsg('No face registered by user');
     }
 
-    document.querySelector('.videoCall').insertAdjacentHTML('beforeend', dom());
+    document.body.insertAdjacentHTML('beforeend', dom());
 
     document.querySelector('.modal_face_content').dataset.value = teacherId;
 
@@ -244,7 +244,7 @@ const faceRecognized = async () => {
 };
 
 const get_descriptor = async () => {
-  const url = '/getDescriptor';
+  const url = '/get-descriptor';
   const data = await getRequest(url);
   return data;
 };

@@ -72,6 +72,9 @@
 /* End loader */
 body {
   background-color: #000000;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 .videoCall {
   height: 100vh;

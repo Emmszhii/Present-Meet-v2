@@ -217,7 +217,8 @@ const settings_dom = () => {
 };
 
 const settingsHandler = async () => {
-  const dom = document.querySelector(`.videoCall`);
+  // const dom = document.querySelector(`.videoCall`);
+  const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
 
   const playerDom = document.getElementById(`user-container-${userData.rtcId}`);

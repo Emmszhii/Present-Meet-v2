@@ -94,7 +94,6 @@ const checkStudentDescriptor = async (data) => {
       warningMsg(`User ${displayName} request is invalid`);
     }
   } catch (e) {
-    errorMsg(`Invalid request of user ${displayName}`);
     console.log(e);
   }
 };
@@ -242,7 +241,7 @@ const restrictDom = () => {
 const attendance = async () => {
   roomLoaderHandler();
   const btn = document.getElementById('attendance-btn');
-  const videoCallContainer = document.querySelector('.videoCall');
+  const body = document.body;
   const attendanceContainer = document.getElementById('attendance__container');
 
   if (btn.classList.contains('active')) {
@@ -253,7 +252,7 @@ const attendance = async () => {
     roomLoaderHandler();
   } else {
     btn.classList.add('active');
-    videoCallContainer.insertAdjacentHTML('beforeend', attendanceDom());
+    body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
 

@@ -527,7 +527,7 @@ select {
   padding: 5px;
 }
 
-/* attendance */
+/* Start Attendance */
 .on {
   background-color: #2aca3e;
   color: black;
@@ -599,6 +599,19 @@ select {
   text-align: center;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
+#legend {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+/* End Attendance */
+/* Start Face recognition */
 .face_recognition_btn {
   display: flex;
   justify-content: space-between;
@@ -610,7 +623,7 @@ select {
   color: white;
   background: black;
 }
-/* Face recognition */
+
 .modal_face {
   z-index: 3;
   position: fixed;

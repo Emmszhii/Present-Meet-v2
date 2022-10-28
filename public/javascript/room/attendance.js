@@ -12,6 +12,7 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
+import { updateStudentIcon } from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const classroom = [];
@@ -62,6 +63,14 @@ const attendanceDom = () => {
       <div id='settings_attendance'></div>
       <div id="classroom"></div>
       <div id="classroom_info"></div>
+      <div id='legend'>
+        <span class='red__icon'></span>
+        <p> absent</p>
+        <span class='orange__icon'></span>
+        <p> late</p>
+        <span class='green__icon'></span>
+        <p> present</p>
+      </div>
       <div id="students"></div>
     </section>
   `;
@@ -374,6 +383,9 @@ const studentsToDom = (info) => {
   const data = info;
   for (const [index, value] of data.entries()) {
     dom.insertAdjacentHTML('beforeend', studentsDom(value));
+    document
+      .querySelector(`.icon_user_${value._id}`)
+      .addEventListener('click', updateStudentIcon);
   }
 };
 
@@ -386,7 +398,8 @@ const noStudentsDom = () => {
 const studentsDom = (val) => {
   return `
     <div class='member__wrapper' id='${val._id}'>
-      <span class='icon_user_${val._id} red__icon'></span>
+      <span class='icon_user_${val._id} clickable red__icon' data-id="${val._id}">
+      </span>
       <p>${val.last_name}, ${val.first_name}</p>
     </div>
   `;

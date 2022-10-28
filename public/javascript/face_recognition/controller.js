@@ -22,7 +22,6 @@ document
   .addEventListener('change', onChangeCameraDevice);
 
 window.addEventListener('load', () => {
-  loader();
   Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),

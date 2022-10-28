@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Present Meet</title>
     <link rel="stylesheet" href="css/face_recognition.css" />
     <link
       rel="stylesheet"
@@ -17,14 +18,15 @@
       href="/public/img/logo-no-background.svg"
       type="image/x-icon"
     />
-    <title>Present Meet</title>
+    <script defer src="javascript/FaceApi/face-api.js"></script>
+    <script defer src="javascript/FaceApi/face-api.min.js"></script>
     <script
       type="module"
       src="javascript/face_recognition/controller.js"
     ></script>
   </head>
   <body>
-    <!-- <div id="preloader"></div> -->
+    <div class="loader" id="loading"></div>
     <div class="nav_bar">
       <div class="buttons left_navbar">
         <button class="button" id="home" onclick="location.href='/'">
@@ -65,7 +67,5 @@
         </div>
       </div>
     </div>
-    <script src="javascript/FaceApi/face-api.js"></script>
-    <script src="javascript/FaceApi/face-api.min.js"></script>
   </body>
 </html>

@@ -26,7 +26,6 @@ router.get('/get-descriptor', ensureAuthenticated, async (req, res) => {
       });
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ err: e });
   }
 });
 

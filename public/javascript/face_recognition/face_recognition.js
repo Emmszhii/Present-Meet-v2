@@ -47,7 +47,7 @@ const videoUserMedia = async () => {
   const dom = document.getElementById('video_error');
   const deviceValue = document.getElementById('camera_device').value;
   const video = document.getElementById('video');
-
+  if (!video) return errorMsg('Please start camera first');
   let constraint = { video: true };
   if (devices.selectedVideoId)
     constraint = { video: { deviceId: deviceValue } };
@@ -115,8 +115,8 @@ const clearVideoAndCanvas = () => {
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
-  loader();
   try {
+    loader();
     devices.videoDevice = null;
     const selected = document.getElementById('camera_device');
     selected.innerHTML = ``;
@@ -133,7 +133,7 @@ const startVideoHandler = async () => {
     const video = document.getElementById('video');
     if (!video) camera.insertBefore(vid, camera.firstChild);
     await videoUserMedia();
-    if ((await backend()) === 'webgl') await faceDetection(100);
+    // if ((await backend()) === 'webgl') await faceDetection(500);
   } catch (err) {
     console.log(err.message);
   } finally {
@@ -173,11 +173,12 @@ const faceDetection = async (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
-  loader();
-  const video = document.getElementById('video');
-  const landmarks = document.getElementById('face_landmarks');
-  if (landmarks) landmarks.remove();
   try {
+    loader();
+    const video = document.getElementById('video');
+    const displaySize = { width: video.width, height: video.height };
+    const imgDom = document.getElementById('img');
+
     if (!video) return errorMsg('Start the camera first!');
     const img = document.createElement('canvas');
     img.id = 'img';
@@ -186,10 +187,8 @@ const photoHandler = async () => {
     const context = img.getContext('2d');
     context.imageSmoothingEnabled = false;
     context.drawImage(video, 0, 0, video.width, video.height);
-    const imgDom = document.getElementById('img');
     if (!imgDom) camera.append(img);
 
-    const displaySize = { width: video.width, height: video.height };
     const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'canvas';
     camera.append(canvas);
@@ -209,10 +208,13 @@ const photoHandler = async () => {
     // stop video play
     stopVideo();
     // display face landmarks
-    faceapi.matchDimensions(canvas, displaySize);
-    const resizedDetections = faceapi.resizeResults(detection, displaySize);
-    faceapi.draw.drawDetections(canvas, resizedDetections);
-    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    await faceapi.matchDimensions(canvas, displaySize);
+    const resizedDetections = await faceapi.resizeResults(
+      detection,
+      displaySize
+    );
+    await faceapi.draw.drawDetections(canvas, resizedDetections);
+    await faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     // store user descriptor
     refUser.descriptor = detection[0].descriptor;
     successMsg(

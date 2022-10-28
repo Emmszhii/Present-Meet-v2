@@ -74,12 +74,9 @@ body {
   background-color: #000000;
   position: relative;
   height: 100vh;
-  overflow: hidden;
-}
-.videoCall {
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* raiseHand */
@@ -261,10 +258,10 @@ body {
   position: absolute;
   top: 45%;
   left: 50%;
-  transform: translate(-50%, -49%);
-  height: 90vh;
+  transform: translate(-50%, -50%);
+  height: 85vh;
   width: 95%;
-  overflow: hidden;
+  overflow-x: hidden;
   overflow-y: auto;
   text-align: justify;
 }

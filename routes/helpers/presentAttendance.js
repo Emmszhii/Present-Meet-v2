@@ -6,9 +6,6 @@ const students = async (attendance_id) => {
       path: 'present',
     })
     .populate({
-      path: 'absent',
-    })
-    .populate({
       path: 'late',
     });
   if (!attendance) return { err: `No attendance` };

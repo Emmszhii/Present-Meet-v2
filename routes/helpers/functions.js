@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 
+const faceApiThreshold = process.env.THRESHOLD || 0.45;
+
 const capitalize = (string) => {
   const name = string.toLowerCase().split(' ');
 
@@ -88,6 +90,7 @@ const timeSince = (date) => {
 };
 
 module.exports = {
+  faceApiThreshold,
   capitalize,
   validateName,
   validateNameEmpty,

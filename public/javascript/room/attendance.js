@@ -77,18 +77,17 @@ const attendanceDom = () => {
 };
 
 const checkStudentDescriptor = async (data) => {
-  const { MemberId, displayName, descriptor } = data;
+  const { MemberId, displayName, descriptor: studentDescriptor } = data;
 
-  const dbStudentDescriptor = await getStudentDescriptor(MemberId);
+  const { descriptor, threshold } = await getStudentDescriptor(MemberId);
 
-  const dbFloatArr = dbStudentDescriptor.split(',');
-  const studentDescriptor = new Float32Array(dbFloatArr);
-  const queryFloatArr = descriptor.split(',');
+  const dbFloatArr = descriptor.split(',');
+  const dbStudentDescriptor = new Float32Array(dbFloatArr);
+  const queryFloatArr = studentDescriptor.split(',');
   const query = new Float32Array(queryFloatArr);
 
   try {
-    const dist = await faceapi.euclideanDistance(studentDescriptor, query);
-    const threshold = 0.4;
+    const dist = await faceapi.euclideanDistance(dbStudentDescriptor, query);
     if (dist <= threshold) {
       const attendance = {
         classroom_id: userData.classroom_id,
@@ -96,9 +95,8 @@ const checkStudentDescriptor = async (data) => {
         student_id: MemberId,
       };
       const { data, err, msg } = await addStudentAttendance(attendance);
-      console.log(data, err, msg);
-
-      successMsg(`Registering ${displayName} attendance`);
+      if (err) return errorMsg(err);
+      if (data) successMsg(msg);
     } else {
       warningMsg(`User ${displayName} request is invalid`);
     }
@@ -119,10 +117,11 @@ const addStudentAttendance = async (info) => {
 
 const getStudentDescriptor = async (id) => {
   try {
-    const url = `student-descriptor/${id}`;
-    const { data, err } = await getRequest(url);
+    const url = `/student-descriptor/${id}`;
+    const { descriptor, threshold, err } = await getRequest(url);
     if (err) return err;
-    if (data) return data;
+    const data = { descriptor, threshold };
+    if (descriptor) return data;
   } catch (e) {
     console.log(e);
   }
@@ -416,4 +415,4 @@ const get_classroom = async () => {
   }
 };
 
-export { makeAttendanceHandler, checkStudentDescriptor };
+export { makeAttendanceHandler, checkStudentDescriptor, loaderHandler };

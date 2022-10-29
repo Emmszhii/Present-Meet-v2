@@ -26,11 +26,7 @@ const faceRecognitionHandler = async (teacherId) => {
     const url = `/get-descriptor`;
     const { descriptor } = await get_descriptor();
 
-    if (descriptor) {
-      userData.descriptor = descriptor;
-    } else {
-      return warningMsg('No face registered by user');
-    }
+    if (!descriptor) return warningMsg('No face registered by user');
 
     document.body.insertAdjacentHTML('beforeend', dom());
 
@@ -189,12 +185,12 @@ const closeFaceRecognition = () => {
 
 const faceRecognized = async () => {
   const loader = document.getElementById('loader_face');
+  const video = document.getElementById('video');
   loader.style.display = 'block';
   try {
-    const video = document.getElementById('video');
-
+    const { descriptor, threshold } = await get_descriptor();
     // Guard clause
-    if (!userData.descriptor)
+    if (!descriptor)
       return warningMsg('User face recognition is not registered');
     if (!video) return warningMsg(`Please start the camera first`);
 
@@ -214,13 +210,15 @@ const faceRecognized = async () => {
     if (!query[0].descriptor) return errorMsg('Invalid Please Try again');
 
     // convert string to float32array
-    const float = userData.descriptor.split(',');
-    const data = new Float32Array(float);
+    const float = descriptor.split(',');
+    const descriptorDb = new Float32Array(float);
 
     // if (query[0].descriptor) {
-    const dist = await faceapi.euclideanDistance(data, query[0].descriptor);
+    const dist = await faceapi.euclideanDistance(
+      descriptorDb,
+      query[0].descriptor
+    );
     console.log(dist);
-    const threshold = 0.4;
     if (dist <= threshold) {
       successMsg(`User match`);
       sendAttendance({

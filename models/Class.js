@@ -26,7 +26,6 @@ const classroomSchema = new mongoose.Schema(
 const attendanceSchema = new mongoose.Schema(
   {
     present: Array,
-    absent: Array,
     late: Array,
   },
   { timestamps: true }

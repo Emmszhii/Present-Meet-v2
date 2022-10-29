@@ -689,11 +689,6 @@ select {
     height: 85vh;
   }
 }
-@media (max-width: 1300px) {
-  #screen-btn {
-    display: none;
-  }
-}
 @media (max-width: 768px) {
   #stream__box {
     height: 85vh;

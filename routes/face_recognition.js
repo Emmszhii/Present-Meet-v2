@@ -5,7 +5,7 @@ const { ensureAuthenticated } = require('../config/auth');
 
 // User model
 const { Account, User, Student, Teacher } = require('../models/User');
-const { comparePassword } = require('./helpers/functions');
+const { comparePassword, faceApiThreshold } = require('./helpers/functions');
 
 router.get('/face-recognition', ensureAuthenticated, (req, res) => {
   res.render('face_recognition');
@@ -22,6 +22,7 @@ router.get('/get-descriptor', ensureAuthenticated, async (req, res) => {
     if (student.descriptor)
       return res.status(200).json({
         descriptor: student.descriptor,
+        threshold: faceApiThreshold,
         msg: 'User face descriptor is now added',
       });
   } catch (e) {
@@ -81,7 +82,9 @@ router.get('/student-descriptor/:id', ensureAuthenticated, async (req, res) => {
       });
 
     if (student.descriptor) {
-      return res.status(200).json({ data: student.descriptor });
+      return res
+        .status(200)
+        .json({ descriptor: student.descriptor, threshold: faceApiThreshold });
     }
   } catch (e) {
     console.log(e);

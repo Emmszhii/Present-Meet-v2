@@ -32,7 +32,6 @@ const addCloseListener = (type, title) => {
   document
     .getElementById(`close_${type}_${title}`)
     .addEventListener('click', (e) => {
-      console.log(e);
       const dom = e.currentTarget.parentNode;
       if (dom) dom.remove();
     });

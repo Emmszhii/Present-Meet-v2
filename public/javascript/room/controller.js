@@ -1,6 +1,3 @@
-// For logging errors in agora set 3 for warnings and error to be log at console set 1 to log it all.
-AgoraRTC.setLogLevel(3);
-
 import {
   toggleCamera,
   toggleMic,
@@ -18,6 +15,7 @@ import {
   hideDisplayFrame,
   settingsToggle,
   raiseHand,
+  checkIfUserIsMobileHandler,
 } from './room.js';
 
 // Event Listeners
@@ -73,9 +71,11 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+  await AgoraRTC.setLogLevel(3);
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
+  await checkIfUserIsMobileHandler();
   // load faces
   Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),

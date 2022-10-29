@@ -22,6 +22,15 @@ let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
 const userIdInDisplayFrame = { val: null };
 
+const checkIfUserIsMobileHandler = async () => {
+  const isMobile = navigator.userAgentData.mobile;
+  const screenBtn = document.getElementById('screen-btn');
+  console.log(isMobile);
+  if (isMobile) {
+    if (screenBtn) screenBtn.remove();
+  }
+};
+
 const checkIfUserDom = (id, name) => {
   const user = document.getElementById(`user-container-${id}`);
   if (!user) {
@@ -364,4 +373,5 @@ export {
   muteStream,
   checkIfUserDom,
   raiseHand,
+  checkIfUserIsMobileHandler,
 };

@@ -12,7 +12,7 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
-import { updateStudentIcon } from './icon_attendance.js';
+import { presentStudent, updateStudentIcon } from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const classroom = [];
@@ -96,7 +96,10 @@ const checkStudentDescriptor = async (data) => {
       };
       const { data, err, msg } = await addStudentAttendance(attendance);
       if (err) return errorMsg(err);
-      if (data) successMsg(msg);
+      if (data) {
+        presentStudent(MemberId);
+        successMsg(msg);
+      }
     } else {
       warningMsg(`User ${displayName} request is invalid`);
     }
@@ -321,29 +324,34 @@ const loaderHandler = () => {
   if (loaderDom) loaderDom.classList.toggle('svg_spinner');
 };
 
-const listDropdown = (e) => {
+const listDropdown = async (e) => {
   loaderHandler();
   attendanceCheckHandler();
-  // document.querySelector(`.svg_spinner`).style.display = 'block';
-  const restrictBtn = document.getElementById('restrict');
-  if (!restrictBtn.classList.contains('on')) {
-    restrictBtn.classList.toggle('on');
-    restrictBtn.value = 'on';
-    restrictBtn.textContent = 'Restriction On';
+  try {
+    const restrictBtn = document.getElementById('restrict');
+    if (!restrictBtn.classList.contains('on')) {
+      restrictBtn.classList.toggle('on');
+      restrictBtn.value = 'on';
+      restrictBtn.textContent = 'Restriction On';
+    }
+
+    const id = e.currentTarget.value;
+    const val = searchDataInArr(classroom[0], id);
+    const dom = document.getElementById('classroom_info');
+
+    dom.innerHTML = ``;
+
+    if (dom)
+      document
+        .getElementById('classroom_info')
+        .insertAdjacentHTML('beforeend', infoDom(val));
+
+    await getStudents(id);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
   }
-
-  const id = e.currentTarget.value;
-  const val = searchDataInArr(classroom[0], id);
-  const dom = document.getElementById('classroom_info');
-
-  dom.innerHTML = ``;
-
-  if (dom)
-    document
-      .getElementById('classroom_info')
-      .insertAdjacentHTML('beforeend', infoDom(val));
-
-  getStudents(id);
 };
 
 const infoDom = (val) => {
@@ -373,7 +381,7 @@ const getStudents = async (id) => {
   } catch (e) {
     console.log(e);
   } finally {
-    loaderHandler();
+    // loaderHandler();
   }
 };
 
@@ -383,7 +391,7 @@ const studentsToDom = (info) => {
   for (const [index, value] of data.entries()) {
     dom.insertAdjacentHTML('beforeend', studentsDom(value));
     document
-      .querySelector(`.icon_user_${value._id}`)
+      .getElementById(`icon_user_${value._id}`)
       .addEventListener('click', updateStudentIcon);
   }
 };
@@ -397,7 +405,7 @@ const noStudentsDom = () => {
 const studentsDom = (val) => {
   return `
     <div class='member__wrapper' id='${val._id}'>
-      <span class='icon_user_${val._id} clickable red__icon' data-id="${val._id}">
+      <span class='clickable red__icon' data-id="${val._id}" id="icon_user_${val._id}">
       </span>
       <p>${val.last_name}, ${val.first_name}</p>
     </div>

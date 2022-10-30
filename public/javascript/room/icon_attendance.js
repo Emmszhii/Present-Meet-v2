@@ -1,4 +1,4 @@
-import { postRequest } from '../helpers/helpers.js';
+import { getRequest, postRequest } from '../helpers/helpers.js';
 import { loaderHandler } from './attendance.js';
 import { errorMsg, successMsg } from './msg.js';
 import { userData } from './rtc.js';
@@ -26,9 +26,35 @@ const updateStudentIcon = async (e) => {
     if (err) {
       removedClassIcon(btn);
       btn.classList.toggle(prevStateIcon);
-      return errorMsg(err);
+      errorMsg(err);
     }
-    if (data) return successMsg(msg);
+    if (data) successMsg(msg);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
+};
+
+const presentStudent = async (id) => {
+  const user = document.getElementById(`icon_user_${id}`);
+  if (!user) return;
+  if (user.classList.contains('red__icon')) {
+    user.classList.toggle('red__icon');
+    user.classList.toggle('green__icon');
+  }
+  if (user.classList.contains('orange__icon')) {
+    user.classList.toggle('orange__icon');
+    user.classList.toggle('green__icon');
+  }
+};
+
+const getStudentPresentHandler = async (id) => {
+  loaderHandler();
+  try {
+    const { err: studentsErr, attendance } = await checkPresent();
+
+    console.log(studentsErr, attendance);
   } catch (e) {
     console.log(e);
   } finally {
@@ -62,4 +88,11 @@ const updateStudentAttendance = async (btn, id) => {
   if (data) return { data, msg };
 };
 
-export { updateStudentIcon };
+const checkPresent = async () => {
+  const url = `/check-present`;
+  const attendance_id = document.getElementById('classroom_list');
+  const { err, attendance } = await postRequest(url, attendance_id);
+  console.log(err, attendance);
+};
+
+export { updateStudentIcon, presentStudent };

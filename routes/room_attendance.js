@@ -3,7 +3,10 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
 const { createJsonToken, verifyJsonToken } = require('../config/jwt');
-const { students } = require('./helpers/presentAttendance');
+const {
+  students,
+  restrictMultipleAttendance,
+} = require('./helpers/presentAttendance');
 
 const {
   capitalize,
@@ -14,12 +17,6 @@ const {
 } = require('./helpers/functions');
 const { Account, User } = require('../models/User');
 const { Teacher, Classroom, Attendance } = require('../models/Class');
-
-// router.get('/create-attendance', ensureAuthenticated, async (req, res) => {
-//   const teacher = Teacher.findOne({ _id: req.user._id });
-
-//   res.status(200).json({ data: `created` });
-// });
 
 router.post(
   '/create-attendance/:restrict',
@@ -43,41 +40,12 @@ router.post(
         if (classroom.students.length === 0)
           return res.status(400).json({ err: `No student(s) registered` });
 
-        // restrict creating multiple attendance
+        const { minutes, seconds, err } = await restrictMultipleAttendance(
+          classId
+        );
 
-        // const { minutes, seconds } = await Classroom.findOne({ _id: classId })
-        //   .populate({
-        //     path: 'attendance_id',
-        //   })
-        //   .then((data) => {
-        //     const attendance = data.attendance_id;
-        //     const lastAttendance = attendance[attendance.length - 1];
-        //     const created = lastAttendance.createdAt;
-        //     const today = new Date().toISOString();
-        //     const difference = new Date(today) - created;
-
-        //     // const diff = timeSince(created);
-        //     const seconds = difference / 1000;
-        //     let interval = seconds / 60;
-        //     if (interval > 1 && seconds > 60) {
-        //       const minutes = Math.floor(seconds / 60);
-        //       return { minutes };
-        //     }
-        //     return { seconds };
-        //   });
-
-        // if (minutes < 15)
-        //   return res.status(400).json({
-        //     err: `Request Timeout! Request again after ${
-        //       15 - minutes
-        //     } minute(s)`,
-        //   });
-        // if (seconds)
-        //   return res.status(400).json({
-        //     err: `Request Timeout! Request again after ${
-        //       60 - seconds
-        //     } second(s)`,
-        //   });
+        if (minutes) return res.status(400).json({ err });
+        if (seconds) return res.status(400).json({ err });
 
         const attendance = new Attendance();
         classroom.attendance_id.push(attendance._id);
@@ -158,7 +126,6 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
   const attendance = await Attendance.findOne({ _id: attendance_id })
     .populate({ path: 'present', match: { _id: student_id } })
     .populate({ path: 'late', match: { _id: student_id } });
-  console.log(attendance);
   if (!attendance) return res.status(400).json({ err: `Invalid classroom ID` });
 
   const isStudentPresent = attendance.present.includes(student_id);
@@ -201,6 +168,15 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
     msg: `User ${lastName}, ${firstName} is ${user}`,
     data: 'ok',
   });
+});
+
+router.post('/check-present', ensureAuthenticated, async (req, res) => {
+  const { attendance_id } = req.body;
+
+  console.log(attendance_id);
+  const { err, attendance } = await students(attendance_id);
+  console.log(err, attendance);
+  res.status(200).json({ err, attendance });
 });
 
 module.exports = router;

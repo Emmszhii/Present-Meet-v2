@@ -40,7 +40,7 @@ router.post(
           return res.status(400).json({ err: `No student(s) registered` });
 
         const { err } = await restrictMultipleAttendance(classId);
-
+        console.log(err);
         if (err) return res.status(400).json({ err });
 
         const attendance = new Attendance();
@@ -168,8 +168,7 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
 
 router.post('/check-present', ensureAuthenticated, async (req, res) => {
   const { classroom_id } = req.body;
-  const { listOfStudents } = students({ classroom_id });
-
+  const listOfStudents = await students({ classroom_id });
   if (!listOfStudents) return res.status(200).json({});
   return res.status(200).json({ listOfStudents });
 });

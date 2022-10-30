@@ -38,6 +38,7 @@ const updateStudentIcon = async (e) => {
 
 const presentStudent = async (id) => {
   const user = document.getElementById(`icon_user_${id}`);
+
   if (!user) return;
   if (user.classList.contains('red__icon')) {
     user.classList.toggle('red__icon');
@@ -48,13 +49,36 @@ const presentStudent = async (id) => {
     user.classList.toggle('green__icon');
   }
 };
+const lateStudent = async (id) => {
+  const user = document.getElementById(`icon_user_${id}`);
+  if (!user) return;
+  if (user.classList.contains('red__icon')) {
+    user.classList.toggle('red__icon');
+    user.classList.toggle('orange__icon');
+  }
+  if (user.classList.contains('green__icon')) {
+    user.classList.toggle('green__icon');
+    user.classList.toggle('orange__icon');
+  }
+};
 
-const getStudentPresentHandler = async (id) => {
+const getStudentPresentHandler = async () => {
   loaderHandler();
   try {
     const { listOfStudents } = await checkPresent();
-    console.log(listOfStudents);
     if (!listOfStudents) return;
+
+    userData.attendance_id = listOfStudents._id;
+    const present = listOfStudents.present;
+    const late = listOfStudents.late;
+
+    for (const [index, id] of present.entries()) {
+      presentStudent(id);
+    }
+
+    for (const [index, id] of late.entries()) {
+      lateStudent(id);
+    }
   } catch (e) {
     console.log(e);
   } finally {

@@ -14,7 +14,6 @@ const students = async (data) => {
     return { attendance };
   }
   if (classroom_id) {
-    let minutes, seconds;
     const attendance = await Classroom.findOne({ _id: classroom_id })
       .populate({
         path: 'attendance_id',
@@ -29,33 +28,19 @@ const students = async (data) => {
 
         const seconds = difference / 1000;
         let interval = seconds / 60;
-        if (interval > 60 && seconds > 0) {
-          return lastAttendance;
-        } else {
-          return;
-        }
+        if (interval > 1) return lastAttendance;
+        if (seconds > 60 && seconds <= 60) return lastAttendance;
+        return;
       });
 
     if (!attendance) return;
-    const { attendance_id } = attendance;
-    const listOfStudents = await Attendance.findOne({
-      _id: attendance_id,
-    })
-      .populate({
-        path: 'present',
-      })
-      .populate({
-        path: 'late',
-      });
-
-    console.log(listOfStudents);
-    return { listOfStudents };
+    if (attendance) return attendance;
   }
 };
 
 const restrictMultipleAttendance = async (classId) => {
   // restrict creating multiple attendance
-  const { minutes, seconds } = await Classroom.findOne({ _id: classId })
+  const classroom = await Classroom.findOne({ _id: classId })
     .populate({
       path: 'attendance_id',
     })
@@ -68,21 +53,18 @@ const restrictMultipleAttendance = async (classId) => {
 
       // const diff = timeSince(created);
       const seconds = difference / 1000;
-      let interval = seconds / 60;
-      if (interval > 1 && seconds > 60) {
-        const minutes = Math.floor(seconds / 60);
-        return { minutes };
-      }
-      return { seconds };
+      const minutes = seconds / 60;
+      if (minutes > 1) return { minutes: Math.floor(minutes) };
+      if (seconds > 0 && seconds <= 60) return { seconds };
     });
   let err;
-  console.log(minutes, seconds);
+  const { minutes, seconds } = classroom;
   if (minutes < 15)
     err = `Request Timeout! Request again after ${15 - minutes} minute(s)`;
 
-  if (seconds)
-    err: `Request Timeout! Request again after ${60 - seconds} second(s)`;
-
+  if (seconds > 60 && seconds <= 60)
+    err = `Request Timeout! Request again after ${60 - seconds} second(s)`;
+  console.log(err);
   return { err };
 };
 

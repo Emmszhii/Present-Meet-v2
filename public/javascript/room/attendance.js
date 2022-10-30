@@ -12,7 +12,7 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
-import { presentStudent, updateStudentIcon } from './icon_attendance.js';
+import { getStudentPresentHandler, presentStudent, updateStudentIcon } from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const classroom = [];
@@ -373,6 +373,8 @@ const getStudents = async (id) => {
       students.push(data);
       if (students.length > 1) students.shift();
       studentsToDom(data);
+
+      await getStudentPresentHandler();
     }
     if (msg) {
       studentsDom.insertAdjacentHTML('beforeend', noStudentsDom());

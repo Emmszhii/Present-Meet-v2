@@ -52,9 +52,9 @@ const presentStudent = async (id) => {
 const getStudentPresentHandler = async (id) => {
   loaderHandler();
   try {
-    const { err: studentsErr, attendance } = await checkPresent();
-
-    console.log(studentsErr, attendance);
+    const { listOfStudents } = await checkPresent();
+    console.log(listOfStudents);
+    if (!listOfStudents) return;
   } catch (e) {
     console.log(e);
   } finally {
@@ -90,9 +90,10 @@ const updateStudentAttendance = async (btn, id) => {
 
 const checkPresent = async () => {
   const url = `/check-present`;
-  const attendance_id = document.getElementById('classroom_list');
-  const { err, attendance } = await postRequest(url, attendance_id);
-  console.log(err, attendance);
+  const classroom_id = document.getElementById('classroom_list').value;
+  const postData = { classroom_id };
+  const data = await postRequest(url, postData);
+  return data;
 };
 
-export { updateStudentIcon, presentStudent };
+export { updateStudentIcon, presentStudent, getStudentPresentHandler };

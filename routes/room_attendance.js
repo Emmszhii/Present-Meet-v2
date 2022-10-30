@@ -34,18 +34,14 @@ router.post(
       if (restrict === 'on') {
         const teacher = await Teacher.findOne({ _id: req.user._id });
         if (!teacher) return res.status(400).json({ err: `Invalid request` });
-
         const classroom = await Classroom.findOne({ _id: classId });
         if (!classroom) return res.status(400).json({ err: `Invalid request` });
         if (classroom.students.length === 0)
           return res.status(400).json({ err: `No student(s) registered` });
 
-        const { minutes, seconds, err } = await restrictMultipleAttendance(
-          classId
-        );
+        const { err } = await restrictMultipleAttendance(classId);
 
-        if (minutes) return res.status(400).json({ err });
-        if (seconds) return res.status(400).json({ err });
+        if (err) return res.status(400).json({ err });
 
         const attendance = new Attendance();
         classroom.attendance_id.push(attendance._id);
@@ -96,7 +92,7 @@ router.post(
       await attendance.save();
       console.log(attendance);
 
-      const data = await students(attendance_id);
+      const data = await students({ attendance_id });
       const queryStudent = student.students[0];
       const firstName = queryStudent.first_name;
       const lastName = queryStudent.last_name;
@@ -171,12 +167,11 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
 });
 
 router.post('/check-present', ensureAuthenticated, async (req, res) => {
-  const { attendance_id } = req.body;
+  const { classroom_id } = req.body;
+  const { listOfStudents } = students({ classroom_id });
 
-  console.log(attendance_id);
-  const { err, attendance } = await students(attendance_id);
-  console.log(err, attendance);
-  res.status(200).json({ err, attendance });
+  if (!listOfStudents) return res.status(200).json({});
+  return res.status(200).json({ listOfStudents });
 });
 
 module.exports = router;

@@ -1,16 +1,56 @@
 const { Teacher, Classroom, Attendance } = require('../../models/Class');
 
-const students = async (attendance_id) => {
-  const attendance = await Attendance.findOne({ _id: attendance_id })
-    .populate({
-      path: 'present',
+const students = async (data) => {
+  const { attendance_id, classroom_id } = data;
+  if (attendance_id) {
+    const attendance = await Attendance.findOne({ _id: attendance_id })
+      .populate({
+        path: 'present',
+      })
+      .populate({
+        path: 'late',
+      });
+    if (!attendance) return { err: `No attendance` };
+    return { attendance };
+  }
+  if (classroom_id) {
+    let minutes, seconds;
+    const attendance = await Classroom.findOne({ _id: classroom_id })
+      .populate({
+        path: 'attendance_id',
+      })
+      .then((data) => {
+        const attendance = data.attendance_id;
+        const lastAttendance = attendance[attendance.length - 1];
+
+        const created = lastAttendance.createdAt;
+        const today = new Date().toISOString();
+        const difference = new Date(today) - created;
+
+        const seconds = difference / 1000;
+        let interval = seconds / 60;
+        if (interval > 60 && seconds > 0) {
+          return lastAttendance;
+        } else {
+          return;
+        }
+      });
+
+    if (!attendance) return;
+    const { attendance_id } = attendance;
+    const listOfStudents = await Attendance.findOne({
+      _id: attendance_id,
     })
-    .populate({
-      path: 'late',
-    });
-  console.log(attendance);
-  if (!attendance) return { err: `No attendance` };
-  return { attendance };
+      .populate({
+        path: 'present',
+      })
+      .populate({
+        path: 'late',
+      });
+
+    console.log(listOfStudents);
+    return { listOfStudents };
+  }
 };
 
 const restrictMultipleAttendance = async (classId) => {
@@ -35,18 +75,15 @@ const restrictMultipleAttendance = async (classId) => {
       }
       return { seconds };
     });
-
+  let err;
+  console.log(minutes, seconds);
   if (minutes < 15)
-    return {
-      minutes,
-      err: `Request Timeout! Request again after ${15 - minutes} minute(s)`,
-    };
+    err = `Request Timeout! Request again after ${15 - minutes} minute(s)`;
 
   if (seconds)
-    return {
-      seconds,
-      err: `Request Timeout! Request again after ${60 - seconds} second(s)`,
-    };
+    err: `Request Timeout! Request again after ${60 - seconds} second(s)`;
+
+  return { err };
 };
 
 module.exports = { students, restrictMultipleAttendance };

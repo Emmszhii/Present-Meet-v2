@@ -43,15 +43,14 @@ const onChangeCameraDevice = async (e) => {
 };
 
 const videoUserMedia = async () => {
+  const video = document.getElementById('video');
+  if (!video) return errorMsg('Please start camera first');
   const text = document.getElementById('video_text');
   const dom = document.getElementById('video_error');
   const deviceValue = document.getElementById('camera_device').value;
-  const video = document.getElementById('video');
-  if (!video) return errorMsg('Please start camera first');
   let constraint = { video: true };
   if (devices.selectedVideoId)
     constraint = { video: { deviceId: deviceValue } };
-
   try {
     const media = await navigator.mediaDevices.getUserMedia(constraint);
     video.srcObject = media;
@@ -77,8 +76,8 @@ const videoUserMedia = async () => {
 
 const cameraDeviceHandler = async () => {
   const cameras = await getCameraDevices();
-  devices.videoDevice = cameras;
   if (!cameras) return errorMsg('No Camera devices found');
+  devices.videoDevice = cameras;
   const select = document.getElementById('camera_device');
   for (const [index, device] of cameras.entries()) {
     const option = document.createElement('option');
@@ -135,8 +134,7 @@ const startVideoHandler = async () => {
     await videoUserMedia();
     // if ((await backend()) === 'webgl') await faceDetection(500);
   } catch (err) {
-    errorMsg(err.message);
-    console.log(err.message);
+    return errorMsg(err.message);
   } finally {
     loader();
   }
@@ -175,11 +173,11 @@ const faceDetection = async (ms) => {
 // PHOTO HANDLER
 const photoHandler = async () => {
   loader();
-  const video = document.getElementById('video');
-  const displaySize = { width: video.width, height: video.height };
-  const imgDom = document.getElementById('img');
-  if (!video) return errorMsg('Start the camera first!');
   try {
+    const video = document.getElementById('video');
+    if (!video) return errorMsg('Start the camera first!');
+    const displaySize = { width: video.width, height: video.height };
+    const imgDom = document.getElementById('img');
     const img = document.createElement('canvas');
     img.id = 'img';
     img.width = video.width;
@@ -230,11 +228,11 @@ const photoHandler = async () => {
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
   loader();
-  const video = document.getElementById('video');
-  if (!video) return errorMsg('Start the camera first!');
-  if (refUser.length === 0) return errorMsg('No reference descriptor!');
-  const img1 = refUser.descriptor;
   try {
+    const video = document.getElementById('video');
+    if (!video) return errorMsg('Start the camera first!');
+    if (refUser.length === 0) return errorMsg('No reference descriptor!');
+    const img1 = refUser.descriptor;
     const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'canvas';
     camera.append(canvas);

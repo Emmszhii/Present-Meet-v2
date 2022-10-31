@@ -115,19 +115,19 @@ const clearVideoAndCanvas = () => {
 
 // VIDEO HANDLER
 const startVideoHandler = async () => {
+  loader();
+  devices.videoDevice = null;
+  const selected = document.getElementById('camera_device');
+  selected.innerHTML = ``;
+  selected.value = devices.selectedVideoId;
+  const vid = document.createElement('video');
+  vid.id = 'video';
+  vid.width = '1920';
+  vid.height = '1080';
+  vid.autoplay = true;
+  vid.muted = true;
   try {
-    loader();
-    devices.videoDevice = null;
-    const selected = document.getElementById('camera_device');
-    selected.innerHTML = ``;
-    selected.value = devices.selectedVideoId;
     await cameraDeviceHandler();
-    const vid = document.createElement('video');
-    vid.id = 'video';
-    vid.width = '1920';
-    vid.height = '1080';
-    vid.autoplay = true;
-    vid.muted = true;
 
     clearVideoAndCanvas();
     const video = document.getElementById('video');
@@ -135,6 +135,7 @@ const startVideoHandler = async () => {
     await videoUserMedia();
     // if ((await backend()) === 'webgl') await faceDetection(500);
   } catch (err) {
+    errorMsg(err.message);
     console.log(err.message);
   } finally {
     loader();
@@ -173,13 +174,12 @@ const faceDetection = async (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
+  loader();
+  const video = document.getElementById('video');
+  const displaySize = { width: video.width, height: video.height };
+  const imgDom = document.getElementById('img');
+  if (!video) return errorMsg('Start the camera first!');
   try {
-    loader();
-    const video = document.getElementById('video');
-    const displaySize = { width: video.width, height: video.height };
-    const imgDom = document.getElementById('img');
-
-    if (!video) return errorMsg('Start the camera first!');
     const img = document.createElement('canvas');
     img.id = 'img';
     img.width = video.width;
@@ -221,7 +221,7 @@ const photoHandler = async () => {
       'If you are satisfied with this photo try to recognize else retry'
     );
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
   } finally {
     loader();
   }
@@ -229,14 +229,13 @@ const photoHandler = async () => {
 
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
+  loader();
+  const video = document.getElementById('video');
+  if (!video) return errorMsg('Start the camera first!');
+  if (refUser.length === 0) return errorMsg('No reference descriptor!');
+  const img1 = refUser.descriptor;
   try {
-    loader();
-    const video = document.getElementById('video');
-    if (!video) return errorMsg('Start the camera first!');
-    if (refUser.length === 0) return errorMsg('No reference descriptor!');
-    const img1 = refUser.descriptor;
-
-    const canvas = faceapi.createCanvasFromMedia(video);
+    const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'canvas';
     camera.append(canvas);
     // const id = document.getElementById('canvas');

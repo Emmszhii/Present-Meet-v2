@@ -1,14 +1,12 @@
 import { getRequest } from '../helpers/helpers.js';
 
 const joinBtn = document.getElementById('join');
-
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
-const classId = urlParams.get('id');
 const token = urlParams.get('token');
 
 const joinClass = async () => {
-  const url = `/join/${classId}/${token}`;
+  const url = `/join-class?token=${token}`;
   const { msg, err } = await getRequest(url);
   if (msg) {
     successJoinHandler();

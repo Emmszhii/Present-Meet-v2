@@ -123,7 +123,7 @@ const onChangeLinkDropDown = async (e) => {
   const id = document.getElementById('main_list').dataset.value;
   const url = window.location.href;
 
-  const link = `${url}/join-class/${token}`;
+  const link = `${url}/join-class?token=${token}`;
   document.getElementById('link_classroom').value = link;
 };
 
@@ -150,7 +150,7 @@ const studentDomHandler = async () => {
 
   const { token } = await getClassToken();
 
-  const link = `${url}/join-class/token${token}`;
+  const link = `${url}/join-class?token=${token}`;
 
   document.getElementById('link_classroom').value = link;
 

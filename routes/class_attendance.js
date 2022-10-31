@@ -164,6 +164,7 @@ router.post('/delete-class-list', ensureAuthenticated, async (req, res) => {
   }
 });
 
+// TOKEN INVITE
 router.get(
   '/generate-class-token/:id/:expire',
   ensureAuthenticated,
@@ -175,12 +176,14 @@ router.get(
 );
 
 router.get(
-  '/class-attendance/join-class/:token',
+  '/class-attendance/join-class',
   ensureAuthenticated,
   async (req, res) => {
-    const id = req.query.id;
-    const token = req.params.token;
-    console.log(token);
+    // const id = req.query.id;
+    const token = req.query.token;
+
+    const { id } = verifyJsonToken(token);
+    if (!id) return res.redirect('*');
 
     const classroom = await Classroom.findOne({ _id: id });
     const teacher = await Teacher.findOne({ classroom_id: id });
@@ -226,34 +229,34 @@ router.get(
   }
 );
 
-router.get('/join-class/:token', ensureAuthenticated, async (req, res) => {
+router.get('/join-class', ensureAuthenticated, async (req, res) => {
   // const id = req.params.id;
-  const token = req.params.token;
-  console.log(token);
+  const token = req.query.token;
   // if (!id) return res.status(400).json({ err: `Link ID is empty` });
   if (!token) return res.status(400).json({ err: `Token is empty` });
 
   try {
-    const verifyToken = verifyJsonToken(token);
-    const id = verifyToken;
-    console.log(id);
+    const { id } = verifyJsonToken(token);
+    if (!id)
+      return res
+        .status(400)
+        .json({ err: `Token expired, request a new link to your instructor` });
     const classroom = await Classroom.findOne({ _id: id });
     if (!classroom)
       return res.status(400).json({ err: `Class list does not exist` });
 
-    if (verifyToken.data === id) {
-      classroom.students.push(req.user._id);
-      classroom.save();
-      return res.status(200).json({ msg: `You have joined the class list` });
-    } else {
-      return res
-        .status(400)
-        .json({ err: `Token expired, request a new link to your instructor` });
-    }
+    // if ( === id) {
+    classroom.students.push(req.user._id);
+    classroom.save();
+    return res.status(200).json({ msg: `You have joined the class list` });
+    // } else {
+    //   return res
+    //     .status(400)
+    //     .json({ err: `Token expired, request a new link to your instructor` });
+    // }
   } catch (e) {
     console.log(e);
   }
-  return res.status(400).json({ err: e });
 });
 
 // STUDENTS

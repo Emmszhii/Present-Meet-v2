@@ -280,7 +280,7 @@ const comparePerson = async (referenceImg, queryImg) => {
 
 const informationHandler = async () => {
   const backend = await faceapi.tf.getBackend();
-  informationDom(`backend`, `Browser backend: ${backend}`);
+  informationDom(`backend`, `Users' browser backend : ${backend}`);
 };
 const informationDom = (id, text) => {
   const dom = `

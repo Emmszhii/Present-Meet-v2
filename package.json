@@ -6,13 +6,13 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "save": "git add . && git commit -m `` && git push -u origin main && git push heroku main"
+    "save": "git add . && git commit -m `fix` && git push -u origin main && git push heroku main"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "16.17.0"
+    "node": "^16.17.0"
   },
   "dependencies": {
     "agora-access-token": "^2.0.4",

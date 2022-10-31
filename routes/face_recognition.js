@@ -47,7 +47,8 @@ router.post('/descriptor', ensureAuthenticated, async (req, res) => {
     if (!account) return res.status(400).json({ err: `Invalid request` });
 
     const booleanPassword = await comparePassword(password, account.password);
-    if (booleanPassword)
+
+    if (!booleanPassword)
       return res.status(400).json({ err: `Invalid Password` });
 
     Student.updateOne(

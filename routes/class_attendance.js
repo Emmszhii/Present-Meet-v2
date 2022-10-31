@@ -174,66 +174,73 @@ router.get(
   }
 );
 
-router.get('/class-attendance/join', ensureAuthenticated, async (req, res) => {
-  const id = req.query.id;
-  const token = req.query.token;
+router.get(
+  '/class-attendance/join-class/:token',
+  ensureAuthenticated,
+  async (req, res) => {
+    const id = req.query.id;
+    const token = req.params.token;
+    console.log(token);
 
-  const classroom = await Classroom.findOne({ _id: id });
-  const teacher = await Teacher.findOne({ classroom_id: id });
-  const teacher_user = await User.findOne({ _id: teacher._id });
-  const student_user = await User.findOne({ _id: req.user._id });
+    const classroom = await Classroom.findOne({ _id: id });
+    const teacher = await Teacher.findOne({ classroom_id: id });
+    const teacher_user = await User.findOne({ _id: teacher._id });
+    const student_user = await User.findOne({ _id: req.user._id });
 
-  const instructor = `${teacher_user.last_name}, ${teacher_user.first_name}`;
-  const user = `${student_user.last_name}, ${student_user.first_name}`;
-  const subject = classroom.subject;
-  const section = classroom.section;
-  const year_level = classroom.year_level;
-  const type = req.user.type;
+    const instructor = `${teacher_user.last_name}, ${teacher_user.first_name}`;
+    const user = `${student_user.last_name}, ${student_user.first_name}`;
+    const subject = classroom.subject;
+    const section = classroom.section;
+    const year_level = classroom.year_level;
+    const type = req.user.type;
 
-  let isExist = false;
-  let text = ``;
+    let isExist = false;
+    let text = ``;
 
-  // check if user is a teacher
-  if (req.user.type === 'teacher') {
-    text = 'This is for student account only';
+    // check if user is a teacher
+    if (req.user.type === 'teacher') {
+      text = 'This is for student account only';
+    }
+
+    // query if user is already in the class list
+    const exist = await Classroom.findOne({
+      _id: id,
+      students: { $in: req.user._id },
+    });
+    if (exist) {
+      isExist = true;
+      text = `You are already in this class list`;
+    }
+
+    return res.render('join_class', {
+      isExist,
+      text,
+      instructor,
+      id,
+      user,
+      subject,
+      section,
+      year_level,
+      type,
+    });
   }
+);
 
-  // query if user is already in the class list
-  const exist = await Classroom.findOne({
-    _id: id,
-    students: { $in: req.user._id },
-  });
-  if (exist) {
-    isExist = true;
-    text = `You are already in this class list`;
-  }
-
-  return res.render('join_class', {
-    isExist,
-    text,
-    instructor,
-    id,
-    user,
-    subject,
-    section,
-    year_level,
-    type,
-  });
-});
-
-router.get('/join/:id/:token', ensureAuthenticated, async (req, res) => {
-  const id = req.params.id;
+router.get('/join-class/:token', ensureAuthenticated, async (req, res) => {
+  // const id = req.params.id;
   const token = req.params.token;
-
-  if (!id) return res.status(400).json({ err: `Link ID is empty` });
+  console.log(token);
+  // if (!id) return res.status(400).json({ err: `Link ID is empty` });
   if (!token) return res.status(400).json({ err: `Token is empty` });
 
   try {
+    const verifyToken = verifyJsonToken(token);
+    const id = verifyToken;
+    console.log(id);
     const classroom = await Classroom.findOne({ _id: id });
     if (!classroom)
       return res.status(400).json({ err: `Class list does not exist` });
 
-    const verifyToken = verifyJsonToken(token);
     if (verifyToken.data === id) {
       classroom.students.push(req.user._id);
       classroom.save();
@@ -276,7 +283,5 @@ router.post('/delete-student', ensureAuthenticated, async (req, res) => {
     console.log(e);
   }
 });
-
-
 
 module.exports = router;

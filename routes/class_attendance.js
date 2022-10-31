@@ -244,16 +244,9 @@ router.get('/join-class', ensureAuthenticated, async (req, res) => {
     const classroom = await Classroom.findOne({ _id: id });
     if (!classroom)
       return res.status(400).json({ err: `Class list does not exist` });
-
-    // if ( === id) {
     classroom.students.push(req.user._id);
     classroom.save();
     return res.status(200).json({ msg: `You have joined the class list` });
-    // } else {
-    //   return res
-    //     .status(400)
-    //     .json({ err: `Token expired, request a new link to your instructor` });
-    // }
   } catch (e) {
     console.log(e);
   }

@@ -76,6 +76,8 @@ const videoUserMedia = async () => {
 
 const cameraDeviceHandler = async () => {
   const cameras = await getCameraDevices();
+  console.log(cameras);
+  if (cameras === typeof String) return errorMsg(cameras);
   if (!cameras) return errorMsg('No Camera devices found');
   devices.videoDevice = cameras;
   const select = document.getElementById('camera_device');

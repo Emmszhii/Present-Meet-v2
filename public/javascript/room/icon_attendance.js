@@ -7,8 +7,8 @@ const updateStudentIcon = async (e) => {
   loaderHandler();
   const btn = e.currentTarget;
   const id = e.currentTarget.dataset.id;
-  let prevStateIcon;
   try {
+    let prevStateIcon;
     if (btn.classList.contains('red__icon')) {
       btn.classList.toggle('red__icon');
       btn.classList.toggle('green__icon');
@@ -26,7 +26,7 @@ const updateStudentIcon = async (e) => {
     if (err) {
       removedClassIcon(btn);
       btn.classList.toggle(prevStateIcon);
-      errorMsg(err);
+      return errorMsg(err);
     }
     if (data) successMsg(msg);
   } catch (e) {
@@ -108,7 +108,7 @@ const updateStudentAttendance = async (btn, id) => {
   if (late) result.user = 'late';
   const url = `/student-attendance`;
   const { data, msg, err } = await postRequest(url, result);
-  if (err) return err;
+  if (err) return { err };
   if (data) return { data, msg };
 };
 

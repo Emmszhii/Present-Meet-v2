@@ -183,7 +183,9 @@ const handleChannelMessage = async (messageData, MemberId) => {
     if (data.type === 'attendance_on') {
       const students = data.students;
       const include = searchDataInArr(students, userData.id);
-      if (data.restrictVal === 'on' && include) {
+      console.log(include);
+      if (data.restrictVal === 'on' && data.students) {
+        console.log(include);
         faceRecognitionHandler(MemberId);
       }
       if (data.restrictVal === 'off') faceRecognitionHandler(MemberId);

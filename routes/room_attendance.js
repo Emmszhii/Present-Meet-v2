@@ -40,7 +40,7 @@ router.post(
           return res.status(400).json({ err: `No student(s) registered` });
 
         const { err } = await restrictMultipleAttendance(classId);
-        console.log(err);
+
         if (err) return res.status(400).json({ err });
 
         const attendance = new Attendance();
@@ -90,7 +90,6 @@ router.post(
 
       attendance.present.push(student_id);
       await attendance.save();
-      console.log(attendance);
 
       const data = await students({ attendance_id });
       const queryStudent = student.students[0];
@@ -122,7 +121,17 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
   const attendance = await Attendance.findOne({ _id: attendance_id })
     .populate({ path: 'present', match: { _id: student_id } })
     .populate({ path: 'late', match: { _id: student_id } });
-  if (!attendance) return res.status(400).json({ err: `Invalid classroom ID` });
+  if (!attendance)
+    return res.status(400).json({ err: `Please create new attendance first` });
+
+  const attendanceCreated = new Date(attendance.createdAt);
+  const now = new Date(new Date().toISOString());
+  const difference = now - attendanceCreated;
+  const seconds = difference / 1000;
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes > 15)
+    return res.status(400).json({ err: `Please create a new attendance` });
 
   const isStudentPresent = attendance.present.includes(student_id);
   const isStudentLate = attendance.late.includes(student_id);

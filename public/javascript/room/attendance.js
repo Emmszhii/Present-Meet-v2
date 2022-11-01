@@ -12,7 +12,11 @@ import {
   startingSeconds,
   end_time,
 } from './face_recognition.js';
-import { getStudentPresentHandler, presentStudent, updateStudentIcon } from './icon_attendance.js';
+import {
+  getStudentPresentHandler,
+  presentStudent,
+  updateStudentIcon,
+} from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 
 const classroom = [];
@@ -244,7 +248,7 @@ const restrictDom = () => {
       <button class='button-box off' id='restrict' value='off'>Restriction Off</button>
     </div>
     <div class='form-group'>
-      <button class='button-box off' id='take_attendance' value='off'>Attendance Off</button>
+      <button class='button-box off' id='take_attendance' value='off'>Create new attendance</button>
     </div>
   `;
 };

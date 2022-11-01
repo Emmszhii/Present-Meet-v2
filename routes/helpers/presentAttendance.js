@@ -21,14 +21,15 @@ const students = async (data) => {
       .then((data) => {
         const attendance = data.attendance_id;
         const lastAttendance = attendance[attendance.length - 1];
-
+        if (!lastAttendance) return;
         const created = lastAttendance.createdAt;
         const today = new Date().toISOString();
         const difference = new Date(today) - created;
 
         const seconds = difference / 1000;
-        let interval = seconds / 60;
-        if (interval > 1) return lastAttendance;
+        const minutes = Math.floor(seconds / 60);
+
+        if (minutes < 15) return lastAttendance;
         if (seconds > 60 && seconds <= 60) return lastAttendance;
         return;
       });
@@ -64,7 +65,7 @@ const restrictMultipleAttendance = async (classId) => {
 
   if (seconds > 60 && seconds <= 60)
     err = `Request Timeout! Request again after ${60 - seconds} second(s)`;
-  console.log(err);
+
   return { err };
 };
 

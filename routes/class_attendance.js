@@ -179,7 +179,6 @@ router.get(
   '/class-attendance/join-class',
   ensureAuthenticated,
   async (req, res) => {
-    // const id = req.query.id;
     const token = req.query.token;
 
     const { id } = verifyJsonToken(token);
@@ -230,9 +229,8 @@ router.get(
 );
 
 router.get('/join-class', ensureAuthenticated, async (req, res) => {
-  // const id = req.params.id;
   const token = req.query.token;
-  // if (!id) return res.status(400).json({ err: `Link ID is empty` });
+
   if (!token) return res.status(400).json({ err: `Token is empty` });
 
   try {

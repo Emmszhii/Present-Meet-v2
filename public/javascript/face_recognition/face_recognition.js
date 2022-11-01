@@ -62,14 +62,10 @@ const videoUserMedia = async () => {
       text.textContent = 'Video: Working';
     }
   } catch (err) {
-    const errArr = ['NotAllowedError'];
-    if (errArr.includes(err.message)) {
-      if (!dom) {
-        informationDom(`video_error`, `Video: Permission Denied by user`);
-        errorMsg('Video: Permission Denied by user');
-      }
-      return;
-    }
+    const errArr = ['Permission denied'];
+    if (errArr.includes(err.message))
+      return errorMsg('Video: Permission Denied by User');
+
     console.log(err.message);
   }
 };

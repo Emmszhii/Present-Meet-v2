@@ -181,12 +181,10 @@ const handleChannelMessage = async (messageData, MemberId) => {
 
   if (userData.type === 'student') {
     if (data.type === 'attendance_on') {
-      const students = data.students;
-      const include = searchDataInArr(students, userData.id);
-      console.log(include);
-      if (data.restrictVal === 'on' && data.students) {
-        console.log(include);
-        faceRecognitionHandler(MemberId);
+      if (data.restrictVal === 'on') {
+        const students = data.students;
+        const include = searchDataInArr(students, userData.id);
+        if (include) faceRecognitionHandler(MemberId);
       }
       if (data.restrictVal === 'off') faceRecognitionHandler(MemberId);
     }

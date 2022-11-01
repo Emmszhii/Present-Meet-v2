@@ -27,4 +27,11 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/connection-secure', async (req, res) => {
+  res.render('404', {
+    title: `Connection is not secure`,
+    message: `Please use a https connection to use this site`,
+  });
+});
+
 module.exports = router;

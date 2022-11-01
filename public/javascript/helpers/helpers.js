@@ -77,6 +77,10 @@ const searchDataInArr = (arr, id) => {
   }
 };
 
+const isHttps = () => {
+  return document.location.protocol === 'https:';
+};
+
 export {
   controller,
   postRequest,
@@ -84,4 +88,5 @@ export {
   randDarkColor,
   generateLightColorHex,
   searchDataInArr,
+  isHttps,
 };

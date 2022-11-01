@@ -1,3 +1,5 @@
+AgoraRTC.setLogLevel(2);
+
 import {
   toggleCamera,
   toggleMic,
@@ -17,6 +19,7 @@ import {
   raiseHand,
   checkIfUserIsMobileHandler,
 } from './room.js';
+import { isHttps } from '../helpers/helpers.js';
 
 // Event Listeners
 // copy to clipboard
@@ -72,7 +75,9 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('load', async () => {
-  await AgoraRTC.setLogLevel(3);
+  const http = isHttps();
+  if (!http) document.location.href = `/connection-secure`;
+
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
   await checkIfUserIsMobileHandler();

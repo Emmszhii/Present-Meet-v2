@@ -70,5 +70,8 @@ app.use('/', require('./routes/room_attendance'));
 
 // 404
 app.use(function (req, res, next) {
-  res.status(404).render('404', { title: 'Sorry, page not found' });
+  res.status(404).render('404', {
+    title: '404 page not found',
+    message: `Nothing can be found here`,
+  });
 });

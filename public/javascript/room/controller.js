@@ -75,8 +75,8 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('load', async () => {
-  // const http = isHttps();
-  // if (!http) document.location.href = `/connection-secure`;
+  const http = isHttps();
+  if (!http) document.location.href = `/connection-secure`;
 
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;

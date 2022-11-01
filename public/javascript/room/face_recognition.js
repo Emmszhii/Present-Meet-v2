@@ -2,6 +2,7 @@ import { userData, rtc, rtm, localDevice } from './rtc.js';
 import { getRequest } from '../helpers/helpers.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 import { muteStream } from './room.js';
+import { getCameraDevices } from '../helpers/devices.js';
 
 const useTinyModel = true;
 let track;
@@ -11,6 +12,11 @@ const startingSeconds = 60;
 let time = startingMinutes * startingSeconds;
 const end_time = 0;
 let interval;
+
+const devices = {
+  videoDevice: null,
+  selectedVideoId: null,
+};
 
 const backend = async () => {
   try {
@@ -73,6 +79,12 @@ const dom = () => {
         </div>
         <div id='countdown'>1:00</div>
         <div class='face_container'>Please start camera</div>
+        <div id="face_devices">
+          <label for='devices'>Camera devices: </label>
+          <select name='devices' id="camera_device">
+            <option value disabled selected hidden>Turn on Camera first</option>
+          </select>
+        </div>
         <div class='buttons face_recognition_btn'>
           <button class='button' id='camera_btn'>
             <i class='fa-solid fa-camera'></i>
@@ -127,17 +139,25 @@ const stopTimer = () => {
   time = startingMinutes * startingSeconds;
 };
 
-const startCamera = () => {
+const startCamera = async () => {
+  devices.videoDevice = null;
   document.getElementById('loader_face').style.display = 'block';
   document.querySelector('.face_container').innerHTML = '';
   stopCamera();
   removeFaceCanvas();
 
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-    })
-    .then((stream) => {
+  const device = document.getElementById('camera_device');
+  let constraint = { video: true };
+  if (devices.selectedVideoId) {
+    constraint = { video: { deviceId: devices.selectedVideoId } };
+  }
+
+  try {
+    await cameraDeviceHandler();
+
+    const stream = await navigator.mediaDevices.getUserMedia(constraint);
+    if (stream) {
+      if (devices.selectedVideoId) device.value = devices.selectedVideoId;
       const video = document.createElement('video');
       video.id = 'video';
       video.autoplay = true;
@@ -145,19 +165,53 @@ const startCamera = () => {
       document.querySelector('.face_container').append(video);
 
       video.srcObject = stream;
+
       if (backend === 'webgl') face_detection();
       track = stream.getTracks();
-    })
-    .catch((e) => {
-      const arrError = ['Permission denied'];
-      console.log(e.message);
-      if (arrError.includes(e.message)) {
-        errorMsg('Camera Permission denied by user');
-      }
-    })
-    .finally(() => {
-      document.getElementById('loader_face').style.display = 'none';
-    });
+    } else {
+      errorMsg('Something went wrong on the camera');
+    }
+  } catch (e) {
+    const arrError = ['Permission denied'];
+    console.log(e.message);
+    if (arrError.includes(e.message)) {
+      errorMsg('Camera Permission denied by user');
+    }
+  } finally {
+    document.getElementById('loader_face').style.display = 'none';
+  }
+};
+
+const cameraDeviceHandler = async () => {
+  const cameras = await getCameraDevices();
+  if (cameras === typeof String) return errorMsg(cameras);
+  if (!cameras) return errorMsg('No Camera devices found');
+  devices.videoDevice = cameras;
+  const select = document.getElementById('camera_device');
+  select.innerHTML = ``;
+  for (const [index, device] of cameras.entries()) {
+    const option = document.createElement('option');
+    option.value = device.deviceId;
+    option.text = device.label;
+    select.appendChild(option);
+  }
+
+  select.value = devices.videoDevice[0].deviceId;
+
+  select.addEventListener('change', changeDeviceHandler);
+};
+
+const changeDeviceHandler = async (e) => {
+  try {
+    document.getElementById('loader_face').style.display = 'block';
+    const deviceId = e.currentTarget.value;
+    devices.selectedVideoId = deviceId;
+    await startCamera();
+  } catch (e) {
+    console.log(e);
+  } finally {
+    document.getElementById('loader_face').style.display = 'none';
+  }
 };
 
 const face_detection = () => {

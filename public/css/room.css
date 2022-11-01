@@ -652,12 +652,24 @@ select {
   flex-direction: column;
 }
 
+#face_devices {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0px;
+}
+#face_devices > select {
+  padding: 5px 10px;
+}
+
 #msg {
   text-align: center;
   padding: 5px 10px;
   color: black;
 }
 
+/* End face recognition */
 /* responsiveness for mobile */
 @media (max-width: 1600px) {
   .settings-modal {

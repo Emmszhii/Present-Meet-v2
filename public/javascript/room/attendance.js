@@ -32,13 +32,9 @@ const updateCountdown = () => {
   let seconds = time % 60;
 
   const countdown = document.getElementById('take_attendance');
-  if (countdown) {
-    countdown.innerHTML = `Attendance taking... ${seconds}`;
-  }
+  if (countdown) countdown.innerHTML = `Attendance taking... ${seconds}`;
 
-  if (time <= end_time) {
-    stopTimer();
-  }
+  if (time <= end_time) stopTimer();
 };
 
 const stopTimer = () => {
@@ -91,7 +87,7 @@ const checkStudentDescriptor = async (data) => {
 
   const studentData = await getStudentDescriptor(MemberId);
   const { descriptor, first_name, last_name, threshold } = studentData;
-  console.log(first_name, last_name);
+
   const dbFloatArr = descriptor.split(',');
   const dbStudentDescriptor = new Float32Array(dbFloatArr);
   const queryFloatArr = studentDescriptor.split(',');

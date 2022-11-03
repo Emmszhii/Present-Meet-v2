@@ -18,6 +18,7 @@ import {
   updateStudentIcon,
 } from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
+import { createExcelAttendance } from './excel.js';
 
 const classroom = [];
 const students = [];
@@ -81,28 +82,43 @@ const attendanceDom = () => {
 };
 
 const checkStudentDescriptor = async (data) => {
-  const { MemberId, displayName, descriptor: studentDescriptor } = data;
+  const {
+    MemberId,
+    displayName,
+    descriptor: studentDescriptor,
+    restrict,
+  } = data;
 
-  const { descriptor, threshold } = await getStudentDescriptor(MemberId);
-
+  const studentData = await getStudentDescriptor(MemberId);
+  const { descriptor, first_name, last_name, threshold } = studentData;
+  console.log(first_name, last_name);
   const dbFloatArr = descriptor.split(',');
   const dbStudentDescriptor = new Float32Array(dbFloatArr);
   const queryFloatArr = studentDescriptor.split(',');
   const query = new Float32Array(queryFloatArr);
-
+  const attendance = {
+    classroom_id: userData.classroom_id,
+    attendance_id: userData.attendance_id,
+    student_id: MemberId,
+  };
+  const restrictOffData = {
+    first_name,
+    last_name,
+    meetingId,
+  };
   try {
     const dist = await faceapi.euclideanDistance(dbStudentDescriptor, query);
     if (dist <= threshold) {
-      const attendance = {
-        classroom_id: userData.classroom_id,
-        attendance_id: userData.attendance_id,
-        student_id: MemberId,
-      };
-      const { data, err, msg } = await addStudentAttendance(attendance);
-      if (err) return errorMsg(err);
-      if (data) {
-        presentStudent(MemberId);
-        successMsg(msg);
+      if (restrict === 'on') {
+        const { data, err, msg } = await addStudentAttendance(attendance);
+        if (err) return errorMsg(err);
+        if (data) {
+          presentStudent(MemberId);
+          successMsg(msg);
+        }
+      } else {
+        createExcelAttendance(restrictOffData);
+        successMsg(`Student ${last_name}, ${first_name} is present`);
       }
     } else {
       warningMsg(`User ${displayName} request is invalid`);
@@ -125,10 +141,10 @@ const addStudentAttendance = async (info) => {
 const getStudentDescriptor = async (id) => {
   try {
     const url = `/student-descriptor/${id}`;
-    const { descriptor, threshold, err } = await getRequest(url);
+    const { data, err } = await getRequest(url);
     if (err) return err;
-    const data = { descriptor, threshold };
-    if (descriptor) return data;
+    if (data) return data;
+    return;
   } catch (e) {
     console.log(e);
   }
@@ -270,7 +286,6 @@ const attendance = async () => {
     body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
-
     try {
       const { data, msg, err } = await get_classroom();
       if (data) {

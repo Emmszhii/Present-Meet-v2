@@ -69,14 +69,15 @@ document.addEventListener('keydown', (e) => {
     }
     if ((messagesModal.style.display = 'block')) {
       messagesModal.style.display = 'none';
+      n;
       messagesBtn.classList.remove('active');
     }
   }
 });
 
 window.addEventListener('load', async () => {
-  const http = isHttps();
-  if (!http) document.location.href = `/connection-secure`;
+  // const http = isHttps();
+  // if (!http) document.location.href = `/connection-secure`;
 
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;

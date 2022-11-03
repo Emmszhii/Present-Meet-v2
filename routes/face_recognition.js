@@ -86,11 +86,14 @@ router.get('/student-descriptor/:id', ensureAuthenticated, async (req, res) => {
         err: `Student ${user.last_name}, ${user.first_name} didn't registered their face descriptor in the database`,
       });
 
-    if (student.descriptor) {
-      return res
-        .status(200)
-        .json({ descriptor: student.descriptor, threshold: faceApiThreshold });
-    }
+    const data = {
+      descriptor: student.descriptor,
+      threshold: faceApiThreshold,
+      first_name: user.first_name,
+      last_name: user.last_name,
+    };
+    if (student.descriptor) return res.status(200).json({ data });
+    return res.status(400).json({ err: `Something went wrong` });
   } catch (e) {
     console.log(e);
   }

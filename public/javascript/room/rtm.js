@@ -174,19 +174,20 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // if student
   if (userData.type === 'teacher') {
     if (data.type === 'attendance_data') {
-      const { descriptor, displayName } = data;
-      checkStudentDescriptor({ descriptor, MemberId, displayName });
+      const { descriptor, displayName, restrict } = data;
+      checkStudentDescriptor({ descriptor, MemberId, displayName, restrict });
     }
   }
 
   if (userData.type === 'student') {
+    const info = { MemberId, restrict: data.restrictVal };
     if (data.type === 'attendance_on') {
       if (data.restrictVal === 'on') {
         const students = data.students;
         const include = searchDataInArr(students, userData.id);
-        if (include) faceRecognitionHandler(MemberId);
+        if (include) faceRecognitionHandler(info);
       }
-      if (data.restrictVal === 'off') faceRecognitionHandler(MemberId);
+      if (data.restrictVal === 'off') faceRecognitionHandler(info);
     }
   }
 };

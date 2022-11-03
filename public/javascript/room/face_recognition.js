@@ -26,10 +26,10 @@ const backend = async () => {
   }
 };
 
-const faceRecognitionHandler = async (teacherId) => {
+const faceRecognitionHandler = async (data) => {
+  const { MemberId: teacherId, restrict } = data;
   try {
     muteStream();
-    const url = `/get-descriptor`;
     const { descriptor } = await get_descriptor();
 
     if (!descriptor) return warningMsg('No face registered by user');
@@ -37,6 +37,7 @@ const faceRecognitionHandler = async (teacherId) => {
     document.body.insertAdjacentHTML('beforeend', dom());
 
     document.querySelector('.modal_face_content').dataset.value = teacherId;
+    document.querySelector('.modal_face_content').dataset.restrict = restrict;
 
     document.getElementById(
       'backend'
@@ -99,14 +100,14 @@ const dom = () => {
 };
 
 const sendAttendance = async (data) => {
-  const { descriptor, id, displayName } = data;
-
+  const { descriptor, id, displayName, restrict } = data;
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'attendance_data',
       descriptor,
       id,
       displayName,
+      restrict,
     }),
   });
 };
@@ -240,6 +241,9 @@ const closeFaceRecognition = () => {
 const faceRecognized = async () => {
   const loader = document.getElementById('loader_face');
   const video = document.getElementById('video');
+  const restrict = document.querySelector('.modal_face_content').dataset
+    .restrict;
+
   loader.style.display = 'block';
   try {
     const { descriptor, threshold } = await get_descriptor();
@@ -279,6 +283,7 @@ const faceRecognized = async () => {
         descriptor: query[0].descriptor.join(','),
         displayName: userData.fullName,
         id: userData._id,
+        restrict,
       });
       stopTimer();
     } else {

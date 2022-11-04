@@ -69,7 +69,6 @@ document.addEventListener('keydown', (e) => {
     }
     if ((messagesModal.style.display = 'block')) {
       messagesModal.style.display = 'none';
-      n;
       messagesBtn.classList.remove('active');
     }
   }

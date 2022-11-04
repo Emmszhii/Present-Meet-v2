@@ -98,6 +98,7 @@ const checkStudentDescriptor = async (data) => {
     student_id: MemberId,
   };
   const restrictOffData = {
+    _id: MemberId,
     first_name,
     last_name,
     meetingId,

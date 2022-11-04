@@ -64,6 +64,7 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/users'));
 app.use('/', require('./routes/room'));
+app.use('/', require('./routes/excel'));
 app.use('/', require('./routes/face_recognition'));
 app.use('/', require('./routes/class_attendance'));
 app.use('/', require('./routes/room_attendance'));

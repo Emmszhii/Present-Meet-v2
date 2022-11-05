@@ -10,16 +10,13 @@ const updateStudentIcon = async (e) => {
   try {
     let prevStateIcon;
     if (btn.classList.contains('red__icon')) {
-      btn.classList.toggle('red__icon');
-      btn.classList.toggle('green__icon');
+      changeIcon(btn);
       prevStateIcon = `red__icon`;
     } else if (btn.classList.contains('green__icon')) {
-      btn.classList.toggle('green__icon');
-      btn.classList.toggle('orange__icon');
+      changeIcon(btn);
       prevStateIcon = `green__icon`;
     } else {
-      btn.classList.toggle('orange__icon');
-      btn.classList.toggle('red__icon');
+      changeIcon(btn);
       prevStateIcon = `orange__icon`;
     }
     const { data, msg, err } = await updateStudentAttendance(btn, id);
@@ -33,6 +30,19 @@ const updateStudentIcon = async (e) => {
     console.log(e);
   } finally {
     loaderHandler();
+  }
+};
+
+const changeIcon = (btn) => {
+  if (btn.classList.contains('red__icon')) {
+    btn.classList.toggle('red__icon');
+    btn.classList.toggle('green__icon');
+  } else if (btn.classList.contains('green__icon')) {
+    btn.classList.toggle('green__icon');
+    btn.classList.toggle('orange__icon');
+  } else {
+    btn.classList.toggle('orange__icon');
+    btn.classList.toggle('red__icon');
   }
 };
 
@@ -59,6 +69,18 @@ const lateStudent = async (id) => {
   if (user.classList.contains('green__icon')) {
     user.classList.toggle('green__icon');
     user.classList.toggle('orange__icon');
+  }
+};
+const absentStudent = async (id) => {
+  const user = document.getElementById(`icon_user_${id}`);
+  if (!user) return;
+  if (user.classList.contains('green__icon')) {
+    user.classList.toggle('green__icon');
+    user.classList.toggle('red__icon');
+  }
+  if (user.classList.contains('orange__icon')) {
+    user.classList.toggle('orange__icon');
+    user.classList.toggle('red__icon');
   }
 };
 
@@ -120,4 +142,11 @@ const checkPresent = async () => {
   return data;
 };
 
-export { updateStudentIcon, presentStudent, getStudentPresentHandler };
+export {
+  changeIcon,
+  updateStudentIcon,
+  getStudentPresentHandler,
+  presentStudent,
+  lateStudent,
+  absentStudent,
+};

@@ -187,6 +187,7 @@ const restrictMode = (e) => {
     btn.classList.toggle('on');
     btn.textContent = 'Restriction Off';
     attendanceCheckHandler();
+    excelFileHandler();
   }
 };
 
@@ -447,4 +448,9 @@ const get_classroom = async () => {
   }
 };
 
-export { makeAttendanceHandler, checkStudentDescriptor, loaderHandler };
+export {
+  makeAttendanceHandler,
+  checkStudentDescriptor,
+  loaderHandler,
+  studentsDom,
+};

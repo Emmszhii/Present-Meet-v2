@@ -2,7 +2,12 @@ import { postRequest } from '../helpers/helpers.js';
 import { errorMsg } from './msg.js';
 import { meetingId } from './room.js';
 import { rtm } from './rtc.js';
-
+import { studentsDom } from './attendance.js';
+import {
+  presentStudent,
+  lateStudent,
+  absentStudent,
+} from './icon_attendance.js';
 const student = [];
 const teacher = [];
 
@@ -14,15 +19,20 @@ const createExcelAttendance = async (data) => {
   } catch (e) {
     console.log(e);
   } finally {
-    student.forEach((item) => {
-      if (item._id === _id) item.activity = 'present';
-    });
     excelFileHandler();
+    student.forEach((item) => {
+      if (item._id === _id) {
+        item.activity = 'present';
+        const user = document.getElementById(`icon_user_${_id}`);
+        if (user) presentStudent(_id);
+      }
+    });
   }
 };
 
 const excelFileHandler = () => {
   const exportBtn = document.getElementById('export_attendance');
+
   if (!exportBtn) {
     document
       .getElementById('settings_attendance')
@@ -32,6 +42,17 @@ const excelFileHandler = () => {
       .getElementById('export_attendance')
       .addEventListener('click', exportExcelAttendance);
   }
+  const studentDom = document.getElementById('students');
+  if (studentDom && student.length > 0)
+    student.forEach((item) => {
+      studentDom.insertAdjacentHTML('beforeend', studentsDom(item));
+      if (item.activity === 'present') presentStudent(item._id);
+      if (item.activity === 'late') lateStudent(item._id);
+    });
+};
+
+const studentRestrictOffHandler = () => {
+  
 };
 
 const domExportAttendanceBtn = () => {

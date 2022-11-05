@@ -25,10 +25,7 @@ const userIdInDisplayFrame = { val: null };
 const checkIfUserIsMobileHandler = async () => {
   const isMobile = navigator.userAgentData.mobile;
   const screenBtn = document.getElementById('screen-btn');
-  console.log(isMobile);
-  if (isMobile) {
-    if (screenBtn) screenBtn.remove();
-  }
+  if (isMobile) if (screenBtn) screenBtn.remove();
 };
 
 const checkIfUserDom = (id, name) => {

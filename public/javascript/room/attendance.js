@@ -18,7 +18,12 @@ import {
   updateStudentIcon,
 } from './icon_attendance.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
-import { createExcelAttendance } from './excel.js';
+import {
+  student,
+  teacher,
+  excelFileHandler,
+  createExcelAttendance,
+} from './excel.js';
 
 const classroom = [];
 const students = [];
@@ -283,6 +288,7 @@ const attendance = async () => {
     body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
+    if (student.length > 0 && teacher.length > 0) excelFileHandler();
     try {
       const { data, msg, err } = await get_classroom();
       if (data) {

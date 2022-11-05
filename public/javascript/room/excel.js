@@ -3,15 +3,26 @@ import { errorMsg } from './msg.js';
 import { meetingId } from './room.js';
 import { rtm } from './rtc.js';
 
-const attendance = [];
+const student = [];
+const teacher = [];
 
-const createExcelAttendance = (data) => {
-  const exportBtn = document.getElementById('export_attendance');
+const createExcelAttendance = async (data) => {
   const { meetingId, _id, first_name, last_name } = data;
 
-  if (!attendance.filter((item) => item._id === _id).length > 0)
-    attendance.push({ _id, first_name, last_name, activity: 'present' });
+  try {
+    if (student.length === 0 && teacher.length === 0) await getAllUsers();
+  } catch (e) {
+    console.log(e);
+  } finally {
+    student.forEach((item) => {
+      if (item._id === _id) item.activity = 'present';
+    });
+    excelFileHandler();
+  }
+};
 
+const excelFileHandler = () => {
+  const exportBtn = document.getElementById('export_attendance');
   if (!exportBtn) {
     document
       .getElementById('settings_attendance')
@@ -37,35 +48,59 @@ const getAllUsers = async () => {
     const url = `/get-all-users-info`;
     const { data, msg, err } = await postRequest(url, users);
     if (err) errorMsg(err);
-    console.log(data, msg, err);
+    if (!data) return;
+    if (data) {
+      data.map((user) => {
+        if (user.type === 'student') {
+          const data = { ...user, activity: 'absent' };
+          student.push(data);
+        }
+        if (user.type === 'teacher') teacher.push(user);
+      });
+    }
   } catch (e) {
     console.log(e);
   }
 };
 
 const exportExcelAttendance = async () => {
-  await getAllUsers();
   const now = new Date().toISOString();
   const dateNowToUtc = new Date().toUTCString();
   const wb = XLSX.utils.book_new();
-  const mapId = attendance.map((user) => ({
+
+  const teacherArr = teacher.map((user) => ({
+    FirstName: user.first_name,
+    LastName: user.last_name,
+  }));
+  teacherArr.push({});
+
+  const studentArr = student.map((user) => ({
     FirstName: user.first_name,
     LastName: user.last_name,
     activity: user.activity,
   }));
-  const wk = XLSX.utils.json_to_sheet(mapId, { origin: 'A4' });
-  XLSX.utils.sheet_add_aoa(
-    wk,
+  studentArr.push({});
+
+  const wk = XLSX.utils.aoa_to_sheet(
     [
-      ['Meeting ID', , 'Date Created'],
-      [meetingId, , dateNowToUtc],
+      ['Meeting ID', '', 'Date Created'],
+      [meetingId, '', dateNowToUtc],
+      ['', '', ''],
     ],
-    {
-      origin: 'A1',
-    }
+    { origin: 'A1' }
   );
+
+  XLSX.utils.sheet_add_aoa(wk, [['TEACHER']], { origin: -1 });
+  XLSX.utils.sheet_add_json(wk, teacherArr, {
+    origin: -1,
+  });
+  XLSX.utils.sheet_add_aoa(wk, [['STUDENT']], { origin: -1 });
+  XLSX.utils.sheet_add_json(wk, studentArr, {
+    origin: -1,
+  });
+
   XLSX.utils.book_append_sheet(wb, wk, meetingId);
   XLSX.writeFile(wb, `${meetingId}_${now}.xlsx`);
 };
 
-export { createExcelAttendance };
+export { createExcelAttendance, excelFileHandler, teacher, student };

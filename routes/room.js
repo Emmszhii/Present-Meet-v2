@@ -7,7 +7,9 @@ const { generateRTMToken } = require('../tokens/rtmToken');
 
 // room Route
 router.get('/room', ensureAuthenticated, (req, res) => {
-  res.render('room');
+  const { meetingId } = req.query;
+  if (!meetingId) return res.redirect('*');
+  return res.render('room');
 });
 
 router.get(

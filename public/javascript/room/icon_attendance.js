@@ -33,7 +33,8 @@ const updateStudentIcon = async (e) => {
   }
 };
 
-const changeIcon = (btn) => {
+const changeIcon = (id) => {
+  const btn = document.getElementById(`icon_user_${id}`);
   if (btn.classList.contains('red__icon')) {
     btn.classList.toggle('red__icon');
     btn.classList.toggle('green__icon');

@@ -23,6 +23,7 @@ import {
   teacher,
   excelFileHandler,
   createExcelAttendance,
+  allStudentsDomHandler,
 } from './excel.js';
 
 const classroom = [];
@@ -175,19 +176,26 @@ const restrictToggleHandler = () => {
     .addEventListener('click', takeAttendanceHandler);
 };
 
-const restrictMode = (e) => {
+const restrictMode = async (e) => {
+  loaderHandler();
   const btn = e.currentTarget;
-  if (btn.value === 'off') {
-    btn.value = 'on';
-    btn.classList.toggle('on');
-    btn.textContent = 'Restriction On';
-    attendanceCheckHandler();
-  } else {
-    btn.value = 'off';
-    btn.classList.toggle('on');
-    btn.textContent = 'Restriction Off';
-    attendanceCheckHandler();
-    excelFileHandler();
+  try {
+    if (btn.value === 'off') {
+      btn.value = 'on';
+      btn.classList.toggle('on');
+      btn.textContent = 'Restriction On';
+      attendanceCheckHandler();
+    } else {
+      await allStudentsDomHandler();
+      btn.value = 'off';
+      btn.classList.toggle('on');
+      btn.textContent = 'Restriction Off';
+      attendanceCheckHandler();
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
   }
 };
 
@@ -289,8 +297,8 @@ const attendance = async () => {
     body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
-    if (student.length > 0 && teacher.length > 0) excelFileHandler();
     try {
+      allStudentsDomHandler();
       const { data, msg, err } = await get_classroom();
       if (data) {
         classroom.push(data);
@@ -322,6 +330,7 @@ const dropDownList = (info) => {
   title.selected = true;
   title.disabled = true;
   title.hidden = true;
+  title.value = 'none';
   select.appendChild(title);
 
   for (const [index, values] of data.entries()) {

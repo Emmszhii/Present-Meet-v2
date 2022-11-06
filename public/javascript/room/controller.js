@@ -75,12 +75,12 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('load', async () => {
-  // const http = isHttps();
-  // if (!http) document.location.href = `/connection-secure`;
+  const http = isHttps();
+  if (!http) document.location.href = `/connection-secure`;
 
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
-  await checkIfUserIsMobileHandler();
+  checkIfUserIsMobileHandler();
   // load faces
   Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -89,7 +89,7 @@ window.addEventListener('load', async () => {
     data_init(),
   ])
     .then(() => {
-      console.log(`face api module success`);
+      console.log(`face api js success`);
     })
     .catch((err) => {
       console.log(err);

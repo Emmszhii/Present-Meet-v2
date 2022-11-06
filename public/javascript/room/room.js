@@ -22,8 +22,11 @@ let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
 const userIdInDisplayFrame = { val: null };
 
-const checkIfUserIsMobileHandler = async () => {
-  const isMobile = navigator.userAgentData.mobile;
+const checkIfUserIsMobileHandler = () => {
+  const isMobile = window.matchMedia(
+    'only screen and (max-width:1000px)'
+  ).matches;
+
   const screenBtn = document.getElementById('screen-btn');
   if (isMobile) if (screenBtn) screenBtn.remove();
 };

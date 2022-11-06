@@ -14,6 +14,7 @@ import { loaderHandler } from './attendance.js';
 
 const student = [];
 const teacher = [];
+let state = null;
 
 const createExcelAttendance = async (data) => {
   const { meetingId, _id, first_name, last_name } = data;
@@ -26,8 +27,8 @@ const createExcelAttendance = async (data) => {
     excelFileHandler();
     student.forEach((item) => {
       if (item._id === _id) {
-        item.activity = 'present';
         const user = document.getElementById(`icon_user_${_id}`);
+        item.activity = 'present';
         if (user) presentStudent(_id);
       }
     });
@@ -41,82 +42,83 @@ const changeActivityStudent = (e) => {
   if (!user) return errorMsg('No User Selected');
   let prevState;
   if (btn.classList.contains('red__icon')) {
+    // present
     changeIcon(id);
-
     prevState = 'red__icon';
-  } else if (btn.classList.contains('green_icon')) {
+    studentChangeActivity(id, 'present');
+  } else if (btn.classList.contains('green__icon')) {
+    // late
     changeIcon(id);
     prevState = 'green__icon';
+    studentChangeActivity(id, 'late');
   } else {
+    // absent
     changeIcon(id);
     prevState = 'orange__icon';
+    studentChangeActivity(id, 'absent');
+  }
+  console.log(student);
+};
+
+const studentChangeActivity = (id, status) => {
+  student.forEach((user) => {
+    if (user._id === id) user.activity = status;
+  });
+};
+
+const allStudentsDomHandler = async () => {
+  // loaderHandler();
+  try {
+    const restrictVal = document.getElementById('restrict').value;
+    if (restrictVal === 'on') return;
+    clearInfoAndStudentsDom();
+    await getAllUsers();
+    studentActivity();
+  } catch (e) {
+    const errArr = [`Cannot read properties of null (reading 'value')`];
+    if (errArr.includes(e.message)) return console.log(`err`);
+    console.log(e.message);
+  } finally {
+    // loaderHandler();
   }
 };
 
-// const getAllStudents = async () => {
-//   await getAllUsers();
-// };
+const clearInfoAndStudentsDom = () => {
+  const studentDom = document.getElementById('students');
+  const classroomInfo = document.getElementById('classroom_info');
+  const selectId = document.getElementById('classroom_list');
+  if (selectId) selectId.value = selectId.firstChild.value;
+  if (studentDom.firstChild) studentDom.innerHTML = ``;
+  if (classroomInfo.firstChild) classroomInfo.innerHTML = ``;
+  if (!studentDom) return console.log(`err`);
+};
 
-const allStudentsDomHandler = async () => {
-  try {
-    const studentDom = document.getElementById('students');
-    const classroomInfo = document.getElementById('classroom_info');
-    const selectId = document.getElementById('classroom_list');
-    if (selectId) selectId.value = selectId.firstChild.value;
-    if (studentDom.firstChild) studentDom.innerHTML = ``;
-    if (classroomInfo.firstChild) classroomInfo.innerHTML = ``;
-    if (!studentDom) return console.log(`err`);
-    await getAllUsers();
-    student.forEach((item) => {
-      studentDom.insertAdjacentHTML('beforeend', studentsDom(item));
-      const user = document.getElementById(`icon_user_${item._id}`);
-      if (user) user.addEventListener('click', changeActivityStudent);
-      if (item.activity === 'present') presentStudent(item._id);
-      if (item.activity === 'late') lateStudent(item._id);
-    });
-  } catch (e) {
-    console.log(e);
-  }
+const studentActivity = () => {
+  const studentDom = document.getElementById('students');
+  student.map((item) => {
+    studentDom.insertAdjacentHTML('beforeend', studentsDom(item));
+    const user = document.getElementById(`icon_user_${item._id}`);
+    if (user) user.addEventListener('click', changeActivityStudent);
+    if (!item.activity || item.activity === 'absent') absentStudent(item._id);
+    if (item.activity === 'present') presentStudent(item._id);
+    if (item.activity === 'late') lateStudent(item._id);
+  });
 };
 
 const excelFileHandler = async () => {
-  console.log(`run`);
   const exportBtn = document.getElementById('export_attendance');
-  const classroomDom = document.getElementById('classroom_info');
-  const studentDom = document.getElementById('students');
-  const selectBtn = document.getElementById('classroom_list');
-  if (classroomDom.firstChild) classroomDom.innerHTML = ``;
-  if (studentDom.firstChild) studentDom.innerHTML = ``;
-  if (selectBtn.value) {
-    selectBtn.value = '';
-    selectBtn.textContent = 'Select a classroom list';
-    selectBtn.hidden = true;
-    selectBtn.disabled = true;
-  }
+  const checkActivity = student.map((user) => {
+    if (user.activity === 'present') return true;
+    return false;
+  });
+  if (!exportBtn && checkActivity) {
+    document
+      .getElementById('settings_attendance')
+      .insertAdjacentHTML('beforeend', domExportAttendanceBtn());
 
-  try {
-    if (!exportBtn && student.length > 0) {
-      document
-        .getElementById('settings_attendance')
-        .insertAdjacentHTML('beforeend', domExportAttendanceBtn());
-
-      const studentDom = document.getElementById('students');
-      if (studentDom && student.length > 0)
-        student.forEach((item) => {
-          studentDom.insertAdjacentHTML('beforeend', studentsDom(item));
-          const user = document.getElementById(`icon_user_${item._id}`);
-          console.log(user);
-          if (user) user.addEventListener('click', changeActivityStudent);
-          if (item.activity === 'present') presentStudent(item._id);
-          if (item.activity === 'late') lateStudent(item._id);
-        });
-
-      document
-        .getElementById('export_attendance')
-        .addEventListener('click', exportExcelAttendance);
-    }
-  } catch (e) {
-    console.log(e);
+    document
+      .getElementById('export_attendance')
+      .addEventListener('click', exportExcelAttendance);
   }
 };
 
@@ -130,24 +132,46 @@ const domExportAttendanceBtn = () => {
 
 const getAllUsers = async () => {
   try {
-    student.length = 0;
-    teacher.length = 0;
     const users = await rtm.channel.getMembers();
     const url = `/get-all-users-info`;
     const { data, msg, err } = await postRequest(url, users);
     if (err) errorMsg(err);
     if (!data) return;
+
     if (data) {
       data.map((user) => {
-        if (user.type === 'student') {
-          const data = { ...user, activity: 'absent' };
-          student.push(data);
-        }
-        if (user.type === 'teacher') teacher.push(user);
+        const studentArrId = student.map((user) => user._id);
+        const teacherArrId = teacher.map((user) => user._id);
+
+        if (user.type === 'student' && !studentArrId.includes(user._id))
+          student.push(user);
+
+        if (user.type === 'teacher' && !teacherArrId.includes(user._id))
+          teacher.push(user);
       });
     }
   } catch (e) {
     console.log(e);
+  }
+};
+
+const deleteIdInArr = (id) => {
+  let type;
+  const studentArr = [];
+  const teacherArr = [];
+  student.map((user) => studentArr.push(user._id));
+  teacher.map((user) => teacherArr.push(user._id));
+  if (studentArr.includes(id)) type = 'student';
+  if (teacher.includes(id)) type = 'teacher';
+  if (!type) return;
+  if (type === 'student') {
+    const index = student.map((user) => user._id).indexOf(id);
+    student.splice(index, 1);
+    allStudentsDomHandler();
+  }
+  if (type === 'teacher') {
+    const index = teacher.map((user) => user._id).indexOf(id);
+    teacher.splice(index, 1);
   }
 };
 
@@ -156,12 +180,15 @@ const exportExcelAttendance = async () => {
   const dateNowToUtc = new Date().toUTCString();
   const wb = XLSX.utils.book_new();
 
+  student.forEach((user) => {
+    if (!user.activity) user.activity = 'absent';
+  });
+
   const teacherArr = teacher.map((user) => ({
     FirstName: user.first_name,
     LastName: user.last_name,
   }));
   teacherArr.push({});
-  console.log(teacherArr);
 
   const studentArr = student.map((user) => ({
     FirstName: user.first_name,
@@ -169,7 +196,6 @@ const exportExcelAttendance = async () => {
     activity: user.activity,
   }));
   studentArr.push({});
-  console.log(studentArr);
 
   const wk = XLSX.utils.aoa_to_sheet(
     [
@@ -194,9 +220,11 @@ const exportExcelAttendance = async () => {
 };
 
 export {
+  teacher,
+  student,
   allStudentsDomHandler,
   createExcelAttendance,
   excelFileHandler,
-  teacher,
-  student,
+  deleteIdInArr,
+  clearInfoAndStudentsDom,
 };

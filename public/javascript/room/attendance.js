@@ -24,6 +24,7 @@ import {
   excelFileHandler,
   createExcelAttendance,
   allStudentsDomHandler,
+  clearInfoAndStudentsDom,
 } from './excel.js';
 
 const classroom = [];
@@ -185,12 +186,13 @@ const restrictMode = async (e) => {
       btn.classList.toggle('on');
       btn.textContent = 'Restriction On';
       attendanceCheckHandler();
+      clearInfoAndStudentsDom();
     } else {
-      await allStudentsDomHandler();
       btn.value = 'off';
       btn.classList.toggle('on');
       btn.textContent = 'Restriction Off';
       attendanceCheckHandler();
+      await allStudentsDomHandler();
     }
   } catch (e) {
     console.log(e);
@@ -297,8 +299,10 @@ const attendance = async () => {
     body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
+
     try {
-      allStudentsDomHandler();
+      await allStudentsDomHandler();
+      excelFileHandler();
       const { data, msg, err } = await get_classroom();
       if (data) {
         classroom.push(data);

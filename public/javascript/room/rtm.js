@@ -16,6 +16,7 @@ import {
 } from './room.js';
 import { checkStudentDescriptor } from './attendance.js';
 import { searchDataInArr } from '../helpers/helpers.js';
+import { allStudentsDomHandler, deleteIdInArr } from './excel.js';
 
 const users = [];
 const raiseHands = [];
@@ -44,6 +45,8 @@ const handleMemberJoin = async (MemberId) => {
 
   const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
   userNotificationMsg(`User ${name} has joined the room`);
+
+  allStudentsDomHandler();
 };
 
 // add member dom when user join
@@ -78,6 +81,8 @@ const handleMemberLeft = async (MemberId) => {
 
   const members = await rtm.channel.getMembers();
   updateMemberTotal(members);
+
+  deleteIdInArr(MemberId);
 };
 
 // remove user dom when they left function

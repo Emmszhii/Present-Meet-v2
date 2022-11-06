@@ -1,9 +1,7 @@
 // initializing the variables
 const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
-
 import { makeAttendanceHandler } from './attendance.js';
-
 import {
   users,
   getMembers,
@@ -12,7 +10,6 @@ import {
   handleMemberLeft,
   handleRtmTokenExpire,
 } from './rtm.js';
-
 import {
   meetingId,
   displayFrame,
@@ -27,6 +24,7 @@ import {
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { faceRecognitionHandler } from './face_recognition.js';
 import { errorMsg } from './msg.js';
+import { student, teacher, deleteIdInArr } from './excel.js';
 
 // User Local Data and Tokens
 const userData = {};
@@ -154,8 +152,6 @@ const joinRoomInit = async () => {
   // get all members in render it to the dom
   getMembers();
 
-  // console.log(checkSystemRequirements());
-
   // initialize setting the rtc
   rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
@@ -249,15 +245,16 @@ const handleUserLeft = async (user) => {
 
   // delete the dom of the user uid who left
   const item = document.getElementById(`user-container-${user.uid}`);
-  if (item) {
-    item.remove();
-  }
+  if (item) item.remove();
+
   if (userIdInDisplayFrame.val === `user-container-${user.uid}`) {
     // if user is on big display and left delete it
     displayFrame.style.display = null;
     // reset user frames
     resetTheFrames();
   }
+
+  deleteIdInArr(user.uid);
 };
 
 // Camera function
@@ -599,7 +596,6 @@ export {
   clearLocalTracks,
   joinRoomInit,
   data_init,
-  handleMemberJoin,
   handleUserLeft,
   handleUserPublished,
   handleStopShareScreen,

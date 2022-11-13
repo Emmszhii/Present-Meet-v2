@@ -89,8 +89,17 @@ const timeSince = (date) => {
   return Math.floor(seconds) + ' seconds';
 };
 
+const isHttps = (req, res, next) => {
+  const http = req.protocol;
+
+  if (http === 'http') return res.redirect('/connection-secure');
+
+  return next();
+};
+
 module.exports = {
   faceApiThreshold,
+  isHttps,
   capitalize,
   validateName,
   validateNameEmpty,

@@ -78,7 +78,10 @@ const searchDataInArr = (arr, id) => {
 };
 
 const isHttps = () => {
-  return document.location.protocol === 'https:';
+  const http = document.location.protocol === 'https:';
+  const redirect = '/connection-secure';
+  if (!http) document.location.href = redirect;
+  // return document.location.protocol === 'https:';
 };
 
 export {

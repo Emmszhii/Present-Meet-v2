@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require('../config/auth');
 
 // User model
 const { Account, User } = require('../models/User');
+const { isHttps } = require('./helpers/functions');
 
 // Welcome Page
 router.get('/', ensureAuthenticated, (req, res) => {
@@ -28,9 +29,15 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
 });
 
 router.get('/connection-secure', async (req, res) => {
+  const url = req.url;
+  const protocol = req.protocol;
+  const originalUrl = req.originalUrl;
+  const host = req.get('host');
+  const baseUrl = `${protocol}s://${host}${originalUrl}`;
+
   res.render('404', {
     title: `Connection is not secure`,
-    message: `See if the browser is using an https connection`,
+    message: `Please use a secure https connection`,
   });
 });
 

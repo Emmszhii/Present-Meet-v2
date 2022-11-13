@@ -24,8 +24,9 @@ document
   .addEventListener('change', onChangeCameraDevice);
 
 window.addEventListener('load', () => {
-  const http = isHttps();
-  if (!http) document.location.href = `/connection-secure`;
+  // isHttps();
+  // const http = isHttps();
+  // if (!http) document.location.href = `/connection-secure`;
 
   Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),

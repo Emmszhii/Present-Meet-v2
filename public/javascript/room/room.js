@@ -249,12 +249,8 @@ const settingsHandler = async () => {
 
       const videoDom = document.getElementById('Video');
       const audioDom = document.getElementById('Audio');
-      if (!videoDom) {
-        createSelectElement('Video', video_devices);
-      }
-      if (!audioDom) {
-        createSelectElement('Audio', audio_devices);
-      }
+      if (!videoDom) createSelectElement('Video', video_devices);
+      if (!audioDom) createSelectElement('Audio', audio_devices);
     });
 
     document
@@ -266,16 +262,22 @@ const settingsHandler = async () => {
       .addEventListener('click', refreshDeviceModal);
   } catch (e) {
     const arrErr = [
-      'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+      {
+        err: 'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+        msg: `Permission to share user audio, video, stream are denied by user. User may not able to stream their audio, video, and stream`,
+      },
+      {
+        err: `AgoraRTCError NOT_READABLE: NotReadableError: Could not start video source`,
+        msg: `Device might be in used by other application`,
+      },
     ];
     console.log(e.message);
-
-    if (arrErr.includes(e.message)) {
-      errorMsg(
-        'Permission to share user audio, video, stream are denied by user. User may not able to stream their audio, video, and stream'
-      );
-      permissionDeniedDom();
-    }
+    arrErr.map((arr) => {
+      if (arr.err === e.message) {
+        permissionDeniedDom();
+        return errorMsg(arr.msg);
+      }
+    });
   } finally {
     document.querySelector('#loader_settings').style.display = 'none';
   }

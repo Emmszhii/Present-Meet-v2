@@ -113,9 +113,7 @@ const data_init = async () => {
 
 // initializing the agora sdk for joining the room and validating the user token for security joining
 const joinRoomInit = async () => {
-  if (userData.type === 'teacher') {
-    makeAttendanceHandler();
-  }
+  if (userData.type === 'teacher') makeAttendanceHandler();
 
   // letting rtc.client become the instance with APP_ID
   rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {

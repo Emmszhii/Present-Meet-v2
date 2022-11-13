@@ -7,9 +7,8 @@ import {
   joinStream,
   leaveStream,
   data_init,
-  remoteUsers,
 } from './rtc.js';
-import { sendMessage, leaveChannel, addVideoPlayerToDom } from './rtm.js';
+import { sendMessage, leaveChannel } from './rtm.js';
 import {
   meetingId,
   membersToggle,

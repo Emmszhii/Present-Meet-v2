@@ -18,6 +18,7 @@ import {
 import { checkStudentDescriptor } from './attendance.js';
 import { searchDataInArr } from '../helpers/helpers.js';
 import { allStudentsDomHandler, deleteIdInArr } from './excel.js';
+import { playSoundNotification, playSoundStart } from '../helpers/sound.js';
 
 const users = [];
 const raiseHands = [];
@@ -132,10 +133,12 @@ const handleChannelMessage = async (messageData, MemberId) => {
   // Add dom message element
   if (data.type === 'chat') {
     addMessageToDom(data.displayName, data.message);
+    playSoundNotification();
   }
 
   if (data.type === 'user_join') {
     checkIfUserDom(data.rtcId, data.name);
+    playSoundStart();
   }
 
   // If user left delete them in the stream
@@ -163,9 +166,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
     const dom = document.getElementById(user);
     const child = displayFrame.children[0];
 
-    if (child) {
-      document.getElementById('streams__container').appendChild(child);
-    }
+    if (child) document.getElementById('streams__container').appendChild(child);
 
     if (dom !== null) {
       displayFrame.style.display = 'block';
@@ -182,16 +183,12 @@ const handleChannelMessage = async (messageData, MemberId) => {
   }
 
   // if other screen share is close hide and reset frames
-  if (data.type === 'user_screen_share_close') {
-    hideDisplayFrame();
-  }
+  if (data.type === 'user_screen_share_close') hideDisplayFrame();
 
   // if student
-  if (userData.type === 'teacher') {
-    if (data.type === 'attendance_data') {
-      const { descriptor, displayName, restrict } = data;
-      checkStudentDescriptor({ descriptor, MemberId, displayName, restrict });
-    }
+  if (userData.type === 'teacher' && data.type === 'attendance_data') {
+    const { descriptor, displayName, restrict } = data;
+    checkStudentDescriptor({ descriptor, MemberId, displayName, restrict });
   }
 
   if (userData.type === 'student') {

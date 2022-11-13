@@ -9,6 +9,7 @@ import {
   handleMemberJoin,
   handleMemberLeft,
   handleRtmTokenExpire,
+  addVideoPlayerToDom,
 } from './rtm.js';
 import {
   meetingId,
@@ -168,9 +169,12 @@ const joinRoomInit = async () => {
 
   // set the users camera and mic
   settingsHandler();
+
+  // load all users who've joined the stream
+  addVideoPlayerToDom();
+
   // if All are loaded loader will be gone
   roomLoaderHandler();
-  // loader.style.display = 'none';
 };
 
 const handleRtcTokenExpire = async () => {
@@ -461,6 +465,10 @@ const joinStream = async () => {
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
   document.getElementById('settings-btn').style.display = 'none';
   try {
+    await rtm.client.addOrUpdateChannelAttributes(meetingId, {
+      name: userData.fullName,
+      _id: userData.rtcId,
+    });
     // initialize local tracks
     rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
 
@@ -472,9 +480,8 @@ const joinStream = async () => {
     checkIfUserDom(userData.id, userData.fullName);
 
     if (device.localAudio) {
-      await rtc.localTracks[0].setDevice(device.localAudio).then(() => {
-        rtc.localTracks[0].setMuted(true);
-      });
+      await rtc.localTracks[0].setDevice(device.localAudio);
+      await rtc.localTracks[0].setMuted(true);
     } else {
       await rtc.localTracks[0].setMuted(true);
     }
@@ -584,6 +591,7 @@ const devices = async () => {
 };
 
 export {
+  remoteUsers,
   userData,
   rtc,
   rtm,

@@ -45,7 +45,7 @@ app.use(
   })
 );
 
-// use https
+// force use https
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'production') {
     if (req.headers['x-forwarded-proto'] !== 'https') {

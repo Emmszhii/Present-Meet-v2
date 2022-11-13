@@ -77,13 +77,6 @@ const searchDataInArr = (arr, id) => {
   }
 };
 
-const isHttps = () => {
-  const http = document.location.protocol === 'https:';
-  const redirect = '/connection-secure';
-  if (!http) document.location.href = redirect;
-  // return document.location.protocol === 'https:';
-};
-
 export {
   controller,
   postRequest,
@@ -91,5 +84,4 @@ export {
   randDarkColor,
   generateLightColorHex,
   searchDataInArr,
-  isHttps,
 };

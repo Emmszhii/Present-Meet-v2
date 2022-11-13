@@ -75,9 +75,14 @@ const allStudentsDomHandler = async () => {
     await getAllUsers();
     studentActivity();
   } catch (e) {
-    const errArr = [`Cannot read properties of null (reading 'value')`];
-    if (errArr.includes(e.message)) return console.log(`err`);
-    console.log(e.message);
+    const errArr = [
+      { err: `Cannot read properties of null (reading 'value')`, msg: `` },
+    ];
+    errArr.map((arr) => {
+      if (arr.err.includes(e.message)) return;
+    });
+    // if (errArr.includes(e.message)) return console.log(`err`);
+    // console.log(e.message);
   } finally {
     // loaderHandler();
   }

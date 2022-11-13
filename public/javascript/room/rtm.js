@@ -13,6 +13,7 @@ import {
   expandVideoFrame,
   hideDisplayFrame,
   checkIfUserDom,
+  meetingId,
 } from './room.js';
 import { checkStudentDescriptor } from './attendance.js';
 import { searchDataInArr } from '../helpers/helpers.js';
@@ -36,7 +37,6 @@ const handleRtmTokenExpire = async () => {
 // get members names and total and add it to the dom;
 // member joining handler
 const handleMemberJoin = async (MemberId) => {
-  // console.log('A new member has joined the room', MemberId);
   addMemberToDom(MemberId);
 
   // update the participants total
@@ -56,6 +56,7 @@ const addMemberToDom = async (MemberId) => {
     'name',
     'rtcId',
   ]);
+
   // store the their name in an array
   users.push({ name, rtcId, MemberId });
 
@@ -67,6 +68,16 @@ const addMemberToDom = async (MemberId) => {
     </div>
   `;
   membersWrapper.insertAdjacentHTML('beforeend', memberItem);
+};
+
+const addVideoPlayerToDom = async () => {
+  const { name, _id } = await rtm.client.getChannelAttributesByKeys(meetingId, [
+    'name',
+    '_id',
+  ]);
+
+  if (!name && !_id) return;
+  checkIfUserDom(_id.value, name.value);
 };
 
 // function that update the total participants to the dom
@@ -131,9 +142,8 @@ const handleChannelMessage = async (messageData, MemberId) => {
   if (data.type === 'user_left') {
     document.getElementById(`user-container-${data.uid}`).remove();
 
-    if (userIdInDisplayFrame.val === `user-container-${data.uid}`) {
+    if (userIdInDisplayFrame.val === `user-container-${data.uid}`)
       hideDisplayFrame();
-    }
   }
 
   if (data.type === 'raise_hand_on') {
@@ -280,6 +290,7 @@ const leaveChannel = async () => {
 
 export {
   users,
+  addVideoPlayerToDom,
   sendMessage,
   getMembers,
   handleChannelMessage,

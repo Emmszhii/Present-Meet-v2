@@ -18,7 +18,11 @@ import {
 import { checkStudentDescriptor } from './attendance.js';
 import { searchDataInArr } from '../helpers/helpers.js';
 import { allStudentsDomHandler, deleteIdInArr } from './excel.js';
-import { playSoundNotification, playSoundStart } from '../helpers/sound.js';
+import {
+  playSoundNotification,
+  playSoundRaiseHand,
+  playSoundStart,
+} from '../helpers/sound.js';
 
 const users = [];
 const raiseHands = [];
@@ -45,7 +49,6 @@ const handleMemberJoin = async (MemberId) => {
   updateMemberTotal(members);
 
   const { name } = await rtm.client.getUserAttributesByKeys(MemberId, ['name']);
-  userNotificationMsg(`User ${name} has joined the room`);
 
   allStudentsDomHandler();
 };
@@ -80,6 +83,8 @@ const addVideoPlayerToDom = async () => {
   if (!name && !_id) return;
   checkIfUserDom(_id.value, name.value);
 };
+
+const deleteVideoPlayerToDom = async () => {};
 
 // function that update the total participants to the dom
 const updateMemberTotal = async (members) => {
@@ -132,13 +137,14 @@ const handleChannelMessage = async (messageData, MemberId) => {
 
   // Add dom message element
   if (data.type === 'chat') {
-    addMessageToDom(data.displayName, data.message);
     playSoundNotification();
+    addMessageToDom(data.displayName, data.message);
   }
 
   if (data.type === 'user_join') {
-    checkIfUserDom(data.rtcId, data.name);
     playSoundStart();
+    checkIfUserDom(data.rtcId, data.name);
+    userNotificationMsg(`User ${data.name} has joined the room`);
   }
 
   // If user left delete them in the stream
@@ -152,6 +158,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
   if (data.type === 'raise_hand_on') {
     raiseHands.push({ _id: data._id, fullName: data.name });
     raiseHandHandler();
+    playSoundRaiseHand();
   }
 
   if (data.type === 'raise_hand_off') {

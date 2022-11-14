@@ -8,4 +8,9 @@ const playSoundNotification = () => {
   audio.play();
 };
 
-export { playSoundStart, playSoundNotification };
+const playSoundRaiseHand = () => {
+  const audio = new Audio('../sound/simple_notification_3.mp3');
+  audio.play();
+};
+
+export { playSoundStart, playSoundNotification, playSoundRaiseHand };

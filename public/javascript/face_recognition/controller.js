@@ -1,4 +1,3 @@
-import { isHttps } from '../helpers/helpers.js';
 import {
   recognizeHandler,
   startVideoHandler,

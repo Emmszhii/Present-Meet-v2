@@ -4,6 +4,16 @@
   margin: 0px;
   padding: 0px;
 }
+/* Start Icons */
+
+.copy:active {
+  border: 1px solid black;
+}
+.check {
+  cursor: default;
+}
+
+/* End Icons */
 /* Start Messages */
 .warning_msg,
 .success_msg,
@@ -135,6 +145,7 @@ body {
   font-size: 20px;
   width: 60px;
   height: 60px;
+  position: relative;
   display: flex;
   place-content: center;
   place-items: center;
@@ -165,20 +176,6 @@ body {
   border-radius: 3px;
   cursor: pointer;
   font-size: 1.2rem;
-}
-.check {
-  cursor: default;
-}
-.copy::before {
-  content: '\f0c5';
-  font: var(--fa-font-solid);
-}
-.copy:active {
-  border: 1px solid black;
-}
-.check::before {
-  content: '\f00c';
-  font: var(--fa-font-solid);
 }
 .mainBtn {
   display: flex;
@@ -214,6 +211,11 @@ body {
   border-radius: 3px;
   cursor: pointer;
   margin: 10px;
+}
+#notification_msg {
+  position: absolute;
+  top: 15%;
+  right: 15%;
 }
 /* End Button */
 /* Scrollbar */

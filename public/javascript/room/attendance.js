@@ -60,7 +60,7 @@ const stopTimer = () => {
 // Teacher host
 const attendanceBtn = () => {
   return `
-    <button class='button' id='attendance-btn'><i class='fa-solid fa-clipboard-user'></i></button>
+    <button class='button clipboard-user' id='attendance-btn'></button>
   `;
 };
 

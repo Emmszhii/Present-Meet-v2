@@ -11,6 +11,7 @@ import {
   devices,
   rtm,
 } from './rtc.js';
+import { notificationMsg } from './rtm.js';
 
 // getting meeting Link
 
@@ -119,11 +120,14 @@ const messagesToggle = (e) => {
   const btn = e.currentTarget;
   const x = document.getElementById('messages__container');
   const y = document.getElementById('members__container');
+  const btnMsgNotification = document.getElementById('notification_msg');
+
   if (y.style.display === 'block') return;
   if (x.style.display === 'block') {
     btn.classList.remove('active');
     x.style.display = 'none';
   } else {
+    if (btnMsgNotification.classList.contains('red__icon')) notificationMsg();
     btn.classList.add('active');
     x.style.display = 'block';
   }

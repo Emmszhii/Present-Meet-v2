@@ -1,0 +1,26 @@
+/* Start icon */
+.copy::before {
+  content: '\f0c5';
+  font: var(--fa-font-solid);
+}
+.check::before {
+  content: '\f00c';
+  font: var(--fa-font-solid);
+}
+.envelope::before {
+  content: '\f0e0';
+  font: var(--fa-font-solid);
+}
+.user::before {
+  content: '\f007';
+  font: var(--fa-font-solid);
+}
+.gear::before {
+  content: '\f013';
+  font: var(--fa-font-solid);
+}
+.clipboard-user::before {
+  content: '\f7f3';
+  font: var(--fa-font-solid);
+}
+/* End Icon */

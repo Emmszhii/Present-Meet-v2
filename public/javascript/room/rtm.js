@@ -65,7 +65,7 @@ const addMemberToDom = async (MemberId) => {
     MemberId,
     ['joinedName', 'joinedId']
   );
-  
+
   if (joinedName && joinedId) checkIfUserDom(joinedId, joinedName);
 
   // store the their name in an array
@@ -129,11 +129,17 @@ const getMembers = async () => {
 const handleChannelMessage = async (messageData, MemberId) => {
   // Initialize data variable to parse the data
   const data = JSON.parse(messageData.text);
-
+  const btnMsgNotification = document.getElementById('notification_msg');
+  const btnMsgContainer = document.getElementById('messages__container');
   // Add dom message element
   if (data.type === 'chat') {
     playSoundNotification();
     addMessageToDom(data.displayName, data.message);
+    if (
+      !btnMsgNotification.classList.contains('red__icon') &&
+      btnMsgContainer.style.display === 'none'
+    )
+      notificationMsg();
   }
 
   if (data.type === 'user_join') {
@@ -235,6 +241,11 @@ const raiseHandDom = (name) => {
   `;
 };
 
+const notificationMsg = () => {
+  const btnNotification = document.getElementById('notification_msg');
+  if (btnNotification) btnNotification.classList.toggle('red__icon');
+};
+
 // function to send message
 const sendMessage = async (e) => {
   e.preventDefault();
@@ -297,4 +308,5 @@ export {
   leaveChannel,
   getRtmToken,
   handleRtmTokenExpire,
+  notificationMsg,
 };

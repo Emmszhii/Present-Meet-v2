@@ -19,6 +19,7 @@
     />
     <script src="https://cdn.sheetjs.com/xlsx-0.19.0/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/room.css" />
+    <link rel="stylesheet" href="css/icon.css" />
     <script
       defer
       type="text/javascript"
@@ -48,7 +49,7 @@
       </section>
     </div>
 
-    <section id="messages__container">
+    <section id="messages__container" style="display: none">
       <div id="messages"></div>
       <form id="message__form">
         <input
@@ -98,14 +99,10 @@
       </div>
       <!-- Right side button for messaging and the participants list -->
       <div class="rightBtn">
-        <button class="button active" id="settings-btn">
-          <i class="fa-solid fa-cog"></i>
-        </button>
-        <button class="button active" id="users-btn">
-          <i class="fa-solid fa-users"></i>
-        </button>
-        <button class="button" id="chat-btn">
-          <i class="fa-solid fa-envelope"></i>
+        <button class="button gear active" id="settings-btn"></button>
+        <button class="button user active" id="users-btn"></button>
+        <button class="button envelope" id="chat-btn">
+          <div class="" id="notification_msg"></div>
         </button>
       </div>
       <!-- Joining stream -->

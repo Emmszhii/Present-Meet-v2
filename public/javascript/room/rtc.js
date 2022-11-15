@@ -181,9 +181,9 @@ const volumeIndicator = async (user) => {
       `user-container-${volume.uid}`
     );
     if (!userContainer) return;
-    if (volume.level > 0)
+    if (volume.level >= 1)
       userContainer.style.border = `2px solid rgba(76,175,80,${volume.level})`;
-    if (volume.level === 0) userContainer.style.border = `1px solid #494949`;
+    if (volume.level < 1) userContainer.style.border = `1px solid #494949`;
   });
 };
 

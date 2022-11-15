@@ -164,6 +164,8 @@ const joinRoomInit = async () => {
   // on user publish and left method
   await rtc.client.on('user-published', handleUserPublished);
   await rtc.client.on('user-left', handleUserLeft);
+  await rtc.client.enableAudioVolumeIndicator();
+  await rtc.client.on('volume-indicator', volumeIndicator);
   await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire);
 
   // set the users camera and mic
@@ -171,6 +173,18 @@ const joinRoomInit = async () => {
 
   // if All are loaded loader will be gone
   roomLoaderHandler();
+};
+
+const volumeIndicator = async (user) => {
+  user.forEach((volume, index) => {
+    const userContainer = document.getElementById(
+      `user-container-${volume.uid}`
+    );
+    if (!userContainer) return;
+    if (volume.level > 0)
+      userContainer.style.border = `2px solid rgba(76,175,80,${volume.level})`;
+    if (volume.level === 0) userContainer.style.border = `1px solid #494949`;
+  });
 };
 
 const handleRtcTokenExpire = async () => {

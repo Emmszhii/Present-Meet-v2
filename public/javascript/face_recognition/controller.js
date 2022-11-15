@@ -7,7 +7,6 @@ import {
   onChangeCameraDevice,
 } from './face_recognition.js';
 import { loader } from './loader.js';
-import { errorMsg } from './msg.js';
 
 document
   .getElementById('camera-btn')
@@ -23,10 +22,6 @@ document
   .addEventListener('change', onChangeCameraDevice);
 
 window.addEventListener('load', () => {
-  // isHttps();
-  // const http = isHttps();
-  // if (!http) document.location.href = `/connection-secure`;
-
   Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),

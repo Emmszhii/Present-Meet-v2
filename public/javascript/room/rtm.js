@@ -1,4 +1,4 @@
-import { userData, rtm, player } from './rtc.js';
+import { userData, rtm, player, leaveChannelAttributeKey } from './rtc.js';
 import { faceRecognitionHandler } from './face_recognition.js';
 import {
   userNotificationMsg,
@@ -61,6 +61,13 @@ const addMemberToDom = async (MemberId) => {
     'rtcId',
   ]);
 
+  const { joinedName, joinedId } = await rtm.client.getUserAttributesByKeys(
+    MemberId,
+    ['joinedName', 'joinedId']
+  );
+  
+  if (joinedName && joinedId) checkIfUserDom(joinedId, joinedName);
+
   // store the their name in an array
   users.push({ name, rtcId, MemberId });
 
@@ -73,18 +80,6 @@ const addMemberToDom = async (MemberId) => {
   `;
   membersWrapper.insertAdjacentHTML('beforeend', memberItem);
 };
-
-const addVideoPlayerToDom = async () => {
-  const { name, _id } = await rtm.client.getChannelAttributesByKeys(meetingId, [
-    'name',
-    '_id',
-  ]);
-
-  if (!name && !_id) return;
-  checkIfUserDom(_id.value, name.value);
-};
-
-const deleteVideoPlayerToDom = async () => {};
 
 // function that update the total participants to the dom
 const updateMemberTotal = async (members) => {
@@ -217,19 +212,17 @@ const raiseHandHandler = () => {
   const firstUser = raiseHands[0];
   const secondUser = raiseHands[1];
 
-  if (!dom && firstUser) {
+  if (!dom && firstUser)
     body.insertAdjacentHTML('beforeend', raiseHandDom(firstUser.fullName));
-  }
+
   const users = document.querySelector('.users');
-  if (dom && secondUser) {
-    users.innerHTML = `${firstUser.fullName} and ${secondUser}\n is rasing their hand <i class="fa-solid fa-hand"></i>`;
-  }
-  if (dom && raiseHands.length > 2) {
-    users.innerHTML = `${firstUser.fullName}, ${secondUser}\nand other's is raising their hand <i class="fa-solid fa-hand"></i> `;
-  }
-  if (raiseHands.length === 0) {
-    if (dom) dom.remove();
-  }
+  if (dom && secondUser)
+    users.innerHTML = `${firstUser.fullName} and ${secondUser.fullName}\n is rasing their hand <i class="fa-solid fa-hand"></i>`;
+
+  if (dom && raiseHands.length > 2)
+    users.innerHTML = `${firstUser.fullName}, ${secondUser.fullName}\nand other's is raising their hand <i class="fa-solid fa-hand"></i> `;
+
+  if (raiseHands.length === 0) if (dom) dom.remove();
 };
 
 const raiseHandDom = (name) => {
@@ -281,20 +274,19 @@ const addMessageToDom = (name, message) => {
     '#messages .message__wrapper:last-child'
   );
 
-  if (lastMessage) {
-    lastMessage.scrollIntoView();
-  }
+  if (lastMessage) lastMessage.scrollIntoView();
 };
 
 // rtm leave channel async function
 const leaveChannel = async () => {
+  leaveChannelAttributeKey();
+
   await rtm.channel.leave();
   await rtm.client.logout();
 };
 
 export {
   users,
-  addVideoPlayerToDom,
   sendMessage,
   getMembers,
   handleChannelMessage,

@@ -277,6 +277,7 @@ const informationHandler = async () => {
   const backend = await faceapi.tf.getBackend();
   informationDom(`backend`, `Users' browser backend : ${backend}`);
 };
+
 const informationDom = (id, text) => {
   const dom = `
   <p id='${id}'>${text}</p>

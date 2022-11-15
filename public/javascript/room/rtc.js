@@ -9,7 +9,6 @@ import {
   handleMemberJoin,
   handleMemberLeft,
   handleRtmTokenExpire,
-  addVideoPlayerToDom,
 } from './rtm.js';
 import {
   meetingId,
@@ -169,9 +168,6 @@ const joinRoomInit = async () => {
 
   // set the users camera and mic
   settingsHandler();
-
-  // load all users who've joined the stream
-  addVideoPlayerToDom();
 
   // if All are loaded loader will be gone
   roomLoaderHandler();
@@ -455,6 +451,24 @@ AgoraRTC.onCameraChanged = async (changedDevice) => {
   }
 };
 
+const leaveChannelAttributeKey = async () => {
+  try {
+    await rtm.client.deleteLocalUserAttributesByKeys([
+      'joinedName',
+      'joinedId',
+    ]);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const addJoinedUserChannelAttribute = async () => {
+  await rtm.client.addOrUpdateLocalUserAttributes({
+    joinedName: userData.fullName,
+    joinedId: userData.rtcId,
+  });
+};
+
 // joining the stream
 const joinStream = async () => {
   // display loader
@@ -465,10 +479,6 @@ const joinStream = async () => {
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
   document.getElementById('settings-btn').style.display = 'none';
   try {
-    await rtm.client.addOrUpdateChannelAttributes(meetingId, {
-      name: userData.fullName,
-      _id: userData.rtcId,
-    });
     // initialize local tracks
     rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
 
@@ -505,6 +515,8 @@ const joinStream = async () => {
         name: userData.fullName,
       }),
     });
+
+    addJoinedUserChannelAttribute();
   } catch (err) {
     const arrError = [
       'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
@@ -519,12 +531,14 @@ const joinStream = async () => {
   }
 };
 
-const audioTrackEnded = () => {
+const audioTrackEnded = async () => {
   console.log(`audio track ended`);
+  await rtc.localTracks[0].setMuted(true);
 };
 
-const videoTrackEnded = () => {
+const videoTrackEnded = async () => {
   console.log(`video track ended`);
+  await rtc.localTracks[1].setMuted(true);
 };
 
 // leave stream
@@ -539,6 +553,7 @@ const leaveStream = async (e) => {
 
   await rtc.client.unpublish([rtc.localTracks[0], rtc.localTracks[1]]);
 
+  leaveChannelAttributeKey();
   clearLocalTracks();
 
   if (rtc.localScreenTracks) {
@@ -554,7 +569,6 @@ const leaveStream = async (e) => {
 
   if (userIdInDisplayFrame.val === `user-container-${userData.rtcId}`) {
     displayFrame.style.display = null;
-
     resetTheFrames();
   }
 
@@ -613,4 +627,6 @@ export {
   leaveStream,
   player,
   devices,
+  addJoinedUserChannelAttribute,
+  leaveChannelAttributeKey,
 };

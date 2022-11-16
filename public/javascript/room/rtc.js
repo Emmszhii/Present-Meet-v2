@@ -176,13 +176,17 @@ const joinRoomInit = async () => {
 };
 
 const volumeIndicator = async (user) => {
+  const streams = document.getElementById('streams__container');
   user.forEach((volume, index) => {
     const userContainer = document.getElementById(
       `user-container-${volume.uid}`
     );
     if (!userContainer) return;
-    if (volume.level >= 1)
+    if (volume.level >= 1) {
       userContainer.style.border = `2px solid rgba(76,175,80,${volume.level})`;
+
+      streams.insertBefore(userContainer, streams.firstChild);
+    }
     if (volume.level < 1) userContainer.style.border = `1px solid #494949`;
   });
 };

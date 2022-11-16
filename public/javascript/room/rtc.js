@@ -20,6 +20,7 @@ import {
   settingsHandler,
   roomLoaderHandler,
   checkIfUserDom,
+  setUserToFirstChild,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { faceRecognitionHandler } from './face_recognition.js';
@@ -282,6 +283,10 @@ const toggleCamera = async (e) => {
     // rtc video muting
     if (rtc.localTracks[1].muted) {
       await rtc.localTracks[1].setMuted(false);
+      await rtm.channel.sendMessage({
+        text: JSON.stringify({ type: 'active_camera', _id: userData.id }),
+      });
+      setUserToFirstChild(userData.id);
       button.classList.add('active');
     } else {
       await rtc.localTracks[1].setMuted(true);

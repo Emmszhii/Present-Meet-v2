@@ -81,8 +81,6 @@ const allStudentsDomHandler = async () => {
     errArr.map((arr) => {
       if (arr.err.includes(e.message)) return;
     });
-    // if (errArr.includes(e.message)) return console.log(`err`);
-    // console.log(e.message);
   } finally {
     // loaderHandler();
   }

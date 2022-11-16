@@ -8,14 +8,16 @@ import {
 } from './face_recognition.js';
 import { loader } from './loader.js';
 
+// open camera
 document
   .getElementById('camera-btn')
   .addEventListener('click', startVideoHandler);
+// take photo and descriptor of the user
 document.getElementById('photo-btn').addEventListener('click', photoHandler);
+// recognize user
 document
   .getElementById('recognize-btn')
   .addEventListener('click', recognizeHandler);
-
 // implement onchange camera device
 document
   .getElementById('camera_device')

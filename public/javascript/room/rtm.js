@@ -14,6 +14,7 @@ import {
   hideDisplayFrame,
   checkIfUserDom,
   meetingId,
+  setUserToFirstChild,
 } from './room.js';
 import { checkStudentDescriptor } from './attendance.js';
 import { searchDataInArr } from '../helpers/helpers.js';
@@ -150,18 +151,24 @@ const handleChannelMessage = async (messageData, MemberId) => {
 
   // If user left delete them in the stream
   if (data.type === 'user_left') {
-    document.getElementById(`user-container-${data.uid}`).remove();
-
+    const user = document.getElementById(`user-container-${data.uid}`);
+    if (user) user.remove();
     if (userIdInDisplayFrame.val === `user-container-${data.uid}`)
       hideDisplayFrame();
   }
 
+  // active camera
+  if (data.type === 'active_camera') {
+    console.log(data._id);
+    setUserToFirstChild(data._id);
+  }
+
+  // raise hand
   if (data.type === 'raise_hand_on') {
     raiseHands.push({ _id: data._id, fullName: data.name });
     raiseHandHandler();
     playSoundRaiseHand();
   }
-
   if (data.type === 'raise_hand_off') {
     const index = raiseHands.findIndex((user) => user._id === data.id);
     raiseHands.splice(index);

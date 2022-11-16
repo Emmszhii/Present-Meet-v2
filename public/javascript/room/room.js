@@ -49,9 +49,7 @@ const checkIfUserDom = (id, name) => {
 // Expand VideoFrame Function
 const expandVideoFrame = (e) => {
   let child = displayFrame.children[0];
-  if (child) {
-    document.getElementById('streams__container').appendChild(child);
-  }
+  if (child) document.getElementById('streams__container').appendChild(child);
 
   displayFrame.style.display = 'block';
   displayFrame.appendChild(e.currentTarget).scrollIntoView();
@@ -155,6 +153,13 @@ const settingsToggle = () => {
     settingsHandler();
     btn.classList.add('active');
   }
+};
+
+const setUserToFirstChild = (id) => {
+  const container = document.getElementById('streams__container');
+  const user = document.getElementById(`user-container-${id}`);
+  if (!user) return;
+  container.insertBefore(user, container.firstChild);
 };
 
 // create dropdown selected DOM
@@ -381,4 +386,5 @@ export {
   checkIfUserDom,
   raiseHand,
   checkIfUserIsMobileHandler,
+  setUserToFirstChild,
 };

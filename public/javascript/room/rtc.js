@@ -497,45 +497,47 @@ const joinStream = async () => {
   // display loader
   roomLoaderHandler();
 
-  // reset the button
+  // reset buttons
   document.getElementsByClassName('mainBtn')[0].style.display = 'none';
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
   document.getElementById('settings-btn').style.display = 'none';
   try {
     // initialize local tracks
-    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-      { cameraId: device.localVideo },
-      { microphoneId: device.localAudio, config: { ANS: true } }
-    );
 
-    await rtc.localTracks[0].setMuted(true);
-    await rtc.localTracks[1].setMuted(true);
+    if (device.localVideo && device.localAudio) {
+      rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+        { cameraId: device.localVideo },
+        { microphoneId: device.localAudio, config: { ANS: true } }
+      );
 
-    // handle error on video track
-    await rtc.localTracks[0].on('track-ended', audioTrackEnded);
-    await rtc.localTracks[1].on('track-ended', videoTrackEnded);
+      await rtc.localTracks[0].setMuted(true);
+      await rtc.localTracks[1].setMuted(true);
 
-    // add the player into the DOM
-    checkIfUserDom(userData.id, userData.fullName);
+      // handle error on video track
+      await rtc.localTracks[0].on('track-ended', audioTrackEnded);
+      await rtc.localTracks[1].on('track-ended', videoTrackEnded);
 
-    // if (device.localAudio) {
-    //   await rtc.localTracks[0].setDevice(device.localAudio);
-    //   await rtc.localTracks[0].setMuted(true);
-    // } else {
-    //   await rtc.localTracks[0].setMuted(true);
-    // }
+      // add the player into the DOM
+      checkIfUserDom(userData.id, userData.fullName);
 
-    // if (device.localVideo) {
-    //   await rtc.localTracks[1].setDevice(device.localVideo);
-    //   await rtc.localTracks[1].setMuted(true);
-    // } else {
-    //   await rtc.localTracks[1].setMuted(true);
-    // }
-    // play the local video and audio to the dom
-    rtc.localTracks[1].play(`user-${userData.rtcId}`);
-    // publish the video for other users to see
-    // localTracks[0] for audio and localTracks[1] for the video
-    await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+      // if (device.localAudio) {
+      //   await rtc.localTracks[0].setDevice(device.localAudio);
+      //   await rtc.localTracks[0].setMuted(true);
+      // } else {
+      //   await rtc.localTracks[0].setMuted(true);
+      // }
+
+      // if (device.localVideo) {
+      //   await rtc.localTracks[1].setDevice(device.localVideo);
+      //   await rtc.localTracks[1].setMuted(true);
+      // } else {
+      //   await rtc.localTracks[1].setMuted(true);
+      // }
+      // play the local video and audio to the dom
+      rtc.localTracks[1].play(`user-${userData.rtcId}`);
+      // localTracks[0] for audio and localTracks[1] for the video
+      await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+    }
 
     rtm.channel.sendMessage({
       text: JSON.stringify({

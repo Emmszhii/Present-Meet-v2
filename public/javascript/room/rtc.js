@@ -485,7 +485,7 @@ const leaveChannelAttributeKey = async () => {
   }
 };
 
-const addJoinedUserChannelAttribute = async () => {
+const addJoinedUserLocalAttribute = async () => {
   await rtm.client.addOrUpdateLocalUserAttributes({
     joinedName: userData.fullName,
     joinedId: userData.rtcId,
@@ -503,7 +503,13 @@ const joinStream = async () => {
   document.getElementById('settings-btn').style.display = 'none';
   try {
     // initialize local tracks
-    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+      { cameraId: device.localVideo },
+      { microphoneId: device.localAudio, config: { ANS: true } }
+    );
+
+    await rtc.localTracks[0].setMuted(true);
+    await rtc.localTracks[1].setMuted(true);
 
     // handle error on video track
     await rtc.localTracks[0].on('track-ended', audioTrackEnded);
@@ -512,19 +518,19 @@ const joinStream = async () => {
     // add the player into the DOM
     checkIfUserDom(userData.id, userData.fullName);
 
-    if (device.localAudio) {
-      await rtc.localTracks[0].setDevice(device.localAudio);
-      await rtc.localTracks[0].setMuted(true);
-    } else {
-      await rtc.localTracks[0].setMuted(true);
-    }
+    // if (device.localAudio) {
+    //   await rtc.localTracks[0].setDevice(device.localAudio);
+    //   await rtc.localTracks[0].setMuted(true);
+    // } else {
+    //   await rtc.localTracks[0].setMuted(true);
+    // }
 
-    if (device.localVideo) {
-      await rtc.localTracks[1].setDevice(device.localVideo);
-      await rtc.localTracks[1].setMuted(true);
-    } else {
-      await rtc.localTracks[1].setMuted(true);
-    }
+    // if (device.localVideo) {
+    //   await rtc.localTracks[1].setDevice(device.localVideo);
+    //   await rtc.localTracks[1].setMuted(true);
+    // } else {
+    //   await rtc.localTracks[1].setMuted(true);
+    // }
     // play the local video and audio to the dom
     rtc.localTracks[1].play(`user-${userData.rtcId}`);
     // publish the video for other users to see
@@ -539,7 +545,7 @@ const joinStream = async () => {
       }),
     });
 
-    addJoinedUserChannelAttribute();
+    addJoinedUserLocalAttribute();
   } catch (err) {
     const arrError = [
       'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
@@ -654,6 +660,6 @@ export {
   leaveStream,
   player,
   devices,
-  addJoinedUserChannelAttribute,
+  addJoinedUserLocalAttribute,
   leaveChannelAttributeKey,
 };

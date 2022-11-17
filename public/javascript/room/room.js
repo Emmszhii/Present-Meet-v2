@@ -19,6 +19,11 @@ const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
 
+const checkMeetingId = () => {
+  const id = urlParams.get('meetingId');
+  if (!id) window.location.href = '*';
+};
+
 // Expand Video Frame on Click
 let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
@@ -387,4 +392,5 @@ export {
   raiseHand,
   checkIfUserIsMobileHandler,
   setUserToFirstChild,
+  checkMeetingId,
 };

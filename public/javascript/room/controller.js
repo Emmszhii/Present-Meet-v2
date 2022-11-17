@@ -18,6 +18,7 @@ import {
   settingsToggle,
   raiseHand,
   checkIfUserIsMobileHandler,
+  checkMeetingId,
 } from './room.js';
 
 // Event Listeners
@@ -74,6 +75,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('load', async () => {
+  checkMeetingId();
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
   checkIfUserIsMobileHandler();

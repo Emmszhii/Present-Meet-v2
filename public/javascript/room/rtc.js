@@ -601,29 +601,33 @@ const leaveStream = async (e) => {
 };
 
 const clearLocalTracks = () => {
-  if (rtc.localTracks !== null) {
-    for (let i = 0; rtc.localTracks.length > i; i++) {
-      rtc.localTracks[i].stop();
-      rtc.localTracks[i].close();
-    }
-  }
+  if (rtc.localTracks !== null)
+    // for (let i = 0; rtc.localTracks.length > i; i++) {
+    //   rtc.localTracks[i].stop();
+    //   rtc.localTracks[i].close();
+    // }
+    rtc.localTracks.forEach((track) => {
+      track.stop();
+      track.close();
+    });
 };
 
 const devices = async () => {
-  await AgoraRTC.getDevices().then((device) => {
-    device.filter((dev) => {
-      if (dev.deviceId !== 'default' && dev.deviceId !== 'communications') {
-        localDevice.push(dev);
-      }
-    });
+  // await AgoraRTC.getDevices().then((device) => {
+  //   device.filter((dev) => {
+  //     if (dev.deviceId !== 'default' && dev.deviceId !== 'communications') {
+  //       localDevice.push(dev);
+  //     }
+  //   });
+  // });
+  const device = await AgoraRTC.getDevices();
+  device.filter((item) => {
+    if (item.deviceId !== 'default' && item.deviceId !== 'communications')
+      localDevice.push(item);
   });
   localDevice.map((item) => {
-    if (item.kind === 'videoinput') {
-      video_devices.push(item);
-    }
-    if (item.kind === 'audioinput') {
-      audio_devices.push(item);
-    }
+    if (item.kind === 'videoinput') video_devices.push(item);
+    if (item.kind === 'audioinput') audio_devices.push(item);
   });
 };
 

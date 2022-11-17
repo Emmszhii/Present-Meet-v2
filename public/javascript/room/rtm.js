@@ -36,7 +36,6 @@ const getRtmToken = async () => {
 
 const handleRtmTokenExpire = async () => {
   const { rtmToken } = await getRtmToken();
-  console.log(rtmToken);
   rtm.client.renewToken(rtmToken);
 };
 
@@ -136,6 +135,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
   if (data.type === 'chat') {
     playSoundNotification();
     addMessageToDom(data.displayName, data.message);
+
     if (
       !btnMsgNotification.classList.contains('red__icon') &&
       btnMsgContainer.style.display === 'none'
@@ -158,10 +158,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
   }
 
   // active camera
-  if (data.type === 'active_camera') {
-    console.log(data._id);
-    setUserToFirstChild(data._id);
-  }
+  if (data.type === 'active_camera') setUserToFirstChild(data._id);
 
   // raise hand
   if (data.type === 'raise_hand_on') {
@@ -169,6 +166,7 @@ const handleChannelMessage = async (messageData, MemberId) => {
     raiseHandHandler();
     playSoundRaiseHand();
   }
+
   if (data.type === 'raise_hand_off') {
     const index = raiseHands.findIndex((user) => user._id === data.id);
     raiseHands.splice(index);
@@ -206,16 +204,14 @@ const handleChannelMessage = async (messageData, MemberId) => {
     checkStudentDescriptor({ descriptor, MemberId, displayName, restrict });
   }
 
-  if (userData.type === 'student') {
+  if (userData.type === 'student' && data.type === 'attendance_on') {
     const info = { MemberId, restrict: data.restrictVal };
-    if (data.type === 'attendance_on') {
-      if (data.restrictVal === 'on') {
-        const students = data.students;
-        const include = searchDataInArr(students, userData.id);
-        if (include) faceRecognitionHandler(info);
-      }
-      if (data.restrictVal === 'off') faceRecognitionHandler(info);
+    if (data.restrictVal === 'on') {
+      const students = data.students;
+      const include = searchDataInArr(students, userData.id);
+      if (include) faceRecognitionHandler(info);
     }
+    if (data.restrictVal === 'off') faceRecognitionHandler(info);
   }
 };
 

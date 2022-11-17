@@ -474,7 +474,7 @@ AgoraRTC.onCameraChanged = async (changedDevice) => {
   }
 };
 
-const leaveChannelAttributeKey = async () => {
+const leaveLocalAttributeKey = async () => {
   try {
     await rtm.client.deleteLocalUserAttributesByKeys([
       'joinedName',
@@ -582,7 +582,7 @@ const leaveStream = async (e) => {
 
   await rtc.client.unpublish([rtc.localTracks[0], rtc.localTracks[1]]);
 
-  leaveChannelAttributeKey();
+  leaveLocalAttributeKey();
   clearLocalTracks();
 
   if (rtc.localScreenTracks) {
@@ -661,5 +661,5 @@ export {
   player,
   devices,
   addJoinedUserLocalAttribute,
-  leaveChannelAttributeKey,
+  leaveLocalAttributeKey,
 };

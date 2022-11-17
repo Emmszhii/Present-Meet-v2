@@ -1,4 +1,4 @@
-import { userData, rtm, player, leaveChannelAttributeKey } from './rtc.js';
+import { userData, rtm, player, leaveLocalAttributeKey } from './rtc.js';
 import { faceRecognitionHandler } from './face_recognition.js';
 import {
   userNotificationMsg,
@@ -101,12 +101,11 @@ const handleMemberLeft = async (MemberId) => {
 const removeMemberFromDom = async (MemberId) => {
   // removing remote users when they left
   for (let i = 0; users.length > i; i++) {
-    if (users[i].MemberId === MemberId) {
-      users.splice(i, 1);
-    }
+    if (users[i].MemberId === MemberId) users.splice(i, 1);
   }
 
   const memberWrapper = document.getElementById(`member__${MemberId}__wrapper`);
+
   const name =
     memberWrapper.getElementsByClassName('member_name')[0].textContent;
 
@@ -293,8 +292,7 @@ const addMessageToDom = (name, message) => {
 
 // rtm leave channel async function
 const leaveChannel = async () => {
-  leaveChannelAttributeKey();
-
+  leaveLocalAttributeKey();
   await rtm.channel.leave();
   await rtm.client.logout();
 };

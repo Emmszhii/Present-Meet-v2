@@ -305,14 +305,14 @@ const setupBtnOnClick = () => {
 
 const permissionDeniedDom = () => {
   const dom = document.querySelector('.text_settings');
+  // const joinBtn = document.getElementById('join-btn');
+  const setupBtn = document.getElementById('setup-btn');
+  const settingBtn = document.getElementById('settings-btn');
 
   if (dom)
     dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
 
-  const joinBtn = document.getElementById('join-btn');
-  const setupBtn = document.getElementById('setup-btn');
-  const settingBtn = document.getElementById('settings-btn');
-  if (joinBtn) joinBtn.style.display = 'none';
+  // if (joinBtn) joinBtn.style.display = 'none';
   if (setupBtn)
     setupBtn.addEventListener('click', () => {
       document.getElementById('modal-settings').remove();

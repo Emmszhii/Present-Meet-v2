@@ -276,9 +276,8 @@ const handleUserLeft = async (user) => {
 
 // Camera function
 const toggleCamera = async (e) => {
-  // button target
+  if (!device.localVideo) return errorMsg('No camera device detected');
   const button = e.currentTarget;
-
   try {
     // rtc video muting
     if (rtc.localTracks[1].muted) {
@@ -292,11 +291,13 @@ const toggleCamera = async (e) => {
       await rtc.localTracks[1].setMuted(true);
       button.classList.remove('active');
     }
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };
 // Audio function
 const toggleMic = async (e) => {
-  // button target
+  if (!device.localAudio) return errorMsg('No camera device detected');
   const button = e.currentTarget;
 
   try {
@@ -308,7 +309,9 @@ const toggleMic = async (e) => {
       await rtc.localTracks[0].setMuted(true);
       button.classList.remove('active');
     }
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // After disabling the share screen function then switch to Camera
@@ -550,13 +553,17 @@ const joinStream = async () => {
     addJoinedUserLocalAttribute();
   } catch (err) {
     const arrError = [
-      'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+      {
+        err: 'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
+        msg: 'Permission to use cam and mic are denied by user. User may not able to stream their audio, video, and stream',
+      },
     ];
-    if (arrError.includes(err.message)) {
-      errorMsg(
-        'Permission to use cam and mic are denied by user. User may not able to stream their audio, video, and stream'
-      );
-    }
+    arrError.map((arr) => {
+      if (arr.err.includes(err.message)) return errorMsg(arr.msg);
+    });
+    // if (arrError.err.includes(err.message)) {
+    //   errorMsg();
+    // }
   } finally {
     roomLoaderHandler();
   }

@@ -297,7 +297,7 @@ const toggleCamera = async (e) => {
 };
 // Audio function
 const toggleMic = async (e) => {
-  if (!device.localAudio) return errorMsg('No camera device detected');
+  if (!device.localAudio) return errorMsg('No microphone device detected');
   const button = e.currentTarget;
 
   try {

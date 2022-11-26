@@ -25,6 +25,7 @@ import {
   createExcelAttendance,
   allStudentsDomHandler,
   clearInfoAndStudentsDom,
+  restrictOnExportFile,
 } from './excel.js';
 
 const classroom = [];
@@ -187,12 +188,15 @@ const restrictMode = async (e) => {
       btn.textContent = 'Restriction On';
       attendanceCheckHandler();
       clearInfoAndStudentsDom();
+      restrictOnExportFile();
     } else {
       btn.value = 'off';
       btn.classList.toggle('on');
       btn.textContent = 'Restriction Off';
       attendanceCheckHandler();
       await allStudentsDomHandler();
+
+      excelFileHandler();
     }
   } catch (e) {
     console.log(e);
@@ -363,6 +367,7 @@ const loaderHandler = () => {
 const listDropdown = async (e) => {
   loaderHandler();
   attendanceCheckHandler();
+  restrictOnExportFile();
   try {
     const restrictBtn = document.getElementById('restrict');
     if (!restrictBtn.classList.contains('on')) {

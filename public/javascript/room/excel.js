@@ -114,6 +114,7 @@ const excelFileHandler = async () => {
     if (user.activity === 'present') return true;
     return false;
   });
+
   if (!exportBtn && checkActivity) {
     document
       .getElementById('settings_attendance')
@@ -222,9 +223,17 @@ const exportExcelAttendance = async () => {
   XLSX.writeFile(wb, `${meetingId}_${now}.xlsx`);
 };
 
+const restrictOnExportFile = () => {
+  const btn = document.getElementById('export_attendance');
+  if (!btn) return;
+  const parentEl = btn.parentElement;
+  if (parentEl) parentEl.remove();
+};
+
 export {
   teacher,
   student,
+  restrictOnExportFile,
   allStudentsDomHandler,
   createExcelAttendance,
   excelFileHandler,

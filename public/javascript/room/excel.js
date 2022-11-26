@@ -280,7 +280,19 @@ const exportExcelFromDb = async (data) => {
   XLSX.utils.sheet_add_aoa(wk, [['STUDENT(S)']], { origin: -1 });
   XLSX.utils.sheet_add_aoa(
     wk,
-    [[`ID`, 'FirstName', 'MiddleName', 'LastName', ...date]],
+    [
+      [
+        `ID`,
+        'FirstName',
+        'MiddleName',
+        'LastName',
+        ...date,
+        '',
+        'Present',
+        'Late',
+        'Absent',
+      ],
+    ],
     { origin: -1 }
   );
   data.students.map((student) => {
@@ -289,22 +301,40 @@ const exportExcelFromDb = async (data) => {
     const MiddleName = student.middle_name;
     const LastName = student.last_name;
     const act = [];
+    let totalPresent = 0;
+    let totalLate = 0;
+    let totalAbsent = 0;
     data.attendance.map((item) => {
       let activity;
-      console.log(item);
+
       if (item.present.includes(studentId)) {
         activity = 'present';
+        totalPresent++;
       } else if (item.late.includes(studentId)) {
         activity = 'late';
+        totalLate++;
       } else {
         activity = 'absent';
+        totalAbsent++;
       }
-      console.log(activity);
+
       act.push(activity);
     });
     XLSX.utils.sheet_add_aoa(
       wk,
-      [[studentId, FirstName, MiddleName, LastName, ...act]],
+      [
+        [
+          studentId,
+          FirstName,
+          MiddleName,
+          LastName,
+          ...act,
+          '',
+          totalPresent,
+          totalLate,
+          totalAbsent,
+        ],
+      ],
       {
         origin: -1,
       }

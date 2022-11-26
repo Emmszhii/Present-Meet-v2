@@ -91,9 +91,7 @@ const timeSince = (date) => {
 
 const isHttps = (req, res, next) => {
   const http = req.protocol;
-
   if (http === 'http') return res.redirect('/connection-secure');
-
   return next();
 };
 

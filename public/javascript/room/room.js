@@ -285,7 +285,7 @@ const settingsHandler = async () => {
         msg: `Device might be in used by other application`,
       },
     ];
-    console.log(e.message);
+
     arrErr.map((arr) => {
       if (arr.err === e.message) {
         permissionDeniedDom();

@@ -1,4 +1,4 @@
-import { postRequest } from '../helpers/helpers.js';
+import { getRequest, postRequest } from '../helpers/helpers.js';
 import { errorMsg } from './msg.js';
 import { meetingId } from './room.js';
 import { rtm } from './rtc.js';
@@ -223,6 +223,98 @@ const exportExcelAttendance = async () => {
   XLSX.writeFile(wb, `${meetingId}_${now}.xlsx`);
 };
 
+const exportAttendanceFromDb = async () => {
+  const exportBtn = document.getElementById('export_attendance');
+  if (exportBtn) exportBtn.parentElement.remove();
+  if (!exportBtn)
+    document
+      .getElementById('settings_attendance')
+      .insertAdjacentHTML('beforeend', domExportAttendanceBtn());
+
+  document
+    .getElementById('export_attendance')
+    .addEventListener('click', attendanceFromDb);
+};
+
+const attendanceFromDb = async () => {
+  loaderHandler();
+  const id = document.getElementById('classroom_list').value;
+  const url = `/all-attendance-classroom/${id}`;
+  try {
+    const { data, err, msg } = await getRequest(url);
+    if (err) return errorMsg(err);
+
+    exportExcelFromDb(data);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
+};
+
+const exportExcelFromDb = async (data) => {
+  const now = new Date().toISOString();
+  const dateNowToUtc = new Date().toUTCString();
+  const wb = XLSX.utils.book_new();
+  const wk = XLSX.utils.aoa_to_sheet(
+    [['Classroom ID', '', 'Date Exported'], [data._id, '', dateNowToUtc], ['']],
+    { origin: 'A1' }
+  );
+  const teacher = [
+    {
+      FirstName: data.first_name,
+      MiddleName: data.middle_name,
+      LastName: data.last_name,
+    },
+    {},
+  ];
+
+  const date = data.attendance.map((item) =>
+    new Date(item.createdAt).toUTCString()
+  );
+
+  XLSX.utils.sheet_add_aoa(wk, [['TEACHER']], { origin: -1 });
+  XLSX.utils.sheet_add_json(wk, teacher, {
+    origin: -1,
+  });
+  XLSX.utils.sheet_add_aoa(wk, [['STUDENT(S)']], { origin: -1 });
+  XLSX.utils.sheet_add_aoa(
+    wk,
+    [[`ID`, 'FirstName', 'MiddleName', 'LastName', ...date]],
+    { origin: -1 }
+  );
+  data.students.map((student) => {
+    const studentId = student._id;
+    const FirstName = student.first_name;
+    const MiddleName = student.middle_name;
+    const LastName = student.last_name;
+    const act = [];
+    data.attendance.map((item) => {
+      let activity;
+      console.log(item);
+      if (item.present.includes(studentId)) {
+        activity = 'present';
+      } else if (item.late.includes(studentId)) {
+        activity = 'late';
+      } else {
+        activity = 'absent';
+      }
+      console.log(activity);
+      act.push(activity);
+    });
+    XLSX.utils.sheet_add_aoa(
+      wk,
+      [[studentId, FirstName, MiddleName, LastName, ...act]],
+      {
+        origin: -1,
+      }
+    );
+  });
+
+  XLSX.utils.book_append_sheet(wb, wk, data._id);
+  XLSX.writeFile(wb, `${data._id}_${now}.xlsx`);
+};
+
 const restrictOnExportFile = () => {
   const btn = document.getElementById('export_attendance');
   if (!btn) return;
@@ -234,6 +326,7 @@ export {
   teacher,
   student,
   restrictOnExportFile,
+  exportAttendanceFromDb,
   allStudentsDomHandler,
   createExcelAttendance,
   excelFileHandler,

@@ -26,6 +26,7 @@ import {
   allStudentsDomHandler,
   clearInfoAndStudentsDom,
   restrictOnExportFile,
+  exportAttendanceFromDb,
 } from './excel.js';
 
 const classroom = [];
@@ -368,6 +369,7 @@ const listDropdown = async (e) => {
   loaderHandler();
   attendanceCheckHandler();
   restrictOnExportFile();
+  exportAttendanceFromDb();
   try {
     const restrictBtn = document.getElementById('restrict');
     if (!restrictBtn.classList.contains('on')) {

@@ -194,9 +194,9 @@ const restrictMode = async (e) => {
       btn.value = 'off';
       btn.classList.toggle('on');
       btn.textContent = 'Restriction Off';
+      restrictOnExportFile();
       attendanceCheckHandler();
       await allStudentsDomHandler();
-
       excelFileHandler();
     }
   } catch (e) {

@@ -190,12 +190,14 @@ const exportExcelAttendance = async () => {
 
   const teacherArr = teacher.map((user) => ({
     FirstName: user.first_name,
+    MiddleName: user.middle_name,
     LastName: user.last_name,
   }));
   teacherArr.push({});
 
   const studentArr = student.map((user) => ({
     FirstName: user.first_name,
+    MiddleName: user.middle_name,
     LastName: user.last_name,
     activity: user.activity,
   }));
@@ -214,7 +216,7 @@ const exportExcelAttendance = async () => {
   XLSX.utils.sheet_add_json(wk, teacherArr, {
     origin: -1,
   });
-  XLSX.utils.sheet_add_aoa(wk, [['STUDENT']], { origin: -1 });
+  XLSX.utils.sheet_add_aoa(wk, [['STUDENT(S)']], { origin: -1 });
   XLSX.utils.sheet_add_json(wk, studentArr, {
     origin: -1,
   });

@@ -135,7 +135,6 @@ const addTable = () => {
           <th>Last Name</th>
           <th>First Name</th>
           <th>Middle Name</th>
-          <th class="no_border"></th>
         </tr>
       </thead>
       <tbody id="tableData"></tbody>
@@ -145,13 +144,12 @@ const addTable = () => {
 
 const addAttendanceTable = () => {
   return `
-    <table>
+    <table id='attendanceTable'>
       <thead>
         <tr>
           <th>Last Name</th>
           <th>First Name</th>
           <th>Middle Name</th>
-          <th class="no_border"></th>
         </tr>
       </thead>
       <tbody id="tableAttendanceData"></tbody>

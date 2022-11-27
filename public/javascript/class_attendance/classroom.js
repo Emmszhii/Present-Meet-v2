@@ -1,4 +1,5 @@
 import { getRequest, postRequest, randDarkColor } from '../helpers/helpers.js';
+import { exportExcelFromDb } from '../helpers/excel.js';
 import { successDom, warningDom, errorDom, deleteMsg } from './msg.js';
 import {
   students_data,
@@ -301,35 +302,51 @@ const attendanceFileBtn = (data) => {
 
 const formAttendance = async (e) => {
   const _id = document.getElementById('main_list').dataset.value;
-  const dataClass = searchTeacherDataInArr(_id);
-  let dataHtml = ``;
+  // const dataClass = searchTeacherDataInArr(_id);
+  // let dataHtml = ``;
+  // let trHtml = ``;
+  // removeChildElement();
+  // document
+  //   .querySelector('.container_class')
+  //   .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
+  // document
+  //   .getElementById('attendance_table')
+  //   .insertAdjacentHTML('beforeend', addAttendanceTable());
+  // const tableData = document.getElementById('tableAttendanceData');
+  // const { data: dataStudents } = await fetchStudents(_id);
+  const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
+  // const attendance = attendanceData.attendance;
+  // // console.log(attendanceData);
+  // for (const [index, value] of attendance.entries()) {
+  //   const utcDate = new Date(value.createdAt).toUTCString();
+  //   trHtml += `
+  //    <th>${utcDate}</th>
+  //   `;
+  // }
+  // for (const [index, student] of dataStudents.entries()) {
+  //   dataHtml += `
+  //   <tr>
+  //     <td>${student.last_name}</td>
+  //     <td>${student.first_name}</td>
+  //     <td>${student.middle_name}</td>
+  //   </tr>
+  //   `;
+  // }
+  // tableData.innerHTML = dataHtml;
+  // document.querySelector('.close').addEventListener('click', closeParentNode);
+  console.log(attendanceData);
+  exportExcelFromDb(attendanceData);
+};
 
-  removeChildElement();
-
-  document
-    .querySelector('.container_class')
-    .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
-  document
-    .getElementById('attendance_table')
-    .insertAdjacentHTML('beforeend', addAttendanceTable());
-
-  const tableData = document.getElementById('tableAttendanceData');
-  const { data: dataStudents } = await fetchStudents(_id);
-
-  for (const [index, student] of dataStudents.entries()) {
-    console.log(student);
-    dataHtml += `
-    <tr>
-      <td>${student.last_name}</td>
-      <td>${student.first_name}</td>
-      <td>${student.middle_name}</td>
-    </tr>
-    `;
+const allAttendanceFromDb = async (id) => {
+  const url = `/all-attendance-classroom/${id}`;
+  try {
+    const { data, msg, err } = await getRequest(url);
+    if (err) return;
+    if (data) return { data, msg };
+  } catch (e) {
+    console.log(e);
   }
-
-  tableData.innerHTML = dataHtml;
-
-  document.querySelector('.close').addEventListener('click', closeParentNode);
 };
 
 const attendanceBtn = () => {

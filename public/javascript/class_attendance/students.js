@@ -39,7 +39,6 @@ const fetchStudents = async (id) => {
 };
 
 const listStudentToDom = async (id) => {
-  loaderHandler();
   try {
     const { data, msg } = await fetchStudents(id);
     if (data) students_data.push(data);
@@ -60,8 +59,6 @@ const listStudentToDom = async (id) => {
     }
   } catch (e) {
     errorDom(e);
-  } finally {
-    loaderHandler();
   }
 };
 
@@ -127,15 +124,15 @@ const deleteStudent = async (e) => {
   }
 };
 
-const searchStudentDataInArr = (id) => {
-  const data = students_data[0];
-  for (const [index, value] of data) {
-    console.log(index, value);
-    if (id === value._id) {
-      console.log(`found`);
-      return value;
-    }
-  }
-};
+// const searchStudentDataInArr = (id) => {
+//   const data = students_data[0];
+//   for (const [index, value] of data) {
+//     console.log(index, value);
+//     if (id === value._id) {
+//       console.log(`found`);
+//       return value;
+//     }
+//   }
+// };
 
 export { students_data, fetchStudents, listStudentToDom, studentTableData };

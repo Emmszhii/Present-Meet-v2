@@ -29,13 +29,10 @@ const classListHandler = () => {
   const list = document.getElementById('add_list');
   if (list) return list.remove();
   removeChildElement();
-
   document
     .querySelector('.container_class')
     .insertAdjacentHTML('beforeend', domAddClassList());
-
   document.querySelector('.close').addEventListener('click', closeParentNode);
-
   document
     .getElementById(`save_class_btn`)
     .addEventListener('click', saveClassList);
@@ -43,9 +40,7 @@ const classListHandler = () => {
 
 const saveClassList = () => {
   document.body.insertAdjacentHTML('beforeend', onConfirm());
-
   document.getElementById('cancel').addEventListener('click', removedOnConfirm);
-
   document
     .getElementById('confirm')
     .addEventListener('click', savedNewClassList);
@@ -55,7 +50,6 @@ const savedNewClassList = async () => {
   const subject = document.getElementById('subject').value;
   const year_level = document.getElementById('year_level').value;
   const section = document.getElementById('section').value;
-
   const password = document.getElementById('password').value;
   const postData = {
     subject,
@@ -82,9 +76,7 @@ const savedNewClassList = async () => {
 
 const deleteClassListHandler = () => {
   document.body.insertAdjacentHTML('beforeend', onConfirm());
-
   document.getElementById('cancel').addEventListener('click', removedOnConfirm);
-
   document.getElementById('confirm').addEventListener('click', deleteClassList);
 };
 
@@ -94,13 +86,11 @@ const deleteClassList = async () => {
   const url = `/delete-class-list`;
   try {
     const { data, msg, err } = await postRequest(url, { id, password });
+    if (err) errorDom(err);
     if (data) {
       successDom(msg);
       getClassroomHandler();
       removeChildElement();
-    }
-    if (err) {
-      errorDom(err);
     }
   } catch (e) {
     console.log(e);
@@ -111,20 +101,28 @@ const deleteClassList = async () => {
 
 const getClassToken = async () => {
   const id = document.getElementById('main_list').dataset.value;
-  const time = document.getElementById('link_time').value;
-  const url = `/generate-class-token/${id}/${time}`;
-  const token = getRequest(url);
-  return token;
+  try {
+    const time = document.getElementById('link_time').value;
+    const url = `/generate-class-token/${id}/${time}`;
+    const token = getRequest(url);
+    return token;
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-const onChangeLinkDropDown = async (e) => {
-  const { token } = await getClassToken();
-
-  const id = document.getElementById('main_list').dataset.value;
-  const url = window.location.href;
-
-  const link = `${url}/join-class?token=${token}`;
-  document.getElementById('link_classroom').value = link;
+const onChangeLinkDropDown = async () => {
+  loaderHandler();
+  try {
+    const { token } = await getClassToken();
+    const url = window.location.href;
+    const link = `${url}/join-class?token=${token}`;
+    document.getElementById('link_classroom').value = link;
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
 };
 
 const copyLink = () => {
@@ -227,18 +225,7 @@ const searchTeacherDataInArr = (id) => {
   return;
 };
 
-const loadClassHandler = async (e) => {
-  const id = e.currentTarget.dataset.value;
-  listStudentToDom(id);
-
-  removeChildElement();
-
-  document
-    .querySelector('.container_class')
-    .insertAdjacentHTML('beforeend', getClassDom());
-
-  document.querySelector('.close').addEventListener('click', closeParentNode);
-
+const infoClass = async (id) => {
   // class info
   const data = searchTeacherDataInArr(id);
 
@@ -249,15 +236,36 @@ const loadClassHandler = async (e) => {
     'year_level'
   ).textContent = `Year Level: ${data.year_level}`;
   document.getElementById('section').textContent = `Section: ${data.section}`;
+};
 
-  studentDomHandler();
+const loadClassHandler = async (e) => {
+  const id = e.currentTarget.dataset.value;
+  loaderHandler();
+  try {
+    removeChildElement();
 
-  document
-    .getElementById('edit_class')
-    .addEventListener('click', editClassHandler);
-  document
-    .getElementById('remove_class')
-    .addEventListener('click', deleteClassListHandler);
+    document
+      .querySelector('.container_class')
+      .insertAdjacentHTML('beforeend', getClassDom());
+
+    document.querySelector('.close').addEventListener('click', closeParentNode);
+
+    await listStudentToDom(id);
+    await infoClass(id);
+    await studentDomHandler();
+    await checkAttendanceFromDb(id);
+
+    document
+      .getElementById('edit_class')
+      .addEventListener('click', editClassHandler);
+    document
+      .getElementById('remove_class')
+      .addEventListener('click', deleteClassListHandler);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
 };
 
 const listToDomHandler = () => {
@@ -265,12 +273,45 @@ const listToDomHandler = () => {
   listTeacherToDom();
 };
 
+const checkAttendanceFromDb = async (id) => {
+  const url = `/all-attendance-classroom/${id}`;
+  try {
+    const { data, err, msg } = await getRequest(url);
+    if (err) return errorDom(err);
+    if (data) attendanceFileBtn(data);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const attendanceFileBtn = (data) => {
+  const _id = data._id;
+  const attendanceArr = data.attendance;
+  if (attendanceArr.length === 0) return;
+
+  document
+    .querySelector('.settings')
+    .insertAdjacentHTML('beforeend', attendanceBtn());
+
+  document
+    .getElementById('attendance_class')
+    .addEventListener('click', formAttendance);
+};
+
+const formAttendance = async (e) => {
+  console.log(e);
+};
+
+const attendanceBtn = () => {
+  return `
+    <button class='button' id="attendance_class">Attendance CLass</button>
+  `;
+};
+
 const listTeacherToDom = () => {
-  console.log(teacher_data);
   if (teacher_data.length > 1) teacher_data.shift();
   const data = teacher_data[0];
-  console.log(data);
-  console.log(data.length);
+
   for (let i = 0; data.length > i; i++) {
     const color = randDarkColor();
 
@@ -288,20 +329,16 @@ const listTeacherToDom = () => {
 const getClassroomHandler = async () => {
   loaderHandler();
   const url = '/get_classroom';
-
   try {
     const { data, msg, err } = await getRequest(url);
+    if (err) errorDom(err);
     if (msg) {
       resetClassList();
       noListDom(msg);
     }
     if (data) {
       teacher_data.push(data);
-      console.log(teacher_data);
       listToDomHandler();
-    }
-    if (err) {
-      errorDom(err);
     }
   } catch (e) {
     console.log(e);

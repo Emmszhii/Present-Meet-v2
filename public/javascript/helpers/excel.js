@@ -8,9 +8,9 @@ const exportExcelFromDb = async (data) => {
   );
   const teacher = [
     {
+      LastName: data.last_name,
       FirstName: data.first_name,
       MiddleName: data.middle_name,
-      LastName: data.last_name,
     },
     {},
   ];
@@ -29,9 +29,9 @@ const exportExcelFromDb = async (data) => {
     [
       [
         `ID`,
+        'LastName',
         'FirstName',
         'MiddleName',
-        'LastName',
         ...date,
         '',
         'Present',
@@ -71,9 +71,9 @@ const exportExcelFromDb = async (data) => {
       [
         [
           studentId,
+          LastName,
           FirstName,
           MiddleName,
-          LastName,
           ...act,
           '',
           totalPresent,

@@ -57,6 +57,10 @@ router.get(
         students.push(user);
       }
 
+      students.sort((a, b) =>
+        a.last_name > b.last_name ? 1 : b.last_name > a.last_name ? -1 : 0
+      );
+
       const attendance = classroomId.attendance_id.map((item) => item);
 
       return res.status(200).json({

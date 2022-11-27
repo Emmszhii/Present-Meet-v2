@@ -323,7 +323,7 @@ const editAttendance = async () => {
     loaderHandler();
     removeChildElement();
     attendanceEditDom(dataClass);
-
+    console.log(``);
     const tableData = document.getElementById('tableAttendanceData');
     const { data: dataStudents } = await fetchStudents(_id);
     const { data: attendanceData, msg } = await allAttendanceFromDb(_id);

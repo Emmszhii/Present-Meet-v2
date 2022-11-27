@@ -21,6 +21,8 @@ import {
   resetClassList,
   noListDom,
   closeParentNode,
+  getAttendanceDom,
+  addAttendanceTable,
 } from './view.js';
 
 const teacher_data = [];
@@ -196,7 +198,6 @@ const updateClass = async () => {
   const section = document.getElementById('section').value;
   const password = document.getElementById('password').value;
   const id = document.getElementById('add_list').dataset.value;
-
   const url = `/update-class`;
   const postData = { id, subject, year_level, section, password };
   try {
@@ -299,7 +300,36 @@ const attendanceFileBtn = (data) => {
 };
 
 const formAttendance = async (e) => {
-  console.log(e);
+  const _id = document.getElementById('main_list').dataset.value;
+  const dataClass = searchTeacherDataInArr(_id);
+  let dataHtml = ``;
+
+  removeChildElement();
+
+  document
+    .querySelector('.container_class')
+    .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
+  document
+    .getElementById('attendance_table')
+    .insertAdjacentHTML('beforeend', addAttendanceTable());
+
+  const tableData = document.getElementById('tableAttendanceData');
+  const { data: dataStudents } = await fetchStudents(_id);
+
+  for (const [index, student] of dataStudents.entries()) {
+    console.log(student);
+    dataHtml += `
+    <tr>
+      <td>${student.last_name}</td>
+      <td>${student.first_name}</td>
+      <td>${student.middle_name}</td>
+    </tr>
+    `;
+  }
+
+  tableData.innerHTML = dataHtml;
+
+  document.querySelector('.close').addEventListener('click', closeParentNode);
 };
 
 const attendanceBtn = () => {

@@ -314,6 +314,12 @@ td:last-child {
   text-transform: uppercase;
 }
 
+#attendance_table {
+  width: 100%;
+  overflow: auto;
+  font-size: 1rem;
+}
+
 .close {
   position: absolute;
   top: 0;

@@ -42,6 +42,25 @@ const getClassDom = () => {
   `;
 };
 
+const getAttendanceDom = (data) => {
+  return `
+    <div class="card" id="main_list" data-value="${data._id}">
+      <button class="button close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="content">
+        <div id="class_info">
+          <h5 id="class_id">Class ID : ${data._id}</h5>
+          <h5 id="subject">Subject: ${data.subject}</h5>
+          <h5 id="year_level">Year Level : ${data.year_level}</h5>
+          <h5 id="section">Section : ${data.section}</h5>
+        </div>
+        <div id="attendance_table"></div>
+      </div>
+    </div>
+  `;
+};
+
 const linkDom = () => {
   return `
       <input class='un-capitalize' id="link_classroom" readonly>
@@ -124,6 +143,22 @@ const addTable = () => {
   `;
 };
 
+const addAttendanceTable = () => {
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Middle Name</th>
+          <th class="no_border"></th>
+        </tr>
+      </thead>
+      <tbody id="tableAttendanceData"></tbody>
+    </table>
+  `;
+};
+
 const onConfirm = () => {
   return `
     <div class="overlay"></div>
@@ -199,6 +234,8 @@ export {
   addTable,
   msgStudentTable,
   domAddClassList,
+  getAttendanceDom,
+  addAttendanceTable,
   domClassList,
   linkDom,
   getClassDom,

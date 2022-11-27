@@ -308,43 +308,133 @@ const attendanceEditDom = (dataClass) => {
   document
     .querySelector('.container_class')
     .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
-  document
-    .getElementById('attendance_table')
-    .insertAdjacentHTML('beforeend', addAttendanceTable());
+  // document
+  //   .getElementById('attendance_table')
+  //   .insertAdjacentHTML('beforeend', addAttendanceTable());
 };
 
 const editAttendance = async () => {
   const _id = document.getElementById('main_list').dataset.value;
-  const dataClass = searchTeacherDataInArr(_id);
+  const dataClassroom = searchTeacherDataInArr(_id);
   let dataHtml = ``;
   let trHtml = ``;
 
   try {
     loaderHandler();
     removeChildElement();
-    attendanceEditDom(dataClass);
-    console.log(``);
-    const tableData = document.getElementById('tableAttendanceData');
+    attendanceEditDom(dataClassroom);
+
+    // const table = document.getElementById('attendanceTable');
+    // const tableData = document.getElementById('tableAttendanceData');
     const { data: dataStudents } = await fetchStudents(_id);
     const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
     const attendance = attendanceData.attendance;
-    for (const [index, value] of attendance.entries()) {
-      const utcDate = new Date(value.createdAt).toUTCString();
-      trHtml += `
-     <th>${utcDate}</th>
-    `;
-    }
-    for (const [index, student] of dataStudents.entries()) {
-      dataHtml += `
-    <tr>
-      <td>${student.last_name}</td>
-      <td>${student.first_name}</td>
-      <td>${student.middle_name}</td>
-    </tr>
-    `;
-    }
-    tableData.innerHTML = dataHtml;
+
+    createTable(dataStudents, attendance);
+    // for (const [index, value] of attendance.entries()) {
+    //   const utcDate = new Date(value.createdAt).toUTCString();
+    //   trHtml += `
+    //    <th>${utcDate}</th>
+    //   `;
+    // }
+    // for (const [index, student] of dataStudents.entries()) {
+    //   dataHtml += `
+    // <tr>
+    //   <td>${student.last_name}</td>
+    //   <td>${student.first_name}</td>
+    //   <td>${student.middle_name}</td>
+    // </tr>
+    // `;
+    // }
+
+    // tableData.innerHTML = dataHtml;
+
     document.querySelector('.close').addEventListener('click', closeParentNode);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
+};
+
+const createTable = (students, attendance) => {
+  const tbl = document.createElement('table');
+  const tblHead = document.createElement('thead');
+  const tblBody = document.createElement('tbody');
+  const headRow = document.createElement('tr');
+  const head = ['ID', 'Last Name', 'First Name', 'Middle Name'];
+
+  for (const [i, val] of head.entries()) {
+    const th = document.createElement('th');
+    const text = document.createTextNode(val);
+    th.appendChild(text);
+    headRow.appendChild(th);
+  }
+  for (const [i, val] of attendance.entries()) {
+    const date = new Date(val.createdAt).toUTCString();
+    const th = document.createElement('th');
+    const text = document.createTextNode(date);
+    th.appendChild(text);
+    headRow.appendChild(th);
+  }
+  tblHead.appendChild(headRow);
+
+  for (const [i, val] of students.entries()) {
+    const { _id, first_name, last_name, middle_name } = val;
+    const info = [_id, last_name, first_name, middle_name];
+    const tr = document.createElement('tr');
+
+    for (const [i, val] of info.entries()) {
+      const x = tr.insertCell(-1);
+      x.innerHTML = val;
+    }
+
+    for (const [i, val] of attendance.entries()) {
+      let activity;
+
+      const x = tr.insertCell(-1);
+      if (val.present.includes(_id)) {
+        activity = 'present';
+      } else if (val.late.includes(_id)) {
+        activity = 'late';
+      } else {
+        activity = 'absent';
+      }
+      x.value = activity;
+      x.id = `user_${_id}_${val._id}`;
+      x.dataset.studentId = _id;
+      x.dataset.attendanceId = val._id;
+      x.innerHTML = activity;
+      x.classList.add('change_activity');
+      x.addEventListener('click', changeActivity);
+    }
+
+    tblBody.appendChild(tr);
+  }
+
+  tbl.appendChild(tblHead);
+  tbl.appendChild(tblBody);
+  document.getElementById(`attendance_table`).appendChild(tbl);
+};
+
+const changeActivity = async (e) => {
+  const btn = e.currentTarget;
+  const studentId = e.currentTarget.dataset.studentId;
+  const attendanceId = e.currentTarget.dataset.attendanceId;
+  const value = e.currentTarget.value;
+  const url = `/change-activity-student`;
+  loaderHandler();
+  try {
+    const { data, msg, err } = await postRequest(url, {
+      studentId,
+      attendanceId,
+      value,
+    });
+    if (err) return errorDom(err);
+    if (data) {
+      btn.textContent = data.activity;
+      btn.value = data.activity;
+    }
   } catch (e) {
     console.log(e);
   } finally {

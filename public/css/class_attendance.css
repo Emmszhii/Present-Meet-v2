@@ -308,6 +308,12 @@ td:last-child {
   text-shadow: 1px 1px black;
 }
 
+.change_activity:hover {
+  color: white;
+  background-color: black;
+  cursor: pointer;
+}
+
 #subject,
 #year_level,
 #section {

@@ -278,4 +278,58 @@ router.post('/delete-student', ensureAuthenticated, async (req, res) => {
   }
 });
 
+router.post(
+  '/change-activity-student',
+  ensureAuthenticated,
+  async (req, res) => {
+    const { value, attendanceId, studentId } = req.body;
+    let activity;
+
+    if (!value) return res.status(400).json({ err: `Value invalid Request` });
+    if (!attendanceId)
+      return res.status(400).json({ err: `Attendance invalid Request` });
+    if (!studentId)
+      return res.status(400).json({ err: `Student invalid Request` });
+
+    try {
+      const attendance = await Attendance.findOne({ _id: attendanceId });
+
+      if (!attendance)
+        return res.status(400).json({ err: `Attendance invalid Request` });
+
+      if (attendance.present.includes(studentId)) {
+        // present
+        await Attendance.updateOne(
+          { _id: attendanceId },
+          { $pull: { present: studentId } }
+        );
+        await Attendance.updateOne(
+          { _id: attendanceId },
+          { $push: { late: studentId } }
+        );
+        activity = `late`;
+      } else if (attendance.late.includes(studentId)) {
+        // late
+        await Attendance.updateOne(
+          { _id: attendanceId },
+          { $pull: { late: studentId } }
+        );
+        activity = `absent`;
+      } else {
+        // absent
+        await Attendance.updateOne(
+          { _id: attendanceId },
+          { $push: { present: studentId } }
+        );
+        activity = 'present';
+      }
+
+      const data = { value, attendanceId, studentId, activity };
+      res.status(200).json({ data });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
+
 module.exports = router;

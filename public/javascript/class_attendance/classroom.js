@@ -296,46 +296,73 @@ const attendanceFileBtn = (data) => {
     .insertAdjacentHTML('beforeend', attendanceBtn());
 
   document
-    .getElementById('attendance_class')
-    .addEventListener('click', formAttendance);
+    .getElementById('attendance_file')
+    .addEventListener('click', exportAttendance);
+
+  document
+    .getElementById('attendance_edit')
+    .addEventListener('click', editAttendance);
 };
 
-const formAttendance = async (e) => {
+const attendanceEditDom = (dataClass) => {
+  document
+    .querySelector('.container_class')
+    .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
+  document
+    .getElementById('attendance_table')
+    .insertAdjacentHTML('beforeend', addAttendanceTable());
+};
+
+const editAttendance = async () => {
   const _id = document.getElementById('main_list').dataset.value;
-  // const dataClass = searchTeacherDataInArr(_id);
-  // let dataHtml = ``;
-  // let trHtml = ``;
-  // removeChildElement();
-  // document
-  //   .querySelector('.container_class')
-  //   .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
-  // document
-  //   .getElementById('attendance_table')
-  //   .insertAdjacentHTML('beforeend', addAttendanceTable());
-  // const tableData = document.getElementById('tableAttendanceData');
-  // const { data: dataStudents } = await fetchStudents(_id);
-  const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
-  // const attendance = attendanceData.attendance;
-  // // console.log(attendanceData);
-  // for (const [index, value] of attendance.entries()) {
-  //   const utcDate = new Date(value.createdAt).toUTCString();
-  //   trHtml += `
-  //    <th>${utcDate}</th>
-  //   `;
-  // }
-  // for (const [index, student] of dataStudents.entries()) {
-  //   dataHtml += `
-  //   <tr>
-  //     <td>${student.last_name}</td>
-  //     <td>${student.first_name}</td>
-  //     <td>${student.middle_name}</td>
-  //   </tr>
-  //   `;
-  // }
-  // tableData.innerHTML = dataHtml;
-  // document.querySelector('.close').addEventListener('click', closeParentNode);
-  console.log(attendanceData);
-  exportExcelFromDb(attendanceData);
+  const dataClass = searchTeacherDataInArr(_id);
+  let dataHtml = ``;
+  let trHtml = ``;
+
+  try {
+    loaderHandler();
+    removeChildElement();
+    attendanceEditDom(dataClass);
+
+    const tableData = document.getElementById('tableAttendanceData');
+    const { data: dataStudents } = await fetchStudents(_id);
+    const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
+    const attendance = attendanceData.attendance;
+    for (const [index, value] of attendance.entries()) {
+      const utcDate = new Date(value.createdAt).toUTCString();
+      trHtml += `
+     <th>${utcDate}</th>
+    `;
+    }
+    for (const [index, student] of dataStudents.entries()) {
+      dataHtml += `
+    <tr>
+      <td>${student.last_name}</td>
+      <td>${student.first_name}</td>
+      <td>${student.middle_name}</td>
+    </tr>
+    `;
+    }
+    tableData.innerHTML = dataHtml;
+    document.querySelector('.close').addEventListener('click', closeParentNode);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
+};
+
+const exportAttendance = async () => {
+  loaderHandler();
+  try {
+    const _id = document.getElementById('main_list').dataset.value;
+    const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
+    exportExcelFromDb(attendanceData);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaderHandler();
+  }
 };
 
 const allAttendanceFromDb = async (id) => {
@@ -351,7 +378,8 @@ const allAttendanceFromDb = async (id) => {
 
 const attendanceBtn = () => {
   return `
-    <button class='button' id="attendance_class">Attendance CLass</button>
+    <button class='button' id="attendance_file">Export File</button>
+    <button class='button' id="attendance_edit">Edit Attendance</button>
   `;
 };
 

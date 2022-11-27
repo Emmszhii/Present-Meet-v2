@@ -308,46 +308,36 @@ const attendanceEditDom = (dataClass) => {
   document
     .querySelector('.container_class')
     .insertAdjacentHTML('beforeend', getAttendanceDom(dataClass));
-  // document
-  //   .getElementById('attendance_table')
-  //   .insertAdjacentHTML('beforeend', addAttendanceTable());
+};
+
+const addExportFileButton = () => {
+  document
+    .querySelector('.settings')
+    .insertAdjacentHTML(
+      'beforeend',
+      `<button class='button' id="attendance_file">Export File</button>`
+    );
+
+  document
+    .getElementById('attendance_file')
+    .addEventListener('click', exportAttendance);
 };
 
 const editAttendance = async () => {
   const _id = document.getElementById('main_list').dataset.value;
   const dataClassroom = searchTeacherDataInArr(_id);
-  let dataHtml = ``;
-  let trHtml = ``;
 
   try {
     loaderHandler();
     removeChildElement();
     attendanceEditDom(dataClassroom);
+    addExportFileButton();
 
-    // const table = document.getElementById('attendanceTable');
-    // const tableData = document.getElementById('tableAttendanceData');
     const { data: dataStudents } = await fetchStudents(_id);
     const { data: attendanceData, msg } = await allAttendanceFromDb(_id);
     const attendance = attendanceData.attendance;
 
     createTable(dataStudents, attendance);
-    // for (const [index, value] of attendance.entries()) {
-    //   const utcDate = new Date(value.createdAt).toUTCString();
-    //   trHtml += `
-    //    <th>${utcDate}</th>
-    //   `;
-    // }
-    // for (const [index, student] of dataStudents.entries()) {
-    //   dataHtml += `
-    // <tr>
-    //   <td>${student.last_name}</td>
-    //   <td>${student.first_name}</td>
-    //   <td>${student.middle_name}</td>
-    // </tr>
-    // `;
-    // }
-
-    // tableData.innerHTML = dataHtml;
 
     document.querySelector('.close').addEventListener('click', closeParentNode);
   } catch (e) {

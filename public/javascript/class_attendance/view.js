@@ -55,6 +55,7 @@ const getAttendanceDom = (data) => {
           <h5 id="year_level">Year Level : ${data.year_level}</h5>
           <h5 id="section">Section : ${data.section}</h5>
         </div>
+        <div class='settings'></div>
         <div id="attendance_table"></div>
       </div>
     </div>

@@ -10,13 +10,13 @@ const updateStudentIcon = async (e) => {
   try {
     let prevStateIcon;
     if (btn.classList.contains('red__icon')) {
-      changeIcon(btn);
+      changeIcon(id);
       prevStateIcon = `red__icon`;
     } else if (btn.classList.contains('green__icon')) {
-      changeIcon(btn);
+      changeIcon(id);
       prevStateIcon = `green__icon`;
     } else {
-      changeIcon(btn);
+      changeIcon(id);
       prevStateIcon = `orange__icon`;
     }
     const { data, msg, err } = await updateStudentAttendance(btn, id);

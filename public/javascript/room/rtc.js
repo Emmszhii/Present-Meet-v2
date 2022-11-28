@@ -179,16 +179,16 @@ const joinRoomInit = async () => {
 const volumeIndicator = async (user) => {
   const streams = document.getElementById('streams__container');
   user.forEach((volume, index) => {
-    const userContainer = document.getElementById(
-      `user-container-${volume.uid}`
-    );
+    const uid = volume.uid;
+    const level = volume.level;
+    const userContainer = document.getElementById(`user-container-${uid}`);
     if (!userContainer) return;
-    if (volume.level >= 1) {
-      userContainer.style.border = `2px solid rgba(76,175,80,${volume.level})`;
-
-      streams.insertBefore(userContainer, streams.firstChild);
+    if (level >= 1) {
+      userContainer.style.border = `2px solid rgba(76,175,80,${level})`;
+      if (userIdInDisplayFrame.val !== `user-container-${uid}`)
+        streams.insertBefore(userContainer, streams.firstChild);
     }
-    if (volume.level < 1) userContainer.style.border = `1px solid #494949`;
+    if (level < 1) userContainer.style.border = `1px solid #494949`;
   });
 };
 
@@ -523,20 +523,6 @@ const joinStream = async () => {
       // add the player into the DOM
       checkIfUserDom(userData.id, userData.fullName);
 
-      // if (device.localAudio) {
-      //   await rtc.localTracks[0].setDevice(device.localAudio);
-      //   await rtc.localTracks[0].setMuted(true);
-      // } else {
-      //   await rtc.localTracks[0].setMuted(true);
-      // }
-
-      // if (device.localVideo) {
-      //   await rtc.localTracks[1].setDevice(device.localVideo);
-      //   await rtc.localTracks[1].setMuted(true);
-      // } else {
-      //   await rtc.localTracks[1].setMuted(true);
-      // }
-      // play the local video and audio to the dom
       rtc.localTracks[1].play(`user-${userData.rtcId}`);
       // localTracks[0] for audio and localTracks[1] for the video
       await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
@@ -617,10 +603,6 @@ const leaveStream = async (e) => {
 
 const clearLocalTracks = () => {
   if (rtc.localTracks !== null)
-    // for (let i = 0; rtc.localTracks.length > i; i++) {
-    //   rtc.localTracks[i].stop();
-    //   rtc.localTracks[i].close();
-    // }
     rtc.localTracks.forEach((track) => {
       track.stop();
       track.close();
@@ -628,13 +610,6 @@ const clearLocalTracks = () => {
 };
 
 const devices = async () => {
-  // await AgoraRTC.getDevices().then((device) => {
-  //   device.filter((dev) => {
-  //     if (dev.deviceId !== 'default' && dev.deviceId !== 'communications') {
-  //       localDevice.push(dev);
-  //     }
-  //   });
-  // });
   const device = await AgoraRTC.getDevices();
   device.filter((item) => {
     if (item.deviceId !== 'default' && item.deviceId !== 'communications')

@@ -46,6 +46,7 @@ const restrictMultipleAttendance = async (classId) => {
       path: 'attendance_id',
     })
     .then((data) => {
+      if (data.attendance_id.length === 0) return { msg: `ok` };
       const attendance_id = data.attendance_id;
       const lastAttendance = attendance_id[attendance_id.length - 1];
       const created = lastAttendance.createdAt;
@@ -59,7 +60,9 @@ const restrictMultipleAttendance = async (classId) => {
       if (seconds > 0 && seconds <= 60) return { seconds };
     });
   let err;
-  const { minutes, seconds } = classroom;
+  const { minutes, seconds, msg } = classroom;
+  if (msg) err = `none`;
+
   if (minutes < 15)
     err = `Request Timeout! Request again after ${15 - minutes} minute(s)`;
 

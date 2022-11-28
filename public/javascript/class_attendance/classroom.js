@@ -347,6 +347,14 @@ const editAttendance = async () => {
   }
 };
 
+const deleteAttendance = (e) => {
+  const _id = e.currentTarget.id;
+  try {
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const createTable = (students, attendance) => {
   const tbl = document.createElement('table');
   const tblHead = document.createElement('thead');
@@ -364,7 +372,9 @@ const createTable = (students, attendance) => {
     const date = new Date(val.createdAt).toUTCString();
     const th = document.createElement('th');
     const text = document.createTextNode(date);
+    th.id = val._id;
     th.appendChild(text);
+    th.addEventListener('click', deleteAttendance);
     headRow.appendChild(th);
   }
   tblHead.appendChild(headRow);

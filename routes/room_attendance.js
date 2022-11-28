@@ -41,7 +41,7 @@ router.post(
 
         const { err } = await restrictMultipleAttendance(classId);
 
-        if (err) return res.status(400).json({ err });
+        if (err !== 'none') return res.status(400).json({ err });
 
         const attendance = new Attendance();
         classroom.attendance_id.push(attendance._id);

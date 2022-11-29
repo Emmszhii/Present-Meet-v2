@@ -15,6 +15,14 @@ router.get('/face-recognition', ensureAuthenticated, (req, res) => {
   }
 });
 
+router.get(
+  '/get-face-recognition-threshold',
+  ensureAuthenticated,
+  async (req, res) => {
+    res.status(200).json({ threshold: faceApiThreshold });
+  }
+);
+
 router.get('/get-descriptor', ensureAuthenticated, async (req, res) => {
   try {
     const student = await Student.findOne({ _id: req.user._id });

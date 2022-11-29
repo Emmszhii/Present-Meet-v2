@@ -172,6 +172,7 @@ const faceDetection = async (ms) => {
 const photoHandler = async () => {
   loader();
   try {
+    const { threshold } = await getThreshold();
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
     const displaySize = { width: video.width, height: video.height };
@@ -223,10 +224,21 @@ const photoHandler = async () => {
   }
 };
 
+const getThreshold = async () => {
+  try {
+    const url = `/get-face-recognition-threshold`;
+    const { threshold } = await getRequest(url);
+    return threshold;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
   loader();
   try {
+    const threshold = await getThreshold();
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
     if (refUser.length === 0) return errorMsg('No reference descriptor!');
@@ -234,7 +246,7 @@ const recognizeHandler = async () => {
     const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'canvas';
     camera.append(canvas);
-    // const id = document.getElementById('canvas');
+
     // face api detection
     const detection = await faceapi
       .detectAllFaces(canvas, tinyFaceOption)
@@ -249,7 +261,7 @@ const recognizeHandler = async () => {
     const img2 = detection[0].descriptor;
     stopVideo();
     // comparing the 2 image
-    await comparePerson(img1, img2);
+    await comparePerson(img1, img2, threshold);
   } catch (e) {
     console.log(e);
   } finally {
@@ -258,18 +270,23 @@ const recognizeHandler = async () => {
 };
 
 // compare the person
-const comparePerson = async (referenceImg, queryImg) => {
-  if (!ArrayBuffer.isView(referenceImg))
-    return errorMsg(`Record your face descriptor first!`);
-  if (!ArrayBuffer.isView(queryImg)) return errorMsg(`Face not recognize`);
-  // matching B query
-  const distance = 0.4;
-  const dist = faceapi.euclideanDistance(referenceImg, queryImg);
-  if (dist <= distance) {
-    successMsg(`Face are match! Please submit it to register`);
-    createPostButton();
-  } else {
-    errorMsg('Face does not Match!');
+const comparePerson = async (referenceImg, queryImg, threshold) => {
+  try {
+    if (!ArrayBuffer.isView(referenceImg))
+      return errorMsg(`Record your face descriptor first!`);
+    if (!ArrayBuffer.isView(queryImg)) return errorMsg(`Face not recognize`);
+    // matching B query
+
+    const dist = faceapi.euclideanDistance(referenceImg, queryImg);
+    console.log(dist);
+    if (dist <= threshold) {
+      successMsg(`Face are match! Please submit it to register`);
+      createPostButton();
+    } else {
+      errorMsg('Face does not Match!');
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 

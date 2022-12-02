@@ -618,20 +618,52 @@ const clearLocalTracks = () => {
 
 const devices = async () => {
   try {
-    const allDevices = await AgoraRTC.getDevices();
-    if (!allDevices)
-      return errorMsg(
-        `Devices might be use by other app or access denied by the user`
-      );
-    console.log(allDevices);
-    allDevices.map((item) => {
-      if (item.deviceId !== 'default' && item.deviceId !== 'communications')
-        localDevice.push(item);
+    const tempAudioStream = AgoraRTC.createStream({
+      audio: true,
+      video: false,
+    });
+    const tempVideoStream = AgoraRTC.createStream({
+      audio: false,
+      video: true,
     });
 
-    localDevice.map((item) => {
-      if (item.kind === 'videoinput') video_devices.push(item);
-      if (item.kind === 'audioinput') audio_devices.push(item);
+    const audioPermissionOK = new Promise((resolve) => {
+      tempAudioStream.init(
+        () => resolve(null),
+        (e) => resolve(e)
+      );
+    });
+    const videoPermissionOK = new Promise((resolve) => {
+      tempVideoStream.init(
+        () => resolve(null),
+        (e) => resolve(e)
+      );
+    });
+
+    Promise.all([audioPermissionOK, videoPermissionOK]).then(async (res) => {
+      if (res[0] !== null) {
+        console.warn('create audio temp stream failed!', res[0]);
+      }
+      if (res[1] !== null) {
+        console.warn('create video temp stream failed!', res[0]);
+      }
+      const allDevices = await AgoraRTC.getDevices();
+      if (!allDevices)
+        return errorMsg(
+          `Devices might be use by other app or access denied by the user`
+        );
+      console.log(allDevices);
+      allDevices.map((item) => {
+        if (item.deviceId !== 'default' && item.deviceId !== 'communications')
+          localDevice.push(item);
+      });
+
+      localDevice.map((item) => {
+        if (item.kind === 'videoinput') video_devices.push(item);
+        if (item.kind === 'audioinput') audio_devices.push(item);
+      });
+      tempAudioStream.close();
+      tempVideoStream.close();
     });
   } catch (e) {
     console.log(e);

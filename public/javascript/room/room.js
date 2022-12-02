@@ -258,7 +258,7 @@ const settingsHandler = async () => {
   try {
     rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
 
-    await rtc.localTracks[1].play(`user-${userData.rtcId}`);
+    rtc.localTracks[1].play(`user-${userData.rtcId}`);
 
     devices().then(() => {
       const videoDom = document.getElementById('Video');

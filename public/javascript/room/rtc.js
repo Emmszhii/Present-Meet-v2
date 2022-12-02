@@ -624,7 +624,7 @@ const devices = async () => {
         `Devices might be use by other app or access denied by the user`
       );
     console.log(allDevices);
-    allDevices.filter((item) => {
+    allDevices.map((item) => {
       if (item.deviceId !== 'default' && item.deviceId !== 'communications')
         localDevice.push(item);
     });

@@ -95,13 +95,9 @@ const getStudentPresentHandler = async () => {
     const present = listOfStudents.present;
     const late = listOfStudents.late;
 
-    for (const [index, id] of present.entries()) {
-      presentStudent(id);
-    }
+    for (const [index, id] of present.entries()) presentStudent(id);
 
-    for (const [index, id] of late.entries()) {
-      lateStudent(id);
-    }
+    for (const [index, id] of late.entries()) lateStudent(id);
   } catch (e) {
     console.log(e);
   } finally {

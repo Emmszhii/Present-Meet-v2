@@ -28,6 +28,7 @@
     "express-session": "^1.17.3",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
+    "memorystore": "^1.6.7",
     "method-override": "^3.0.0",
     "mongoose": "^6.5.2",
     "mongoose-encryption": "^2.1.2",

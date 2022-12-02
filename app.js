@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const PORT = process.env.PORT || 3000;
 
@@ -26,6 +27,10 @@ app.use(express.json());
 // express session
 app.use(
   session({
+    cookie: { maxAge: 86400000 }, // 24hrs
+    store: new MemoryStore({
+      checkPeriod: 86400000, // prune expired entries every 24h
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,

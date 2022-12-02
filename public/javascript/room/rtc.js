@@ -617,17 +617,22 @@ const clearLocalTracks = () => {
 };
 
 const devices = async () => {
-  const devices = await AgoraRTC.getDevices();
+  try {
+    const devices = await AgoraRTC.getDevices();
 
-  devices.filter((item) => {
-    if (item.deviceId !== 'default' && item.deviceId !== 'communications')
-      localDevice.push(item);
-  });
+    devices.filter((item) => {
+      if (item.deviceId !== 'default' && item.deviceId !== 'communications')
+        localDevice.push(item);
+    });
 
-  localDevice.map((item) => {
-    if (item.kind === 'videoinput') video_devices.push(item);
-    if (item.kind === 'audioinput') audio_devices.push(item);
-  });
+    localDevice.map((item) => {
+      if (item.kind === 'videoinput') video_devices.push(item);
+      if (item.kind === 'audioinput') audio_devices.push(item);
+    });
+  } catch (e) {
+    console.log(e);
+    errorMsg(e.message);
+  }
 };
 
 export {

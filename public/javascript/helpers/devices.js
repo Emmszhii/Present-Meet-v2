@@ -2,7 +2,7 @@ const getCameraDevices = async () => {
   if (!navigator.mediaDevices.enumerateDevices)
     return `This App don't support the kind of devices you are using`;
 
-  const device = navigator.mediaDevices
+  const device = await navigator.mediaDevices
     .enumerateDevices()
     .then((device) => {
       const cameraDevice = [];
@@ -21,6 +21,34 @@ const getCameraDevices = async () => {
   return device;
 };
 
+const allVideoAndAudioDevices = async () => {
+  if (!navigator.mediaDevices.enumerateDevices)
+    return { err: `This App don't support the kind of devices you are using` };
+
+  try {
+    const allDevices = await navigator.mediaDevices.enumerateDevices();
+    if (!allDevices) return;
+
+    const filterDevices = [];
+    const audioDevices = [];
+    const videoDevices = [];
+    allDevices.map((item) => {
+      if (item.deviceId !== 'communications' && item.deviceId !== 'default')
+        filterDevices.push(item);
+    });
+
+    filterDevices.forEach((item) => {
+      if (item.kind === 'audioinput') audioDevices.push(item);
+      if (item.kind === 'videoinput') videoDevices.push(item);
+    });
+
+    const devices = { audioDevices, videoDevices };
+    return devices;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const removeOptions = (selectElement) => {
   let i,
     L = selectElement.options.length - 1;
@@ -29,4 +57,4 @@ const removeOptions = (selectElement) => {
   }
 };
 
-export { getCameraDevices, removeOptions };
+export { allVideoAndAudioDevices, getCameraDevices, removeOptions };

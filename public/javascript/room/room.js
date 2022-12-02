@@ -1,5 +1,5 @@
 import { tryCatchDeviceErr } from './error.js';
-import { errorMsg } from './msg.js';
+import { errorMsg, successMsg } from './msg.js';
 import {
   userData,
   device,
@@ -191,16 +191,22 @@ const createSelectElement = (name, val) => {
     const select = ['Audio', 'Video'];
     if (name === select[1]) {
       const dev = val.find((device) => device.label === e.target.value);
-      rtc.localTracks[1]
-        .setDevice(dev.deviceId)
-        .catch((e) => errorMsg(e.message));
+      rtc.localTracks[1].setDevice(dev.deviceId).catch(async (e) => {
+        const err = tryCatchDeviceErr(e.message);
+        console.log(err);
+        if (err[0]) return errorMsg(err[0].msg);
+        console.log(e.message);
+      });
       device.localVideo = dev.deviceId;
     }
     if (name === select[0]) {
       const dev = val.find((device) => device.label === e.target.value);
-      rtc.localTracks[0]
-        .setDevice(dev.deviceId)
-        .catch((e) => errorMsg(e.message));
+      rtc.localTracks[0].setDevice(dev.deviceId).catch((e) => {
+        const err = tryCatchDeviceErr(e.message);
+        console.log(err);
+        if (err[0]) return errorMsg(err[0].msg);
+        errorMsg(e.message);
+      });
       device.localAudio = dev.deviceId;
     }
   });
@@ -256,19 +262,20 @@ const settingsHandler = async () => {
     document.querySelector('.video__container').style.cursor = 'auto';
   }
   try {
-    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+    // successMsg('Please allow Camera and Audio to continue...');
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
     rtc.localTracks[1].play(`user-${userData.rtcId}`);
 
-    devices().then(() => {
-      const videoDom = document.getElementById('Video');
-      const audioDom = document.getElementById('Audio');
+    await devices();
 
-      if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
-      if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
+    const videoDom = document.getElementById('Video');
+    const audioDom = document.getElementById('Audio');
 
-      if (!videoDom) createSelectElement('Video', video_devices);
-      if (!audioDom) createSelectElement('Audio', audio_devices);
-    });
+    if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
+    if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
+
+    if (!videoDom) createSelectElement('Video', video_devices);
+    if (!audioDom) createSelectElement('Audio', audio_devices);
 
     document
       .getElementById('setup-btn')
@@ -278,12 +285,10 @@ const settingsHandler = async () => {
       .getElementById('refresh')
       .addEventListener('click', refreshDeviceModal);
   } catch (e) {
-    console.log(e.message);
-    const error = tryCatchDeviceErr(e.message);
-    console.log(error);
-    if (error) {
+    const err = tryCatchDeviceErr(e.message);
+    if (err[0]) {
       permissionDeniedDom();
-      return errorMsg(error.msg);
+      return errorMsg(err[0].msg);
     }
   } finally {
     document.querySelector('#loader_settings').style.display = 'none';

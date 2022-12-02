@@ -618,13 +618,13 @@ const clearLocalTracks = () => {
 
 const devices = async () => {
   try {
-    const devices = await AgoraRTC.getDevices();
+    const allDevice = await AgoraRTC.getDevices();
     if (!devices)
       return errorMsg(
         `Devices might be use by other app or access denied by the user`
       );
-
-    devices.filter((item) => {
+    console.log(allDevice);
+    allDevice.filter((item) => {
       if (item.deviceId !== 'default' && item.deviceId !== 'communications')
         localDevice.push(item);
     });

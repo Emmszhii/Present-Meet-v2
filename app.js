@@ -13,19 +13,6 @@ require('./config/passport')(passport);
 // DB config
 const db = require('./config/keys').MongoURI;
 
-// Connection to MongoDB
-mongoose
-  .connect(db, { useNewUrlParser: true })
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is up and listening on PORT ${PORT}`);
-    });
-    console.log(`MongoDB connected...`);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
 // EJS
 app.use(express.static('public'));
 app.use('/public/', express.static('./public'));
@@ -86,3 +73,16 @@ app.use(function (req, res, next) {
     message: `Nothing can be found here`,
   });
 });
+
+// Connection to MongoDB
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is up and listening on PORT ${PORT}`);
+    });
+    console.log(`MongoDB connected...`);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

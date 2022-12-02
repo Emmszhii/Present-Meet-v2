@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
@@ -11,9 +14,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": "16.17.0"
-  },
   "dependencies": {
     "agora-access-token": "^2.0.4",
     "bcrypt": "^5.0.1",

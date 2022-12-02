@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "present-meet",
   "builds": [
     {
       "src": "./app.js",

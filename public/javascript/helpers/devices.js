@@ -6,6 +6,7 @@ const getCameraDevices = async () => {
     .enumerateDevices()
     .then((device) => {
       const cameraDevice = [];
+
       for (const [index, camera] of device.entries()) {
         if (camera.kind === 'videoinput') cameraDevice.push(camera);
       }

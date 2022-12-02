@@ -173,6 +173,7 @@ const photoHandler = async () => {
   loader();
   try {
     const { threshold } = await getThreshold();
+    console.log(threshold);
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
     const displaySize = { width: video.width, height: video.height };

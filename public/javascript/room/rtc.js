@@ -23,7 +23,6 @@ import {
   setUserToFirstChild,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
-import { faceRecognitionHandler } from './face_recognition.js';
 import { errorMsg } from './msg.js';
 import { student, teacher, deleteIdInArr } from './excel.js';
 
@@ -94,6 +93,7 @@ const data_init = async () => {
     userData.type = type;
     userData.APP_ID = AGORA_APP_ID;
     userData.firstName = first_name;
+    userData.middleName = middle_name;
     userData.lastName = last_name;
     userData.fullName = `${first_name} ${last_name}`;
     userData.id = _id;
@@ -178,7 +178,7 @@ const joinRoomInit = async () => {
 
 const volumeIndicator = async (user) => {
   const streams = document.getElementById('streams__container');
-  user.forEach((volume, index) => {
+  user.forEach((volume) => {
     const uid = volume.uid;
     const level = volume.level;
     const userContainer = document.getElementById(`user-container-${uid}`);
@@ -247,11 +247,16 @@ const handleUserPublished = async (user, mediaType) => {
     }
   } catch (err) {
     const arrErr = [
-      `rtc.js:250 Cannot read properties of undefined (reading 'play')`,
-      `Cannot read properties of undefined (reading 'play')`,
+      {
+        err: `rtc.js:250 Cannot read properties of undefined (reading 'play')`,
+        msg: ``,
+      },
+      { err: `Cannot read properties of undefined (reading 'play')`, msg: `` },
+      { err: `user.videoTrack is undefined`, msg: `` },
     ];
-    if (arrErr.includes(err.message)) return;
-    console.log(err.message);
+    arrErr.map((item) => {
+      if (item.err.includes(err.message)) errorMsg(item.msg);
+    });
   }
 };
 
@@ -547,9 +552,6 @@ const joinStream = async () => {
     arrError.map((arr) => {
       if (arr.err.includes(err.message)) return errorMsg(arr.msg);
     });
-    // if (arrError.err.includes(err.message)) {
-    //   errorMsg();
-    // }
   } finally {
     roomLoaderHandler();
   }
@@ -568,6 +570,7 @@ const videoTrackEnded = async () => {
 // leave stream
 const leaveStream = async (e) => {
   e.preventDefault();
+  const user = document.getElementById(`user-container-${userData.rtcId}`);
 
   document.getElementById('camera-btn').classList.remove('active');
   document.getElementById('mic-btn').classList.remove('active');
@@ -575,7 +578,11 @@ const leaveStream = async (e) => {
   document.getElementsByClassName('middleBtn')[0].style.display = 'none';
   document.getElementById('settings-btn').style.display = 'block';
 
-  await rtc.client.unpublish([rtc.localTracks[0], rtc.localTracks[1]]);
+  await rtc.client
+    .unpublish([rtc.localTracks[0], rtc.localTracks[1]])
+    .catch((e) => {
+      console.log(e.message);
+    });
 
   leaveLocalAttributeKey();
   clearLocalTracks();
@@ -588,7 +595,6 @@ const leaveStream = async (e) => {
     screenBtn.classList.remove('active');
   }
 
-  const user = document.getElementById(`user-container-${userData.rtcId}`);
   if (user) user.remove();
 
   if (userIdInDisplayFrame.val === `user-container-${userData.rtcId}`) {
@@ -610,11 +616,13 @@ const clearLocalTracks = () => {
 };
 
 const devices = async () => {
-  const device = await AgoraRTC.getDevices();
-  device.filter((item) => {
+  const devices = await AgoraRTC.getDevices();
+
+  devices.filter((item) => {
     if (item.deviceId !== 'default' && item.deviceId !== 'communications')
       localDevice.push(item);
   });
+
   localDevice.map((item) => {
     if (item.kind === 'videoinput') video_devices.push(item);
     if (item.kind === 'audioinput') audio_devices.push(item);

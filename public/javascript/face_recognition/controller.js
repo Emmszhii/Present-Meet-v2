@@ -23,11 +23,12 @@ document
   .getElementById('camera_device')
   .addEventListener('change', onChangeCameraDevice);
 
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
+    faceapi.nets.faceExpressionNet.loadFromUri('/models'),
     fetchPrevDescriptor(),
   ])
     .then(async () => {

@@ -1,3 +1,4 @@
+import { tryCatchDeviceErr } from './error.js';
 import { errorMsg } from './msg.js';
 import {
   userData,
@@ -14,7 +15,6 @@ import {
 import { notificationMsg } from './rtm.js';
 
 // getting meeting Link
-
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
@@ -31,7 +31,7 @@ const userIdInDisplayFrame = { val: null };
 
 const checkIfUserIsMobileHandler = () => {
   const isMobile = window.matchMedia(
-    'only screen and (max-width:1000px)'
+    'only screen and (max-width:900px)'
   ).matches;
 
   const screenBtn = document.getElementById('screen-btn');
@@ -41,7 +41,6 @@ const checkIfUserIsMobileHandler = () => {
 const checkIfUserDom = (id, name) => {
   const user = document.getElementById(`user-container-${id}`);
   if (!user) {
-    // add the player into the DOM
     document
       .getElementById('streams__container')
       .insertAdjacentHTML('beforeend', player(id, name));
@@ -192,12 +191,16 @@ const createSelectElement = (name, val) => {
     const select = ['Audio', 'Video'];
     if (name === select[1]) {
       const dev = val.find((device) => device.label === e.target.value);
-      rtc.localTracks[1].setDevice(dev.deviceId).catch((e) => console.log(e));
+      rtc.localTracks[1]
+        .setDevice(dev.deviceId)
+        .catch((e) => errorMsg(e.message));
       device.localVideo = dev.deviceId;
     }
     if (name === select[0]) {
       const dev = val.find((device) => device.label === e.target.value);
-      rtc.localTracks[0].setDevice(dev.deviceId).catch((e) => console.log(e));
+      rtc.localTracks[0]
+        .setDevice(dev.deviceId)
+        .catch((e) => errorMsg(e.message));
       device.localAudio = dev.deviceId;
     }
   });
@@ -241,11 +244,10 @@ const settings_dom = () => {
 };
 
 const settingsHandler = async () => {
-  // const dom = document.querySelector(`.videoCall`);
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
-
   const playerDom = document.getElementById(`user-container-${userData.rtcId}`);
+
   if (!playerDom) {
     document
       .getElementById('video-settings')
@@ -255,14 +257,16 @@ const settingsHandler = async () => {
   }
   try {
     rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-    rtc.localTracks[1].play(`user-${userData.rtcId}`);
+
+    await rtc.localTracks[1].play(`user-${userData.rtcId}`);
 
     devices().then(() => {
+      const videoDom = document.getElementById('Video');
+      const audioDom = document.getElementById('Audio');
+
       if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
       if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
 
-      const videoDom = document.getElementById('Video');
-      const audioDom = document.getElementById('Audio');
       if (!videoDom) createSelectElement('Video', video_devices);
       if (!audioDom) createSelectElement('Audio', audio_devices);
     });
@@ -275,23 +279,13 @@ const settingsHandler = async () => {
       .getElementById('refresh')
       .addEventListener('click', refreshDeviceModal);
   } catch (e) {
-    const arrErr = [
-      {
-        err: 'AgoraRTCError PERMISSION_DENIED: NotAllowedError: Permission denied',
-        msg: `Permission to share user audio, video, stream are denied by user. User may not able to stream their audio, video, and stream`,
-      },
-      {
-        err: `AgoraRTCError NOT_READABLE: NotReadableError: Could not start video source`,
-        msg: `Device might be in used by other application`,
-      },
-    ];
-
-    arrErr.map((arr) => {
-      if (arr.err === e.message) {
-        permissionDeniedDom();
-        return errorMsg(arr.msg);
-      }
-    });
+    console.log(e.message);
+    const error = tryCatchDeviceErr(e.message);
+    console.log(error);
+    if (error) {
+      permissionDeniedDom();
+      return errorMsg(error.msg);
+    }
   } finally {
     document.querySelector('#loader_settings').style.display = 'none';
   }
@@ -305,14 +299,11 @@ const setupBtnOnClick = () => {
 
 const permissionDeniedDom = () => {
   const dom = document.querySelector('.text_settings');
-  // const joinBtn = document.getElementById('join-btn');
   const setupBtn = document.getElementById('setup-btn');
   const settingBtn = document.getElementById('settings-btn');
 
   if (dom)
     dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
-
-  // if (joinBtn) joinBtn.style.display = 'none';
   if (setupBtn)
     setupBtn.addEventListener('click', () => {
       document.getElementById('modal-settings').remove();
@@ -349,7 +340,6 @@ const muteStream = async () => {
 
 const raiseHand = async (e) => {
   const btn = e.currentTarget;
-
   if (btn.classList.contains('active')) {
     btn.classList.toggle('active');
     rtm.channel.sendMessage({

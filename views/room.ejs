@@ -10,6 +10,8 @@
       type="image/x-icon"
     />
     <title>Present Meet</title>
+    <link rel="stylesheet" href="css/room.css" />
+    <link rel="stylesheet" href="css/icon.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
@@ -17,9 +19,10 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.0/package/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="css/room.css" />
-    <link rel="stylesheet" href="css/icon.css" />
+    <script
+      defer
+      src="https://cdn.sheetjs.com/xlsx-0.19.0/package/dist/xlsx.full.min.js"
+    ></script>
     <script
       defer
       type="text/javascript"
@@ -36,8 +39,6 @@
   </head>
   <body>
     <div class="svg_spinner" id="room_loader"></div>
-
-    <!-- <div class="videoCall"> -->
     <div class="streams">
       <section id="stream__container">
         <div id="stream__box"></div>
@@ -48,7 +49,6 @@
         </div>
       </section>
     </div>
-
     <section id="messages__container" style="display: none">
       <div id="messages"></div>
       <form id="message__form">
@@ -60,7 +60,6 @@
         />
       </form>
     </section>
-
     <section id="members__container" style="display: block">
       <div id="members__header">
         <p>Participants</p>
@@ -72,9 +71,7 @@
     <div class="footerBtn">
       <div class="videoLink">
         <!-- Button for copying the room ID -->
-        <button class="icon copy" id="link-btn" type="button">
-          <!-- <i class="fa-solid fa-copy"></i> -->
-        </button>
+        <button class="icon copy" id="link-btn" type="button"></button>
         <!-- Left side for the ink of the room -->
         <p class="link"></p>
       </div>
@@ -92,7 +89,6 @@
         <button class="button" id="raise-hand">
           <i class="fa-solid fa-hand"></i>
         </button>
-        <!-- <button><i class="fa-solid fa-ellipsis-vertical"></i></button> -->
         <button class="button" id="leave-btn">
           <i class="fa-solid fa-phone"></i>
         </button>
@@ -114,6 +110,5 @@
         </button>
       </div>
     </div>
-    <!-- </div> -->
   </body>
 </html>

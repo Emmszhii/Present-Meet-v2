@@ -74,7 +74,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('load', async () => {
+const appInitialize = () => {
   checkMeetingId();
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
@@ -84,12 +84,16 @@ window.addEventListener('load', async () => {
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    faceapi.nets.faceExpressionNet.loadFromUri('/models'),
     data_init(),
   ])
     .then(() => {
+      window.stop();
       console.log(`face api js success`);
     })
     .catch((err) => {
       console.log(err);
     });
-});
+};
+
+window.addEventListener('DOMContentLoaded', appInitialize);

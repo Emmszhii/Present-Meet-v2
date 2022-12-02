@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "save": "git add . && git commit -m `fix` && git push -u origin main && git push heroku main"
+    "save": "git add . && git commit -m `fix` && git push -u origin main && git push heroku main",
+    "github": "git add . && git commit -m 'fix' && git push -u origin main"
   },
   "keywords": [],
   "author": "",

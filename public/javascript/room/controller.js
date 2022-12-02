@@ -88,7 +88,6 @@ const appInitialize = () => {
     data_init(),
   ])
     .then(() => {
-      window.stop();
       console.log(`face api js success`);
     })
     .catch((err) => {

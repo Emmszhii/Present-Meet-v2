@@ -27,6 +27,7 @@ const attendanceSchema = new mongoose.Schema(
   {
     present: Array,
     late: Array,
+    emotions: Array,
   },
   { timestamps: true }
 );

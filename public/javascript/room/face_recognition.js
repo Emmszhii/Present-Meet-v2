@@ -3,6 +3,7 @@ import { getRequest } from '../helpers/helpers.js';
 import { errorMsg, successMsg, warningMsg } from './msg.js';
 import { muteStream } from './room.js';
 import { getCameraDevices } from '../helpers/devices.js';
+import { returnExpressions } from '../helpers/functions.js';
 
 const useTinyModel = true;
 let track;
@@ -265,7 +266,9 @@ const faceRecognized = async () => {
     const float = descriptor.split(',');
     const descriptorDb = new Float32Array(float);
 
-    // if (query[0].descriptor) {
+    const expression = returnExpressions(query.expressions);
+    console.log(expression);
+
     const dist = await faceapi.euclideanDistance(
       descriptorDb,
       query[0].descriptor
@@ -275,7 +278,6 @@ const faceRecognized = async () => {
       successMsg(`User match`);
       sendAttendance({
         descriptor: query[0].descriptor.join(','),
-
         displayName: userData.fullName,
         id: userData._id,
         restrict,
@@ -284,7 +286,6 @@ const faceRecognized = async () => {
     } else {
       errorMsg('Not match. Please try again.');
     }
-    // }
   } catch (e) {
     if (!video)
       return errorMsg('Please start camera first to use face recognition');

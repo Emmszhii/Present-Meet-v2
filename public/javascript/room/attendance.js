@@ -246,7 +246,6 @@ const createAttendanceHandler = async () => {
       userData.classroom_id = id;
       const postData = { meetingId, id };
       const { data, msg, err } = await postRequest(url, postData);
-      console.log(data, msg, err);
       return { err, msg, data };
     } else {
       const postData = { meetingId };

@@ -14,7 +14,6 @@ import {
 } from './rtc.js';
 import { notificationMsg } from './rtm.js';
 
-// getting meeting Link
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
@@ -24,7 +23,6 @@ const checkMeetingId = () => {
   if (!id) window.location.href = '*';
 };
 
-// Expand Video Frame on Click
 let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
 const userIdInDisplayFrame = { val: null };
@@ -50,7 +48,6 @@ const checkIfUserDom = (id, name) => {
   }
 };
 
-// Expand VideoFrame Function
 const expandVideoFrame = (e) => {
   let child = displayFrame.children[0];
   if (child) document.getElementById('streams__container').appendChild(child);
@@ -87,7 +84,6 @@ const resetTheFrames = () => {
   }
 };
 
-// Copy Meeting ID function
 const copyClipboard = (e) => {
   const btn = e.currentTarget;
   const link = window.location.href;

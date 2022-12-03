@@ -24,7 +24,6 @@ router.post(
   async (req, res) => {
     const restrict = req.params.restrict;
     const { meetingId, id: classId } = req.body;
-
     if (restrict !== 'on' && restrict !== 'off')
       return res.status(400).json({ err: `Invalid restriction request` });
     if (!meetingId)
@@ -36,6 +35,7 @@ router.post(
         if (!teacher) return res.status(400).json({ err: `Invalid request` });
         const classroom = await Classroom.findOne({ _id: classId });
         if (!classroom) return res.status(400).json({ err: `Invalid request` });
+
         if (classroom.students.length === 0)
           return res.status(400).json({ err: `No student(s) registered` });
 
@@ -57,6 +57,7 @@ router.post(
         res.status(200).json({ msg: `Not yet implemented` });
       }
     } catch (e) {
+      res.status(400).json({ err: `Something went wrong` });
       console.log(e);
     }
   }
@@ -114,7 +115,7 @@ router.post('/student-attendance', ensureAuthenticated, async (req, res) => {
     path: 'students',
     match: { _id: student_id },
   });
-
+  console.log(student);
   const queryStudent = student.students[0]._id;
   if (!queryStudent) return res.status(400).json({ err: `Invalid student` });
 

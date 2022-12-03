@@ -110,7 +110,6 @@ const data_init = async () => {
     console.log(err);
   } finally {
     joinRoomInit();
-    window.stop();
   }
 };
 

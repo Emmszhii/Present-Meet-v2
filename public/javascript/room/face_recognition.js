@@ -164,10 +164,7 @@ const startCamera = async () => {
       video.autoplay = true;
       video.muted = true;
       document.querySelector('.face_container').append(video);
-
       video.srcObject = stream;
-
-      if (backend === 'webgl') face_detection();
       track = stream.getTracks();
     } else {
       errorMsg('Something went wrong on the camera');
@@ -215,10 +212,6 @@ const changeDeviceHandler = async (e) => {
   }
 };
 
-const face_detection = () => {
-  console.log(`run`);
-};
-
 const stopCamera = () => {
   const video = document.getElementById('video');
   if (video) {
@@ -260,6 +253,7 @@ const faceRecognized = async () => {
     const query = await faceapi
       .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
       .withFaceLandmarks(useTinyModel)
+      .withFaceExpressions()
       .withFaceDescriptors();
 
     if (query.length === 0 || query.length > 1) {
@@ -281,6 +275,7 @@ const faceRecognized = async () => {
       successMsg(`User match`);
       sendAttendance({
         descriptor: query[0].descriptor.join(','),
+
         displayName: userData.fullName,
         id: userData._id,
         restrict,

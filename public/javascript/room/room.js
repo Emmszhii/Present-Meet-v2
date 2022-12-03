@@ -253,17 +253,20 @@ const settingsHandler = async () => {
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
   const playerDom = document.getElementById(`user-container-${userData.rtcId}`);
-
-  if (!playerDom) {
-    document
-      .getElementById('video-settings')
-      .insertAdjacentHTML('beforeend', player(userData.rtcId, ''));
-
-    document.querySelector('.video__container').style.cursor = 'auto';
-  }
   try {
-    // successMsg('Please allow Camera and Audio to continue...');
-    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({}, {});
+    if (!playerDom) {
+      document
+        .getElementById('video-settings')
+        .insertAdjacentHTML('beforeend', player(userData.rtcId, ''));
+
+      document.querySelector('.video__container').style.cursor = 'auto';
+    }
+
+    successMsg(
+      'If stuck at loading please either allow or deny access to the camera and audio manually'
+    );
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+
     rtc.localTracks[1].play(`user-${userData.rtcId}`);
 
     await devices();
@@ -291,6 +294,7 @@ const settingsHandler = async () => {
       return errorMsg(err[0].msg);
     }
   } finally {
+    window.stop();
     document.querySelector('#loader_settings').style.display = 'none';
   }
 };

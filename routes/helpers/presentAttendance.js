@@ -61,13 +61,14 @@ const restrictMultipleAttendance = async (classId) => {
     });
   let err;
   const { minutes, seconds, msg } = classroom;
-  if (msg) err = `none`;
 
-  if (minutes < 15)
+  if (minutes < 15) {
     err = `Request Timeout! Request again after ${15 - minutes} minute(s)`;
-
-  if (seconds > 60 && seconds <= 60)
+  } else if (seconds > 60 && seconds <= 60) {
     err = `Request Timeout! Request again after ${60 - seconds} second(s)`;
+  } else if (msg === `ok`) {
+    err = 'none';
+  }
 
   return { err };
 };

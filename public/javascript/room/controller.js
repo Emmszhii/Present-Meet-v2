@@ -19,6 +19,7 @@ import {
   raiseHand,
   checkIfUserIsMobileHandler,
   checkMeetingId,
+  visibilityChangeHandler,
 } from './room.js';
 
 // Event Listeners
@@ -92,7 +93,11 @@ const appInitialize = () => {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      window.stop();
     });
 };
 
 window.addEventListener('DOMContentLoaded', appInitialize);
+window.addEventListener('visibilitychange', visibilityChangeHandler, false);

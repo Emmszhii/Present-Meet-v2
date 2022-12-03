@@ -669,8 +669,58 @@ select {
   padding: 5px 10px;
   color: black;
 }
-
 /* End face recognition */
+/* switch */
+.toggle-settings {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 65%;
+  height: 100%;
+  text-align: center;
+  margin: 10px;
+}
+.switch {
+  position: relative;
+  width: 70%;
+  height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.switch label {
+  width: 55px;
+  height: 23px;
+  background-color: #999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50px;
+}
+.switch input[type='checkbox'] {
+  visibility: hidden;
+}
+.switch label:after {
+  content: '';
+  width: 21px;
+  height: 21px;
+  border-radius: 50px;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: 100ms;
+  background-color: white;
+}
+.switch .look:checked + label:after {
+  left: 32px;
+  background-color: green;
+}
+.switch .look:checked + label {
+  background-color: lightsteelblue;
+}
+/* End switch */
 /* responsiveness for mobile */
 @media (max-width: 1600px) {
   .settings-modal {

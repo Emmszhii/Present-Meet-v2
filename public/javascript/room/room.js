@@ -13,6 +13,7 @@ import {
   rtm,
 } from './rtc.js';
 import { notificationMsg } from './rtm.js';
+import { switchHandler } from './switch.js';
 
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
@@ -238,6 +239,7 @@ const settings_dom = () => {
         <h3>Settings</h3>
         <div id="video-settings"></div>
         <div id="devices-settings"></div>
+        <div class='toggle-settings' id='toggle-settings'></div>
         <span class='text_settings'>Here's the devices available in your setup!</span>
         <button class="button_box" type="button" id="setup-btn">Done</button>
       </div>
@@ -276,6 +278,9 @@ const settingsHandler = async () => {
     if (!videoDom) createSelectElement('Video', video_devices);
     if (!audioDom) createSelectElement('Audio', audio_devices);
 
+    switchHandler('toggle-settings', 'audio-switch');
+    switchHandler('toggle-settings', 'camera-switch');
+
     document
       .getElementById('setup-btn')
       .addEventListener('click', setupBtnOnClick);
@@ -290,7 +295,6 @@ const settingsHandler = async () => {
       return errorMsg(err[0].msg);
     }
   } finally {
-    window.stop();
     document.querySelector('#loader_settings').style.display = 'none';
   }
 };
@@ -365,6 +369,11 @@ const raiseHand = async (e) => {
   }
 };
 
+const visibilityChangeHandler = async () => {
+  if (!rtc.localTracks[0].muted) await rtc.localTracks[0].setMuted(true);
+  if (!rtc.localTracks[1].muted) await rtc.localTracks[1].setMuted(true);
+};
+
 export {
   displayFrame,
   videoFrames,
@@ -387,4 +396,5 @@ export {
   checkIfUserIsMobileHandler,
   setUserToFirstChild,
   checkMeetingId,
+  visibilityChangeHandler,
 };

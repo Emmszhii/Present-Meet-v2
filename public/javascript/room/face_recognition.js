@@ -266,8 +266,11 @@ const faceRecognized = async () => {
     const float = descriptor.split(',');
     const descriptorDb = new Float32Array(float);
 
-    const expression = returnExpressions(query.expressions);
+    const expressionObj = returnExpressions(query[0].expressions);
+    const { max } = expressionObj;
+    const expression = max;
     console.log(expression);
+    console.log(expressionObj);
 
     const dist = await faceapi.euclideanDistance(
       descriptorDb,

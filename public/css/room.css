@@ -177,6 +177,9 @@ body {
   cursor: pointer;
   font-size: 1.2rem;
 }
+.link {
+  font-size: 1rem;
+}
 .mainBtn {
   display: flex;
   position: absolute;
@@ -677,7 +680,7 @@ select {
   gap: 10px;
   justify-content: space-evenly;
   align-items: center;
-  width: 65%;
+  width: 70%;
   height: 100%;
   text-align: center;
   margin: 10px;
@@ -726,6 +729,9 @@ select {
   .settings-modal {
     width: 40%;
   }
+  .toggle-settings {
+    width: 50%;
+  }
 }
 @media (max-width: 1366px) {
   .middleBtn {
@@ -750,6 +756,17 @@ select {
   }
   #stream__box {
     height: 85vh;
+  }
+  .toggle-settings {
+    width: 45%;
+  }
+}
+@media (max-width: 1000px) {
+  .link {
+    display: none;
+  }
+  .toggle-settings {
+    width: 70%;
   }
 }
 @media (max-width: 768px) {
@@ -779,8 +796,8 @@ select {
   .modal_face_content {
     width: 90%;
   }
-  .link {
-    font-size: 0.9rem;
+  .videoLink {
+    width: 10%;
   }
   #link-btn {
     width: 40px;
@@ -792,13 +809,13 @@ select {
     width: 90%;
   }
   .videoLink {
-    width: 28%;
+    width: 10%;
   }
   .mainBtn > button {
     font-size: 0.9rem;
     padding: 3px 8px;
   }
-  .link {
-    font-size: 0.8rem;
+  .toggle-settings {
+    width: 75%;
   }
 }

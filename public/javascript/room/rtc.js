@@ -28,50 +28,31 @@ import { student, teacher, deleteIdInArr } from './excel.js';
 import { allVideoAndAudioDevices } from '../helpers/devices.js';
 import { tryCatchDeviceErr } from './error.js';
 import { checkDeviceMuted } from './switch.js';
-
-// User Local Data and Tokens
-const userData = {};
-
-// User Local Devices
-const localDevice = [];
+const userData = {}; // User Local Data and Tokens
+const localDevice = []; // User Local Devices
 const video_devices = [];
 const audio_devices = [];
-
-// selected device
 const device = {
-  localAudio: null,
+  localAudio: null, // selected device
   localVideo: null,
   boolAudio: true,
   boolVideo: true,
+  joined: false,
 };
-
-// rtc API
 const rtc = {
-  // rtc.client
-  client: null,
-  // rtc local audio
+  client: null, // rtc API
   localAudioTrack: null,
-  // rtc local video
   localVideoTrack: null,
-  // rtc local tracks
   localTracks: null,
-  // rtc local screen track
+  dummyTracks: null,
   localScreenTracks: null,
-  // rtc boolean screen share
   sharingScreen: false,
 };
-
-// rtm API
 const rtm = {
-  // rtm.client
   client: null,
   channel: null,
 };
-
-// remote users
-const remoteUsers = {};
-
-// player DOM element
+const remoteUsers = {}; // remote users
 const player = (uid, name) => {
   return `
     <div class="video__container" id="user-container-${uid}">
@@ -81,15 +62,13 @@ const player = (uid, name) => {
         <p>${name}</p>
       </div>
     </div>
-    `;
+    `; // player DOM element
 };
-
 const getRtcToken = async () => {
   const url = `/rtc/${meetingId}/publisher/uid/${userData.rtcId}`;
   const data = await getRequest(url);
   return data;
 };
-
 const data_init = async () => {
   try {
     const infoUrl = `/getInfo`;
@@ -104,6 +83,7 @@ const data_init = async () => {
     userData.id = _id;
     userData.rtcId = _id;
     userData.rtmId = _id;
+    userData.dummyId = _id + 'a';
     const rtcUrl = `/rtc/${meetingId}/publisher/uid`;
     const { rtcToken } = await getRequest(rtcUrl);
     userData.rtcToken = rtcToken;
@@ -117,68 +97,42 @@ const data_init = async () => {
   }
 };
 
-// initializing the agora sdk for joining the room and validating the user token for security joining
 const joinRoomInit = async () => {
   if (userData.type === 'teacher') makeAttendanceHandler();
-
-  // letting rtc.client become the instance with APP_ID
   rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {
     logFilter: AgoraRTM.LOG_FILTER_WARNING,
   });
-
-  // option to login into RTM
   const rtmOption = {
     uid: userData.rtmId,
     token: userData.rtmToken,
   };
-
-  // login to the rtm with user id and rtmToken
   await rtm.client.login(rtmOption);
-
-  // give the name of the local user to remote users
   await rtm.client.addOrUpdateLocalUserAttributes({
     name: userData.fullName,
     rtcId: userData.rtcId,
   });
-
-  // create channel with meetingId
   rtm.channel = await rtm.client.createChannel(meetingId);
-
-  // join RTM
   await rtm.channel.join();
-
-  // setting the rtm channel on with handlers
   await rtm.channel.on('MemberJoined', handleMemberJoin);
   await rtm.channel.on('MemberLeft', handleMemberLeft);
   await rtm.channel.on('ChannelMessage', handleChannelMessage);
   await rtm.channel.on('token-privilege-will-expire', handleRtmTokenExpire);
-
   // get all members in render it to the dom
   getMembers();
-
-  // initialize setting the rtc
-  rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-
-  // join rtc with the params info
+  rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' }); // initialize setting the rtc
   await rtc.client.join(
     userData.APP_ID,
     meetingId,
     userData.rtcToken,
     userData.rtcId
-  );
-
-  // on user publish and left method
+  ); // join rtc with the params info
   await rtc.client.on('user-published', handleUserPublished);
   await rtc.client.on('user-left', handleUserLeft);
   await rtc.client.enableAudioVolumeIndicator();
   await rtc.client.on('volume-indicator', volumeIndicator);
-  await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire);
-
-  // set the users camera and mic
-  settingsHandler();
-
-  // if All are loaded loader will be gone
-  roomLoaderHandler();
+  await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
+  settingsHandler(); // set the users camera and mic
+  roomLoaderHandler(); // if All are loaded loader will be gone
 };
 
 const volumeIndicator = async (user) => {
@@ -206,17 +160,10 @@ const handleRtcTokenExpire = async () => {
   }
 };
 
-// user joined the meeting handler
 const handleUserPublished = async (user, mediaType) => {
-  // set remote users as user
-  remoteUsers[user.uid] = user;
-
-  // subscribe to the meeting
-  await rtc.client.subscribe(user, mediaType);
-
-  //
+  remoteUsers[user.uid] = user; // set remote users as user
+  await rtc.client.subscribe(user, mediaType); // subscribe to the meeting
   const playerDom = document.getElementById(`user-container-${user.uid}`);
-  // if player is null then run it
   if (playerDom === null) {
     let name;
     for (let i = 0; users.length > i; i++) {
@@ -232,7 +179,7 @@ const handleUserPublished = async (user, mediaType) => {
     document
       .getElementById(`user-container-${user.uid}`)
       .addEventListener('click', expandVideoFrame);
-  }
+  } // if player is null then run it
 
   // if big screen is true let the other users resize their screen
   if (displayFrame.style.display) {
@@ -242,84 +189,83 @@ const handleUserPublished = async (user, mediaType) => {
   }
 
   try {
-    // if media is VIDEO play their video in stream container
-    if (mediaType === 'video') {
-      user.videoTrack.play(`user-${user.uid}`);
-    }
-    // if media is AUDIO play their audio
-    if (mediaType === 'audio') {
-      user.audioTrack.play();
-    }
+    if (mediaType === 'video') user.videoTrack.play(`user-${user.uid}`); // if media is VIDEO play their video in stream container
+    if (mediaType === 'audio') user.audioTrack.play(); // if media is AUDIO play their audio
   } catch (e) {
     const arrErr = tryCatchDeviceErr(e.message);
-    if (arrErr[0].err && arrErr[0].msg) errorMsg(arrErr[0].msg);
+    if (arrErr[0].err && arrErr[0].msg) return errorMsg(arrErr[0].msg);
+    console.log(e.message);
   }
-};
+}; // user joined the meeting handler
 
-// user left the meeting
 const handleUserLeft = async (user) => {
-  // delete a remote user with their uid
-  delete remoteUsers[user.uid];
-
-  // delete the dom of the user uid who left
-  const item = document.getElementById(`user-container-${user.uid}`);
+  delete remoteUsers[user.uid]; // delete a remote user with their uid
+  const item = document.getElementById(`user-container-${user.uid}`); // delete the dom of the user uid who left
   if (item) item.remove();
-
   if (userIdInDisplayFrame.val === `user-container-${user.uid}`) {
-    // if user is on big display and left delete it
-    displayFrame.style.display = null;
-    // reset user frames
-    resetTheFrames();
+    displayFrame.style.display = null; // if user is on big display and left delete it
+    resetTheFrames(); // reset user frames
   }
-
   deleteIdInArr(user.uid);
-};
+}; // user left the meeting
 
 // Camera function
 const toggleCamera = async (e) => {
-  if (!device.localVideo) return errorMsg('No camera device detected');
-  const button = e.currentTarget;
   try {
-    // rtc video muting
+    if (!device.localVideo) return errorMsg('No camera device detected');
+    const button = e.currentTarget;
     if (rtc.localTracks[1].muted) {
       await rtc.localTracks[1].setMuted(false);
       await rtm.channel.sendMessage({
         text: JSON.stringify({ type: 'active_camera', _id: userData.id }),
       });
       setUserToFirstChild(userData.id);
+      device.boolVideo = true;
       button.classList.add('active');
     } else {
       await rtc.localTracks[1].setMuted(true);
       button.classList.remove('active');
-    }
+      device.boolVideo = false;
+    } // rtc video muting
   } catch (err) {
     console.log(err);
+  }
+};
+const setCameraToggle = async (boolCamera) => {
+  try {
+    await rtc.localTracks[1].setMuted(boolCamera);
+  } catch (e) {
+    console.log(e);
+  }
+};
+const setAudioToggle = async (boolAudio) => {
+  try {
+    await rtc.localTracks[0].setMuted(boolAudio);
+  } catch (e) {
+    console.log(e);
   }
 };
 // Audio function
 const toggleMic = async (e) => {
-  if (!device.localAudio) return errorMsg('No microphone device detected');
-  const button = e.currentTarget;
-
   try {
-    // rtc audio muting
+    if (!device.localAudio) return errorMsg('No microphone device detected');
+    const button = e.currentTarget;
     if (rtc.localTracks[0].muted) {
       await rtc.localTracks[0].setMuted(false);
       button.classList.add('active');
+      device.boolAudio = true;
     } else {
       await rtc.localTracks[0].setMuted(true);
       button.classList.remove('active');
-    }
+      device.boolAudio = false;
+    } // rtc audio muting
   } catch (err) {
     console.log(err);
   }
 };
 
-// After disabling the share screen function then switch to Camera
 const switchToCamera = async () => {
-  // reset the Display Frame
-  displayFrame.style.display = null;
-
+  displayFrame.style.display = null; // reset the Display Frame
   // add the local user in the dom
   document
     .getElementById('streams__container')
@@ -327,21 +273,15 @@ const switchToCamera = async () => {
   document
     .getElementById(`user-container-${userData.rtcId}`)
     .addEventListener('click', expandVideoFrame);
-
   // mute the local tracks of the user
   if (rtc.localTracks[0]) await rtc.localTracks[0].setMuted(true);
   if (rtc.localTracks[1]) await rtc.localTracks[1].setMuted(true);
-
   // removing the active class
   document.getElementById(`mic-btn`).classList.remove('active');
   document.getElementById(`screen-btn`).classList.remove('active');
-
-  // play the user video
-  rtc.localTracks[1].play(`user-${userData.rtcId}`);
-
-  // publish the video
-  await rtc.client.publish([rtc.localTracks[1]]);
-};
+  rtc.localTracks[1].play(`user-${userData.rtcId}`); // play the user video
+  await rtc.client.publish([rtc.localTracks[1]]); // publish the video
+}; // After disabling the share screen function then switch to Camera
 
 // stop share screen handler
 const handleStopShareScreen = async () => {
@@ -350,18 +290,13 @@ const handleStopShareScreen = async () => {
   if (screenBtn.classList.contains('active'))
     screenBtn.classList.remove('active');
 
-  // remove the local screen tracks to the dom
-  document.getElementById(`user-container-${userData.rtcId}`).remove();
+  document.getElementById(`user-container-${userData.rtcId}`).remove(); // remove the local screen tracks to the dom
 
   //unpublish the local screen tracks
   await rtc.client.unpublish([rtc.localScreenTracks]);
   await rtc.localScreenTracks.close();
-
-  // reset users frame
-  resetTheFrames();
-  // then switch to camera
-  switchToCamera();
-
+  resetTheFrames(); // reset users frame
+  switchToCamera(); // then switch to camera
   rtm.channel.sendMessage({
     text: JSON.stringify({
       type: 'user_screen_share_close',
@@ -372,16 +307,12 @@ const handleStopShareScreen = async () => {
 
 const successShareScreen = async () => {
   try {
-    // remove the local video screen
-    const userDom = document.getElementById(`user-container-${userData.rtcId}`);
-
+    const userDom = document.getElementById(`user-container-${userData.rtcId}`); // remove the local video screen
     rtc.sharingScreen = true;
     screenBtn.classList.add('active');
     cameraBtn.classList.remove('active');
     cameraBtn.style.display = 'none';
-
     if (userDom) userDom.remove();
-
     // display in big frame the player dom
     displayFrame.style.display = ' block';
     displayFrame.insertAdjacentHTML(
@@ -391,22 +322,16 @@ const successShareScreen = async () => {
     document
       .getElementById(`user-container-${userData.rtcId}`)
       .addEventListener('click', expandVideoFrame);
-
-    //
     userIdInDisplayFrame.val = `user-container-${userData.rtcId}`;
     rtc.localScreenTracks.play(`user-${userData.rtcId}`);
-
     // unpublish the video track
     const videoTrack = rtc.localTracks[1] || null;
     if (videoTrack) await rtc.client.unpublish([rtc.localTracks[1]]);
+    resetTheFrames(); // reset each user Frames
 
-    // reset each user Frames
-    resetTheFrames();
-
-    // sending my uid to make viewer view my local screen track
     rtm.channel.sendMessage({
       text: JSON.stringify({ type: 'user_screen_share', uid: userData.rtcId }),
-    });
+    }); // sending my uid to make viewer view my local screen track
 
     await rtc.localScreenTracks.on('track-ended', handleStopShareScreen);
   } catch (e) {
@@ -415,19 +340,15 @@ const successShareScreen = async () => {
     if (err[0].err || arr[err].msg) return errorMsg(arr[0].msg);
     console.log(e.message);
   } finally {
-    // publish the screen track
     await rtc.client.publish([rtc.localScreenTracks]);
   }
 };
 
 // Screen function
 const toggleScreen = async (e) => {
-  // if rtc sharing screen is false
   if (!rtc.sharingScreen) {
-    // let variable for error handling
-    let error = false;
-    // run rtc localScreenTracks
-
+    // if rtc sharing screen is false
+    let error = false; // let variable for error handling
     rtc.localScreenTracks = await AgoraRTC.createScreenVideoTrack({
       withAudio: 'auto',
     }).catch(async (err) => {
@@ -438,13 +359,9 @@ const toggleScreen = async (e) => {
       if (arrErr[0].err && arrErr[0].msg) return errorMsg(arrErr[0].msg);
       if (arr[0].err) return;
       console.log(err.message);
-    });
-
-    // if error is true this function will end
-    if (error === true) return;
-
-    // if error is false this will run
-    await successShareScreen();
+    }); // run rtc localScreenTracks
+    if (error === true) return; // if error is true this function will end
+    await successShareScreen(); // if error is false this will run
   } else {
     handleStopShareScreen();
   }
@@ -509,7 +426,7 @@ const addJoinedUserLocalAttribute = async () => {
 const hideButtons = () => {
   document.getElementsByClassName('mainBtn')[0].style.display = 'none';
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
-  document.getElementById('settings-btn').style.display = 'none';
+  // document.getElementById('settings-btn').style.display = 'none';
 };
 
 const showButtons = () => {
@@ -517,49 +434,52 @@ const showButtons = () => {
   document.getElementById('mic-btn').classList.remove('active');
   document.getElementsByClassName('mainBtn')[0].style.display = 'flex';
   document.getElementsByClassName('middleBtn')[0].style.display = 'none';
-  document.getElementById('settings-btn').style.display = 'block';
+  // document.getElementById('settings-btn').style.display = 'block';
 };
 
 // joining the stream
 const joinStream = async () => {
-  roomLoaderHandler();
-  hideButtons();
+  device.joined = true;
   try {
-    // add the player into the DOM
+    roomLoaderHandler();
+    hideButtons();
+    clearLocalTracks();
     checkIfUserDom(userData.id, userData.fullName);
+    userJoinMsg();
+    addJoinedUserLocalAttribute();
     if (device.localVideo && device.localAudio) {
       rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-        { cameraId: device.localVideo },
-        { microphoneId: device.localAudio, config: { ANS: true } }
+        { microphoneId: device?.localAudio, config: { ANS: true } },
+        { cameraId: device?.localVideo }
       );
-
-      // await rtc.localTracks[0].setMuted(device.localAudio);
-      // await rtc.localTracks[1].setMuted(device.localVideo);
       await checkDeviceMuted();
-
       // handle error on video track
       await rtc.localTracks[0].on('track-ended', audioTrackEnded);
       await rtc.localTracks[1].on('track-ended', videoTrackEnded);
-
-      rtc.localTracks[1].play(`user-${userData.rtcId}`);
+      if (!rtc.localTracks[1].isPlaying)
+        rtc.localTracks[1].play(`user-${userData.rtcId}`);
       // localTracks[0] for audio and localTracks[1] for the video
       await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
     }
-
-    rtm.channel.sendMessage({
-      text: JSON.stringify({
-        type: `user_join`,
-        rtcId: userData.id,
-        name: userData.fullName,
-      }),
-    });
-    addJoinedUserLocalAttribute();
   } catch (e) {
+    const errMsg = e.message;
     const err = tryCatchDeviceErr(e.message);
-    if (err[0]) errorMsg(err[0].msg);
+    if (err[0]) return errorMsg(err[0].msg);
+    console.log(e);
+    console.log(errMsg);
   } finally {
     roomLoaderHandler();
   }
+};
+
+const userJoinMsg = async () => {
+  rtm.channel.sendMessage({
+    text: JSON.stringify({
+      type: `user_join`,
+      rtcId: userData.id,
+      name: userData.fullName,
+    }),
+  });
 };
 
 const audioTrackEnded = async () => {
@@ -574,13 +494,9 @@ const videoTrackEnded = async () => {
 const leaveStream = async (e) => {
   try {
     e.preventDefault();
+    device.joined = false;
     const user = document.getElementById(`user-container-${userData.rtcId}`);
-    showButtons();
     await rtc.client.unpublish([rtc.localTracks[0], rtc.localTracks[1]]);
-
-    leaveLocalAttributeKey();
-    clearLocalTracks();
-
     if (rtc.localScreenTracks) {
       await rtc.client.unpublish([rtc.localScreenTracks]);
       await rtc.localScreenTracks.close();
@@ -588,9 +504,7 @@ const leaveStream = async (e) => {
       cameraBtn.style.display = 'block';
       screenBtn.classList.remove('active');
     }
-
     if (user) user.remove();
-
     if (userIdInDisplayFrame.val === `user-container-${userData.rtcId}`) {
       displayFrame.style.display = null;
       resetTheFrames();
@@ -606,17 +520,29 @@ const leaveStream = async (e) => {
     if (error && !msgErr) return;
     if (error && msgErr) return errorMsg(msgErr);
     console.log(e.message);
+  } finally {
+    clearLocalTracks();
+    leaveLocalAttributeKey();
+    showButtons();
   }
 };
-
 const clearLocalTracks = () => {
-  if (rtc.localTracks !== null)
+  const joined = device.joined;
+  if (joined) return;
+  if (rtc.localTracks !== null) {
     rtc.localTracks.forEach((track) => {
       track.stop();
       track.close();
     });
+  }
 };
-
+const clearDummyTracks = () => {
+  if (!rtc.dummyTracks) return;
+  rtc.dummyTracks.forEach((track) => {
+    track.close();
+    track.stop();
+  });
+};
 const devices = async () => {
   try {
     const allDevices = await AgoraRTC.getDevices();
@@ -649,7 +575,10 @@ export {
   localDevice,
   audio_devices,
   video_devices,
+  setCameraToggle,
+  setAudioToggle,
   clearLocalTracks,
+  clearDummyTracks,
   joinRoomInit,
   data_init,
   handleUserLeft,

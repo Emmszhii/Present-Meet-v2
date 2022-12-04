@@ -1,4 +1,10 @@
-import { device, rtc } from './rtc.js';
+import {
+  clearLocalTracks,
+  device,
+  rtc,
+  setAudioToggle,
+  setCameraToggle,
+} from './rtc.js';
 
 const switchDom = (id, name) => {
   return `
@@ -25,6 +31,7 @@ const checkSwitchToggle = () => {
   const btnCamera = document.getElementById('camera-switch');
   const boolAudio = device.boolAudio;
   const boolVideo = device.boolVideo;
+
   if (!btnAudio && !btnCamera) return;
   if (!boolAudio) btnAudio.checked = false;
   if (!boolVideo) btnCamera.checked = false;
@@ -35,39 +42,82 @@ const checkDeviceMuted = async () => {
   const cameraBtn = document.getElementById('camera-btn');
   const boolAudio = !device.boolAudio;
   const boolVideo = !device.boolVideo;
-  if (!micBtn && !cameraBtn) return;
-  if (!boolAudio) micBtn.classList.toggle('active');
-  if (!boolVideo) cameraBtn.classList.toggle('active');
-  await rtc.localTracks[1].setMuted(boolVideo);
-  await rtc.localTracks[0].setMuted(boolAudio);
+  const joined = device.joined;
+
+  if (joined) {
+    if (!micBtn && !cameraBtn) return;
+    if (!boolAudio) micBtn.classList.add('active');
+    if (!boolVideo) cameraBtn.classList.add('active');
+    await rtc.localTracks[1].setMuted(boolVideo);
+    await rtc.localTracks[0].setMuted(boolAudio);
+  }
 };
 
 const checkDeviceEnabled = () => {
-  if (rtc.localTracks[0]) rtc.localTracks[0].setEnabled(device.boolAudio);
-  if (rtc.localTracks[1]) rtc.localTracks[1].setEnabled(device.boolVideo);
+  const joined = device.joined;
+  const enabledAudio = device.boolAudio;
+  const enabledVideo = device.boolVideo;
+  if (!rtc.dummyTracks[1].isPlaying) return;
+  if (!joined) {
+    if (rtc.dummyTracks[0]) rtc.localTracks[0].setEnabled(enabledAudio);
+    if (rtc.dummyTracks[1]) rtc.localTracks[1].setEnabled(enabledVideo);
+  } else {
+    clearLocalTracks();
+  }
 };
 
 const switchEventHandler = async (e) => {
   const btn = e.currentTarget;
+  const micBtn = document.getElementById('mic-btn');
+  const cameraBtn = document.getElementById('camera-btn');
   const name = btn.id.split('-')[0];
-  if (btn.checked) {
-    if (name === 'audio') {
-      device.boolAudio = true;
-      if (rtc.localTracks[0]) rtc.localTracks[0].setEnabled(true);
+  const setEnabledAudio = !device.boolAudio;
+  const setEnabledVideo = !device.boolVideo;
+  const setMutedAudio = device.boolAudio;
+  const setMutedVideo = device.boolVideo;
+  const joined = device.joined;
+  try {
+    if (btn.checked) {
+      if (name === 'audio') {
+        device.boolAudio = true;
+        if (rtc.dummyTracks[0] && !joined)
+          rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        // if (rtc.localTracks[0] && joined) {
+        //   micBtn.classList.toggle('active');
+        //   // setAudioToggle(setMutedAudio);
+        // }
+      }
+      if (name === 'camera') {
+        device.boolVideo = true;
+        if (rtc.dummyTracks[1] && !joined)
+          rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        // if (rtc.localTracks[1] && joined) {
+        //   cameraBtn.classList.toggle('active');
+        //   // setCameraToggle(setMutedVideo);
+        // }
+      }
+    } else {
+      if (name === 'audio') {
+        device.boolAudio = false;
+        if (rtc.dummyTracks[0] && !joined)
+          rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        // if (rtc.localTracks[0] && joined) {
+        //   micBtn.classList.toggle('active');
+        //   // setAudioToggle(setMutedAudio);
+        // }
+      }
+      if (name === 'camera') {
+        device.boolVideo = false;
+        if (rtc.dummyTracks[1] && !joined)
+          rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        // if (rtc.localTracks[1] && joined) {
+        //   cameraBtn.classList.toggle('active');
+        //   // setCameraToggle(setMutedVideo);
+        // }
+      }
     }
-    if (name === 'camera') {
-      device.boolVideo = true;
-      if (rtc.localTracks[1]) rtc.localTracks[1].setEnabled(true);
-    }
-  } else {
-    if (name === 'audio') {
-      device.boolAudio = false;
-      if (rtc.localTracks[0]) rtc.localTracks[0].setEnabled(false);
-    }
-    if (name === 'camera') {
-      device.boolVideo = false;
-      if (rtc.localTracks[1]) rtc.localTracks[1].setEnabled(false);
-    }
+  } catch (e) {
+    console.log(e);
   }
 };
 

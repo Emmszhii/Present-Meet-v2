@@ -208,8 +208,6 @@ const handleUserLeft = async (user) => {
   }
   deleteIdInArr(user.uid);
 }; // user left the meeting
-
-// Camera function
 const toggleCamera = async (e) => {
   try {
     if (!device.localVideo) return errorMsg('No camera device detected');
@@ -230,7 +228,7 @@ const toggleCamera = async (e) => {
   } catch (err) {
     console.log(err);
   }
-};
+}; // Camera function
 const setCameraToggle = async (boolCamera) => {
   try {
     await rtc.localTracks[1].setMuted(boolCamera);
@@ -245,7 +243,6 @@ const setAudioToggle = async (boolAudio) => {
     console.log(e);
   }
 };
-// Audio function
 const toggleMic = async (e) => {
   try {
     if (!device.localAudio) return errorMsg('No microphone device detected');
@@ -262,8 +259,7 @@ const toggleMic = async (e) => {
   } catch (err) {
     console.log(err);
   }
-};
-
+}; // Audio function
 const switchToCamera = async () => {
   displayFrame.style.display = null; // reset the Display Frame
   // add the local user in the dom
@@ -289,9 +285,7 @@ const handleStopShareScreen = async () => {
   cameraBtn.style.display = 'block';
   if (screenBtn.classList.contains('active'))
     screenBtn.classList.remove('active');
-
   document.getElementById(`user-container-${userData.rtcId}`).remove(); // remove the local screen tracks to the dom
-
   //unpublish the local screen tracks
   await rtc.client.unpublish([rtc.localScreenTracks]);
   await rtc.localScreenTracks.close();
@@ -456,10 +450,9 @@ const joinStream = async () => {
       // handle error on video track
       await rtc.localTracks[0].on('track-ended', audioTrackEnded);
       await rtc.localTracks[1].on('track-ended', videoTrackEnded);
-      if (!rtc.localTracks[1].isPlaying)
-        rtc.localTracks[1].play(`user-${userData.rtcId}`);
+      rtc.localTracks[1].play(`user-${userData.rtcId}`);
       // localTracks[0] for audio and localTracks[1] for the video
-      await rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+      rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
     }
   } catch (e) {
     const errMsg = e.message;
@@ -550,12 +543,10 @@ const devices = async () => {
       return errorMsg(
         `Devices might be use by other app or access denied by the user`
       );
-
     allDevices.map((item) => {
       if (item.deviceId !== 'default' && item.deviceId !== 'communications')
         localDevice.push(item);
     });
-
     localDevice.map((item) => {
       if (item.kind === 'videoinput') video_devices.push(item);
       if (item.kind === 'audioinput') audio_devices.push(item);

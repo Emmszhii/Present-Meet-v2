@@ -1,6 +1,7 @@
 import { tryCatchDeviceErr } from './error.js';
 import { errorMsg, successMsg } from './msg.js';
 import {
+  data_init,
   userData,
   device,
   rtc,
@@ -32,6 +33,29 @@ const checkMeetingId = () => {
 let displayFrame = document.getElementById('stream__box');
 let videoFrames = document.getElementsByClassName('video__container');
 const userIdInDisplayFrame = { val: null };
+
+const appInitialize = () => {
+  checkMeetingId();
+  // display the meeting link
+  document.querySelector('.link').textContent = meetingId;
+  checkIfUserIsMobileHandler();
+  // load faces
+  Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    data_init(),
+  ])
+    .then(() => {
+      console.log(`face api js success`);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      window.stop();
+    });
+};
 
 const checkIfUserIsMobileHandler = () => {
   const isMobile = window.matchMedia(
@@ -65,22 +89,13 @@ const expandVideoFrame = (e) => {
   resetTheFrames();
 };
 
-// for (let i = 0; videoFrames.length > i; i++) {
-//   videoFrames[i].addEventListener('click', expandVideoFrame);
-// }
-
-// Hide Display Frame Function
 const hideDisplayFrame = () => {
   userIdInDisplayFrame.val = null;
   displayFrame.style.display = null;
-
   let child = displayFrame.children[0];
-  if (child) {
-    document.getElementById('streams__container').appendChild(child);
-  }
-
+  if (child) document.getElementById('streams__container').appendChild(child);
   resetTheFrames();
-};
+}; // Hide Display Frame Function
 
 const resetTheFrames = () => {
   const videoFrames = document.getElementsByClassName('video__container');
@@ -160,15 +175,12 @@ const settingsToggle = () => {
     btn.classList.add('active');
   }
 };
-
 const setUserToFirstChild = (id) => {
   const container = document.getElementById('streams__container');
   const user = document.getElementById(`user-container-${id}`);
   if (!user) return;
   container.insertBefore(user, container.firstChild);
 };
-
-// create dropdown selected DOM
 const createSelectElement = (name, val) => {
   const device_settings = document.getElementById('devices-settings');
   const select = document.createElement('select');
@@ -212,7 +224,7 @@ const createSelectElement = (name, val) => {
   });
 
   document.getElementById('setup-btn').style.display = 'block';
-};
+}; // create dropdown selected DOM
 
 const resetDevices = () => {
   localDevice.length = 0;
@@ -222,10 +234,8 @@ const resetDevices = () => {
 
 const refreshDeviceModal = () => {
   resetDevices();
-
   const dom = document.querySelector(`#modal-settings`);
   if (dom) dom.remove();
-
   clearLocalTracks();
   settingsHandler();
 };
@@ -308,10 +318,27 @@ const settingsHandler = async () => {
   }
 };
 
-const setupBtnOnClick = () => {
+const setupBtnOnClick = async () => {
+  const camBtn = document.getElementById('camera-btn');
+  const micBtn = document.getElementById('mic-btn');
   document.querySelector(`#modal-settings`).remove();
   document.getElementById('settings-btn').classList.remove('active');
-  clearLocalTracks();
+  try {
+    clearLocalTracks();
+    if (!device.joined) return;
+    await rtc.localTracks[0].setDevice(device.localAudio);
+    await rtc.localTracks[1].setDevice(device.localVideo);
+    await rtc.localTracks[0].setMuted(!device.boolAudio);
+    await rtc.localTracks[1].setMuted(!device.boolVideo);
+    !rtc.localTracks[0].muted
+      ? micBtn.classList.add('active')
+      : micBtn.classList.remove('active');
+    !rtc.localTracks[1].muted
+      ? camBtn.classList.add('active')
+      : camBtn.classList.remove('active');
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 const permissionDeniedDom = () => {
@@ -344,7 +371,6 @@ const muteStream = async () => {
       }),
     });
   }
-
   if (micBtn.classList.contains('active')) {
     document.getElementById('mic-btn').classList.remove('active');
     await rtc.localTracks[0].setMuted(true);
@@ -380,8 +406,8 @@ const raiseHand = async (e) => {
 
 const visibilityChangeHandler = async () => {
   try {
-    if (!rtc.localTracks[0].muted) await rtc.localTracks[0].setMuted(true);
-    if (!rtc.localTracks[1].muted) await rtc.localTracks[1].setMuted(true);
+    if (rtc.localTracks[0]) await rtc.localTracks[0].setMuted(true);
+    if (rtc.localTracks[1]) await rtc.localTracks[1].setMuted(true);
   } catch (e) {
     console.log(e);
   }
@@ -392,6 +418,7 @@ export {
   videoFrames,
   userIdInDisplayFrame,
   meetingId,
+  appInitialize,
   roomLoaderHandler,
   membersToggle,
   messagesToggle,

@@ -1,5 +1,4 @@
 AgoraRTC.setLogLevel(3);
-
 import {
   toggleCamera,
   toggleMic,
@@ -10,6 +9,7 @@ import {
 } from './rtc.js';
 import { sendMessage, leaveChannel } from './rtm.js';
 import {
+  appInitialize,
   meetingId,
   membersToggle,
   messagesToggle,
@@ -23,40 +23,27 @@ import {
 } from './room.js';
 
 // Event Listeners
-// copy to clipboard
-document.getElementById('link-btn').addEventListener('click', copyClipboard);
-// messages toggle
-document.getElementById('chat-btn').addEventListener('click', messagesToggle);
-// participants toggle
-document.getElementById('users-btn').addEventListener('click', membersToggle);
-// Camera Button
-document.getElementById('camera-btn').addEventListener('click', toggleCamera);
-// Mic Button
-document.getElementById('mic-btn').addEventListener('click', toggleMic);
-// Screen Share Button
-document.getElementById('screen-btn').addEventListener('click', toggleScreen);
-// Leave Stream
-document.getElementById('leave-btn').addEventListener('click', leaveStream);
-// Join Stream
-document.getElementById('join-btn').addEventListener('click', joinStream);
-// open settings modal
+document.getElementById('link-btn').addEventListener('click', copyClipboard); // copy to clipboard
+document.getElementById('chat-btn').addEventListener('click', messagesToggle); // messages toggle
+document.getElementById('users-btn').addEventListener('click', membersToggle); // participants toggle
+document.getElementById('camera-btn').addEventListener('click', toggleCamera); // Camera Button
+document.getElementById('mic-btn').addEventListener('click', toggleMic); // Mic Button
+document.getElementById('screen-btn').addEventListener('click', toggleScreen); // Screen Share Button
+document.getElementById('leave-btn').addEventListener('click', leaveStream); // Leave Stream
+document.getElementById('join-btn').addEventListener('click', joinStream); // Join Stream
 document
   .getElementById('settings-btn')
-  .addEventListener('click', settingsToggle);
-// // User send message
+  .addEventListener('click', settingsToggle); // open settings modal
 document
   .getElementById('message__form')
-  .addEventListener('submit', sendMessage);
-// toggle display Frame
+  .addEventListener('submit', sendMessage); // // User send message
 document
   .getElementById('stream__box')
-  .addEventListener('click', hideDisplayFrame);
-// raise hand
-document.getElementById('raise-hand').addEventListener('click', raiseHand);
+  .addEventListener('click', hideDisplayFrame); // toggle display Frame
+document.getElementById('raise-hand').addEventListener('click', raiseHand); // raise hand
 
-// when a user forced close they will be deleted to the dom
-window.addEventListener('beforeunload', leaveChannel);
-// when users click esc btn close the msg & members modal
+window.addEventListener('beforeunload', leaveChannel); // when a user forced close they will be deleted to the dom
+
 document.addEventListener('keydown', (e) => {
   const membersModal = document.getElementById('members__container');
   const messagesModal = document.getElementById('messages__container');
@@ -73,31 +60,7 @@ document.addEventListener('keydown', (e) => {
       messagesBtn.classList.remove('active');
     }
   }
-});
-
-const appInitialize = () => {
-  checkMeetingId();
-  // display the meeting link
-  document.querySelector('.link').textContent = meetingId;
-  checkIfUserIsMobileHandler();
-  // load faces
-  Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-    faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
-    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-    faceapi.nets.faceExpressionNet.loadFromUri('/models'),
-    data_init(),
-  ])
-    .then(() => {
-      console.log(`face api js success`);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-    .finally(() => {
-      window.stop();
-    });
-};
+}); // when users click esc btn close the msg & members modal
 
 window.addEventListener('DOMContentLoaded', appInitialize);
 window.addEventListener('visibilitychange', visibilityChangeHandler, false);

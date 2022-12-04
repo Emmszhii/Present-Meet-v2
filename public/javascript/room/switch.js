@@ -59,8 +59,8 @@ const checkDeviceEnabled = () => {
   const enabledVideo = device.boolVideo;
   if (!rtc.dummyTracks[1].isPlaying) return;
   if (!joined) {
-    if (rtc.dummyTracks[0]) rtc.localTracks[0].setEnabled(enabledAudio);
-    if (rtc.dummyTracks[1]) rtc.localTracks[1].setEnabled(enabledVideo);
+    if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(enabledAudio);
+    if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(enabledVideo);
   } else {
     clearLocalTracks();
   }
@@ -68,13 +68,9 @@ const checkDeviceEnabled = () => {
 
 const switchEventHandler = async (e) => {
   const btn = e.currentTarget;
-  const micBtn = document.getElementById('mic-btn');
-  const cameraBtn = document.getElementById('camera-btn');
   const name = btn.id.split('-')[0];
   const setEnabledAudio = !device.boolAudio;
   const setEnabledVideo = !device.boolVideo;
-  const setMutedAudio = device.boolAudio;
-  const setMutedVideo = device.boolVideo;
   const joined = device.joined;
   try {
     if (btn.checked) {
@@ -82,38 +78,22 @@ const switchEventHandler = async (e) => {
         device.boolAudio = true;
         if (rtc.dummyTracks[0] && !joined)
           rtc.dummyTracks[0].setEnabled(setEnabledAudio);
-        // if (rtc.localTracks[0] && joined) {
-        //   micBtn.classList.toggle('active');
-        //   // setAudioToggle(setMutedAudio);
-        // }
       }
       if (name === 'camera') {
         device.boolVideo = true;
         if (rtc.dummyTracks[1] && !joined)
           rtc.dummyTracks[1].setEnabled(setEnabledVideo);
-        // if (rtc.localTracks[1] && joined) {
-        //   cameraBtn.classList.toggle('active');
-        //   // setCameraToggle(setMutedVideo);
-        // }
       }
     } else {
       if (name === 'audio') {
         device.boolAudio = false;
         if (rtc.dummyTracks[0] && !joined)
           rtc.dummyTracks[0].setEnabled(setEnabledAudio);
-        // if (rtc.localTracks[0] && joined) {
-        //   micBtn.classList.toggle('active');
-        //   // setAudioToggle(setMutedAudio);
-        // }
       }
       if (name === 'camera') {
         device.boolVideo = false;
         if (rtc.dummyTracks[1] && !joined)
           rtc.dummyTracks[1].setEnabled(setEnabledVideo);
-        // if (rtc.localTracks[1] && joined) {
-        //   cameraBtn.classList.toggle('active');
-        //   // setCameraToggle(setMutedVideo);
-        // }
       }
     }
   } catch (e) {

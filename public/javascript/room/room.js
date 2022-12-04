@@ -13,7 +13,11 @@ import {
   rtm,
 } from './rtc.js';
 import { notificationMsg } from './rtm.js';
-import { switchHandler } from './switch.js';
+import {
+  switchHandler,
+  checkDeviceEnabled,
+  checkSwitchToggle,
+} from './switch.js';
 
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
@@ -274,12 +278,12 @@ const settingsHandler = async () => {
 
     if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
     if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
-
     if (!videoDom) createSelectElement('Video', video_devices);
     if (!audioDom) createSelectElement('Audio', audio_devices);
-
     switchHandler('toggle-settings', 'audio-switch');
     switchHandler('toggle-settings', 'camera-switch');
+    checkDeviceEnabled();
+    checkSwitchToggle();
 
     document
       .getElementById('setup-btn')
@@ -294,6 +298,7 @@ const settingsHandler = async () => {
       permissionDeniedDom();
       return errorMsg(err[0].msg);
     }
+    console.log(e.message);
   } finally {
     document.querySelector('#loader_settings').style.display = 'none';
   }

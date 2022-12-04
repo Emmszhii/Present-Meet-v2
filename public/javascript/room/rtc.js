@@ -27,6 +27,7 @@ import { errorMsg } from './msg.js';
 import { student, teacher, deleteIdInArr } from './excel.js';
 import { allVideoAndAudioDevices } from '../helpers/devices.js';
 import { tryCatchDeviceErr } from './error.js';
+import { checkDeviceMuted } from './switch.js';
 
 // User Local Data and Tokens
 const userData = {};
@@ -40,6 +41,8 @@ const audio_devices = [];
 const device = {
   localAudio: null,
   localVideo: null,
+  boolAudio: true,
+  boolVideo: true,
 };
 
 // rtc API
@@ -530,8 +533,9 @@ const joinStream = async () => {
         { microphoneId: device.localAudio, config: { ANS: true } }
       );
 
-      await rtc.localTracks[0].setMuted(true);
-      await rtc.localTracks[1].setMuted(true);
+      // await rtc.localTracks[0].setMuted(device.localAudio);
+      // await rtc.localTracks[1].setMuted(device.localVideo);
+      await checkDeviceMuted();
 
       // handle error on video track
       await rtc.localTracks[0].on('track-ended', audioTrackEnded);

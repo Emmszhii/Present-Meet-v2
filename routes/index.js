@@ -2,16 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
 
-// User model
-const { Account, User } = require('../models/User');
-const { isHttps } = require('./helpers/functions');
+const { Account, User } = require('../models/User'); // User model
 
-// Welcome Page
 router.get('/', ensureAuthenticated, (req, res) => {
   res.render('home', { type: req.user.type });
-});
-
-// // fetch user information
+}); // Welcome Page
 router.get('/getInfo', ensureAuthenticated, async (req, res) => {
   const { _id, first_name, middle_name, last_name, type } = req.user;
 
@@ -23,7 +18,11 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
     type,
     AGORA_APP_ID: process.env.AGORA_APP_ID,
   });
-});
+}); // fetch user information
+
+router.get('/forgot-password', async (req, res) => {
+  res.render('forgot_password');
+}); // forgot password
 
 router.get('/connection-secure', async (req, res) => {
   const url = req.url;
@@ -36,6 +35,6 @@ router.get('/connection-secure', async (req, res) => {
     title: `Connection is not secure`,
     message: `Please use a secure https connection`,
   });
-});
+}); // connection not secure
 
 module.exports = router;

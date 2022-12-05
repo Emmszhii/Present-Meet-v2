@@ -345,9 +345,8 @@ const permissionDeniedDom = () => {
   const dom = document.querySelector('.text_settings');
   const setupBtn = document.getElementById('setup-btn');
   const settingBtn = document.getElementById('settings-btn');
-
   if (dom)
-    dom.innerHTML = `Allow the camera and audio permission to use camera and mic then refresh the page otherwise close this by clicking done.`;
+    dom.innerHTML = `Allow the camera and audio permission to use them then refresh the page otherwise close this by clicking done.`;
   if (setupBtn)
     setupBtn.addEventListener('click', () => {
       document.getElementById('modal-settings').remove();

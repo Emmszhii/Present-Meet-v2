@@ -8,11 +8,8 @@ const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const PORT = process.env.PORT || 3000;
 
-// Passport Config
-require('./config/passport')(passport);
-
-// DB config
-const db = require('./config/keys').MongoURI;
+require('./config/passport')(passport); // Passport Config
+const db = require('./config/keys').MongoURI; // DB config
 
 // EJS
 app.use(express.static('public'));
@@ -24,7 +21,6 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// express session
 app.use(
   session({
     cookie: { maxAge: 86400000 }, // 24hrs
@@ -35,9 +31,8 @@ app.use(
     resave: false,
     saveUninitialized: true,
   })
-);
+); // express session
 
-// force use https
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'production') {
     if (req.headers['x-forwarded-proto'] !== 'https') {
@@ -45,22 +40,20 @@ app.use((req, res, next) => {
       return res.redirect('https://' + req.headers.host + req.url);
     } else return next();
   } else return next();
-});
+}); // force use https
 
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// connect flash
-app.use(flash());
+app.use(flash()); // connect flash
 
-// Global Vars
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
   next();
-});
+}); // Global Vars
 
 // Routes
 app.use('/', require('./routes/index'));
@@ -70,16 +63,15 @@ app.use('/', require('./routes/excel'));
 app.use('/', require('./routes/face_recognition'));
 app.use('/', require('./routes/class_attendance'));
 app.use('/', require('./routes/room_attendance'));
+app.use('/', require('./routes/forgot_password'));
 
-// 404
 app.use(function (req, res, next) {
   res.status(404).render('404', {
     title: '404 page not found',
     message: `Nothing can be found here`,
   });
-});
+}); // 404
 
-// Connection to MongoDB
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => {
@@ -90,4 +82,4 @@ mongoose
   })
   .catch((err) => {
     console.log(err);
-  });
+  }); // Connection to MongoDB

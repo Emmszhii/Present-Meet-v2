@@ -1,7 +1,8 @@
 import { loader } from '../helpers/loader.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
-const dom = document.getElementById('forgot-div');
+import { successMsg, warningMsg, errorMsg } from './error.js';
 
+const dom = document.getElementById('forgot-div');
 let token;
 
 const sendUserEmail = async (e) => {
@@ -11,7 +12,7 @@ const sendUserEmail = async (e) => {
   const postData = { emailValue };
   try {
     const { data, err, msg } = await postRequest(url, postData);
-    if (err) return console.log(err);
+    if (err) return errorMsg(err);
     if (data.token) {
       token = data.token;
       changeDivToOtp();
@@ -58,32 +59,38 @@ const changeDivToChangePassword = (email) => {
 };
 
 const verifyHandler = async () => {
+  loader();
   const code = document.getElementById('code').value;
   try {
     const url = `/forgot-password/${code}/${token}`;
     const { data, err, msg } = await getRequest(url);
-    if (err) return console.log(err);
+    if (err) return errorMsg(err);
     const { success, failed, email } = data;
     if (failed) return console.log(`invalid code`);
     if (success) changeDivToChangePassword(email);
   } catch (e) {
     console.log(e);
+  } finally {
+    loader();
   }
 };
 
 const changePassword = async () => {
+  loader();
   const pw1 = document.getElementById('password').value;
   const pw2 = document.getElementById('confirm-password').value;
   try {
     const postData = { pw1, pw2, token };
     const url = `/forgot-password/change-password`;
     const { data, msg, err } = await postRequest(url, postData);
+    if (err) return errorMsg(err);
     const { success, failed } = data;
-    if (err) return console.log(err);
     if (failed) return console.log(`something went wrong`);
     if (success) redirectToHome();
   } catch (e) {
     console.log(e);
+  } finally {
+    loader();
   }
 };
 

@@ -25,8 +25,14 @@ router.post('/forgot-password', async (req, res) => {
 
     const number = Math.floor(100000 + Math.random() * 900000); // 6 digit number
     const otp = createJsonToken({ email, number }, '2m');
-    const { err } = forgotPasswordMail(email, number);
-    if (err) return res.status(400).json({ err: `Something went wrong` });
+
+    if (process.env.NODE_ENV === 'production') {
+      const { err } = forgotPasswordMail(email, number);
+      if (err) return res.status(400).json({ err: `Something went wrong` });
+    } else {
+      console.log(number);
+    }
+
     const data = { token: otp };
     return res.status(200).json({ data });
   } catch (e) {
@@ -67,9 +73,7 @@ router.post('/forgot-password/change-password', async (req, res) => {
     const verifiedToken = verifyJsonToken(token);
     if (!verifiedToken || verifiedToken === 'invalid token')
       return res.status(400).json({ err: `Invalid Request` });
-
     const { email } = verifiedToken.id;
-
     const account = await Account.findOne({ email: email });
     if (!account) return res.status(400).json({ err: `Account Invalid` });
 

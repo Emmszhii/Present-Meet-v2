@@ -24,7 +24,6 @@ const {
 userSchema.plugin(passportLocalMongoose); // passport local mongoose
 
 router.get('/login', async (req, res) => {
-  console.log(req.session.loginAttempts);
   req.isAuthenticated() ? res.redirect('/') : res.render('login');
 }); // Login Handle
 
@@ -36,7 +35,7 @@ const checkAttempts = (req, res, next) => {
     return res.redirect('/forgot-password');
   }
   next();
-};
+}; //count login attempts
 
 router.post(
   '/login',

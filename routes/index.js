@@ -9,7 +9,6 @@ router.get('/', ensureAuthenticated, (req, res) => {
 }); // Welcome Page
 router.get('/getInfo', ensureAuthenticated, async (req, res) => {
   const { _id, first_name, middle_name, last_name, type } = req.user;
-
   return res.status(200).json({
     _id,
     first_name,
@@ -19,10 +18,6 @@ router.get('/getInfo', ensureAuthenticated, async (req, res) => {
     AGORA_APP_ID: process.env.AGORA_APP_ID,
   });
 }); // fetch user information
-
-router.get('/forgot-password', async (req, res) => {
-  res.render('forgot_password');
-}); // forgot password
 
 router.get('/connection-secure', async (req, res) => {
   const url = req.url;

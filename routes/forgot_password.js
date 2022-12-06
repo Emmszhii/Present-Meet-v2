@@ -8,6 +8,10 @@ const { generateHashPassword } = require('./helpers/functions');
 
 const { Account } = require('../models/User');
 
+router.get('/forgot-password', async (req, res) => {
+  res.render('forgot_password');
+}); // forgot password
+
 router.post('/forgot-password', async (req, res) => {
   const { emailValue: email } = req.body;
   if (!email || email.trim().length === 0)

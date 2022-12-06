@@ -13,29 +13,34 @@ const {
   validateEmpty,
 } = require('./helpers/functions');
 
-// User model
 const {
   Account,
   userSchema,
   User,
   Student,
   Teacher,
-} = require('../models/User');
+} = require('../models/User'); // User model
 
 userSchema.plugin(passportLocalMongoose); // passport local mongoose
 
 router.get('/login', async (req, res) => {
+  console.log(req.session.loginAttempts);
   req.isAuthenticated() ? res.redirect('/') : res.render('login');
-
-  // if (req.isAuthenticated()) {
-  //   res.redirect('/');
-  // } else {
-  //   res.render('login');
-  // }
 }); // Login Handle
+
+const checkAttempts = (req, res, next) => {
+  req.session.loginAttempts++;
+  const attempts = req.session.loginAttempts;
+  if (attempts > 3) {
+    req.session.loginAttempts = 0;
+    return res.redirect('/forgot-password');
+  }
+  next();
+};
 
 router.post(
   '/login',
+  checkAttempts,
   passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true,
@@ -43,7 +48,6 @@ router.post(
   }),
   (req, res) => {
     let redirectTo = `/`;
-
     if (req.session.reqUrl) {
       redirectTo = req.session.reqUrl;
       req.session.reqUrl = null;

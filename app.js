@@ -64,6 +64,7 @@ app.use('/', require('./routes/face_recognition'));
 app.use('/', require('./routes/class_attendance'));
 app.use('/', require('./routes/room_attendance'));
 app.use('/', require('./routes/forgot_password'));
+app.use('/', require('./routes/redirect_to'));
 
 app.use(function (req, res, next) {
   res.status(404).render('404', {

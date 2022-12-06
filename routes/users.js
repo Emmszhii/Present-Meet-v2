@@ -22,17 +22,17 @@ const {
   Teacher,
 } = require('../models/User');
 
-// passport local mongoose
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose); // passport local mongoose
 
-// Login Handle
 router.get('/login', async (req, res) => {
-  if (req.isAuthenticated()) {
-    res.redirect('/');
-  } else {
-    res.render('login');
-  }
-});
+  req.isAuthenticated() ? res.redirect('/') : res.render('login');
+
+  // if (req.isAuthenticated()) {
+  //   res.redirect('/');
+  // } else {
+  //   res.render('login');
+  // }
+}); // Login Handle
 
 router.post(
   '/login',
@@ -52,12 +52,8 @@ router.post(
   }
 );
 
-// register page
-router.get('/register', (req, res) => {
-  res.render('register');
-});
+router.get('/register', (req, res) => res.render('register')); // register page
 
-// Register Handle
 router.post('/register', async (req, res) => {
   const {
     first_name,
@@ -80,43 +76,32 @@ router.post('/register', async (req, res) => {
   if (validateEmpty(email)) errors.push({ msg: `email is empty` });
   if (validateEmpty(password)) errors.push({ msg: `Password is empty` });
 
-  // check if first_name is valid
-  if (first_name < 3 || first_name.trim() === '') {
-    errors.push({ msg: 'First name must contain at least 3 letters' });
-  }
+  if (first_name < 3 || first_name.trim() === '')
+    errors.push({ msg: 'First name must contain at least 3 letters' }); // check if first_name is valid
   if (middle_name < 3)
     errors.push({ msg: `Middle name must contain at least 3 or more letters` });
   if (middle_name.trim() === '') errors.push({ msg: `Middle name is empty` });
-  // check if last_name is valid
-  if (last_name < 3 || last_name.trim() === '') {
-    errors.push({ msg: 'Last name must contain at least 3 letter' });
-  }
-  // check if birthday is not null
-  if (birthday.trim() === '') {
-    errors.push({ msg: 'Must input a birthday' });
-  }
-  // check if type is not null and valid
+  if (last_name < 3 || last_name.trim() === '')
+    errors.push({ msg: 'Last name must contain at least 3 letter' }); // check if last_name is valid
+
+  if (birthday.trim() === '') errors.push({ msg: 'Must input a birthday' }); // check if birthday is not null
+
   if (
     type.trim() === '' &&
     type !== 'student' &&
     type !== 'teacher' &&
     type !== 'audience' &&
     type !== 'host'
-  ) {
-    res.status(400).json({ msg: 'Please input a valid account type' });
-  }
-  // check if email is valid
-  if (!isEmail(email)) {
-    errors.push({ msg: 'Email is not valid' });
-  }
-  if (password !== password2) {
-    // check password match
-    errors.push({ msg: 'Passwords do not much' });
-  }
-  // check pass length
-  if (password.length < 6) {
-    errors.push({ msg: 'Password should be at least 6 characters' });
-  }
+  )
+    res.status(400).json({ msg: 'Please input a valid account type' }); // check if type is not null and valid
+
+  if (!isEmail(email)) errors.push({ msg: 'Email is not valid' }); // check if email is valid
+
+  if (password !== password2) errors.push({ msg: 'Passwords do not much' }); // check password match
+
+  if (password.length < 6)
+    errors.push({ msg: 'Password should be at least 6 characters' }); // check pass length
+
   if (errors.length > 0) {
     res.render('register', {
       errors,
@@ -152,14 +137,11 @@ router.post('/register', async (req, res) => {
 
       try {
         const hash = await generateHashPassword(password);
-
         const new_account = new Account({
           email,
           password: hash,
         });
-
         const accountUser = await new_account.save();
-
         const new_user = new User({
           _id: accountUser._id,
           first_name: fname,
@@ -184,7 +166,7 @@ router.post('/register', async (req, res) => {
       }
     }
   }
-});
+}); // Register Handle
 
 // profile get request
 router.get('/profile', ensureAuthenticated, (req, res) => {
@@ -251,7 +233,6 @@ router.post('/profile', ensureAuthenticated, async (req, res) => {
     };
 
     const account = await Account.findOne({ _id: req.user._id });
-
     const booleanPassword = await comparePassword(password, account.password);
 
     if (booleanPassword) {
@@ -277,17 +258,14 @@ router.post('/password', ensureAuthenticated, async (req, res) => {
     newPassword: newPw,
     newPassword1: newPw1,
   } = req.body;
-
   if (!oldPw || !newPw || !newPw1)
     return res
       .status(400)
       .json({ err: 'All fields in password are required!' });
-
   if (newPw < 6)
     return res
       .status(400)
       .json({ err: 'Password must contain 6 or more characters!' });
-
   if (newPw !== newPw1)
     return res
       .status(400)
@@ -297,11 +275,9 @@ router.post('/password', ensureAuthenticated, async (req, res) => {
   if (!account) return res.status(200).json({ err: 'Invalid request' });
 
   const booleanPassword = await comparePassword(oldPw, account.password);
-
   if (booleanPassword) {
     try {
       const hash = await generateHashPassword(newPw);
-
       Account.updateOne(
         { _id: req.user._id },
         { password: hash },

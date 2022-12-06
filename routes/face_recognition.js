@@ -8,11 +8,9 @@ const { Account, User, Student, Teacher } = require('../models/User');
 const { comparePassword, faceApiThreshold } = require('./helpers/functions');
 
 router.get('/face-recognition', ensureAuthenticated, (req, res) => {
-  if (req.user.type === 'student') {
-    res.render('face_recognition');
-  } else {
-    res.redirect('/');
-  }
+  req.user.type === 'student'
+    ? res.render('face_recognition')
+    : res.redirect('/');
 });
 
 router.get(

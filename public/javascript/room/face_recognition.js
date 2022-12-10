@@ -32,28 +32,20 @@ const faceRecognitionHandler = async (data) => {
   try {
     muteStream();
     const { descriptor } = await get_descriptor();
-
     if (!descriptor) return warningMsg('No face registered by user');
-
     document.body.insertAdjacentHTML('beforeend', dom());
-
     document.querySelector('.modal_face_content').dataset.value = teacherId;
     document.querySelector('.modal_face_content').dataset.restrict = restrict;
-
     document.getElementById(
       'backend'
     ).textContent = `User's Backend : ${await backend()}`;
-
     interval = setInterval(updateCountdown, startingInterval);
-
     document
       .querySelector('.close')
       .addEventListener('click', closeFaceRecognition);
-
     document
       .getElementById('camera_btn')
       .addEventListener('click', startCamera);
-
     document
       .getElementById('face_recognize_btn')
       .addEventListener('click', faceRecognized);
@@ -147,16 +139,12 @@ const startCamera = async () => {
   document.querySelector('.face_container').innerHTML = '';
   stopCamera();
   removeFaceCanvas();
-
   const device = document.getElementById('camera_device');
   let constraint = { video: true };
-  if (devices.selectedVideoId) {
+  if (devices.selectedVideoId)
     constraint = { video: { deviceId: devices.selectedVideoId } };
-  }
-
   try {
     await cameraDeviceHandler();
-
     const stream = await navigator.mediaDevices.getUserMedia(constraint);
     if (stream) {
       if (devices.selectedVideoId) device.value = devices.selectedVideoId;
@@ -173,9 +161,8 @@ const startCamera = async () => {
   } catch (e) {
     const arrError = ['Permission denied'];
     console.log(e.message);
-    if (arrError.includes(e.message)) {
-      errorMsg('Camera Permission denied by user');
-    }
+    if (arrError.includes(e.message))
+      return errorMsg('Camera Permission denied by user');
   } finally {
     document.getElementById('loader_face').style.display = 'none';
   }
@@ -194,9 +181,7 @@ const cameraDeviceHandler = async () => {
     option.text = device.label;
     select.appendChild(option);
   }
-
   select.value = devices.videoDevice[0].deviceId;
-
   select.addEventListener('change', changeDeviceHandler);
 };
 
@@ -237,15 +222,12 @@ const faceRecognized = async () => {
   const video = document.getElementById('video');
   const restrict = document.querySelector('.modal_face_content').dataset
     .restrict;
-
   loader.style.display = 'block';
   try {
     const { descriptor, threshold } = await get_descriptor();
-    // Guard clause
     if (!descriptor)
       return warningMsg('User face recognition is not registered');
     if (!video) return warningMsg(`Please start the camera first`);
-
     stopCamera();
     const canvas = await faceapi.createCanvasFromMedia(video);
     canvas.id = 'user_face';
@@ -254,31 +236,21 @@ const faceRecognized = async () => {
     const query = await faceapi
       .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
       .withFaceLandmarks(useTinyModel)
-      .withFaceExpressions()
       .withFaceDescriptors();
 
-    if (query.length === 0 || query.length > 1) {
+    if (query.length === 0 || query.length > 1)
       return errorMsg('Invalid face. Please try again');
-    }
     if (!query[0].descriptor) return errorMsg('Invalid Please Try again');
 
-    // convert string to float32array
-    const float = descriptor.split(',');
+    const float = descriptor.split(','); // convert string to float32array
     const descriptorDb = new Float32Array(float);
-
-    const expressionObj = returnExpressions(query[0].expressions);
-    const { max } = expressionObj;
-    const expression = max;
-    console.log(expression);
-    console.log(expressionObj);
-
     const dist = await faceapi.euclideanDistance(
       descriptorDb,
       query[0].descriptor
     );
     console.log(dist);
     if (dist <= threshold) {
-      successMsg(`User match`);
+      successMsg(`User match, Attendance sending...`);
       sendAttendance({
         descriptor: query[0].descriptor.join(','),
         displayName: userData.fullName,

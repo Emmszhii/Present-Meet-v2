@@ -132,7 +132,7 @@ const joinRoomInit = async () => {
     await rtc.client.enableAudioVolumeIndicator();
     await rtc.client.on('volume-indicator', volumeIndicator);
     await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
-    settingsHandler(); // set the users camera and mic
+    await settingsHandler(); // set the users camera and mic
   } catch (e) {
     console.log(e);
   } finally {
@@ -345,24 +345,30 @@ const successShareScreen = async () => {
 
 // Screen function
 const toggleScreen = async (e) => {
-  if (!rtc.sharingScreen) {
-    // if rtc sharing screen is false
-    let error = false; // let variable for error handling
-    rtc.localScreenTracks = await AgoraRTC.createScreenVideoTrack({
-      withAudio: 'auto',
-    }).catch(async (err) => {
-      const arrErr = tryCatchDeviceErr(err.message);
-      rtc.sharingScreen = false;
-      screenBtn.classList.remove('active');
-      error = !error;
-      if (arrErr[0].err && arrErr[0].msg) return errorMsg(arrErr[0].msg);
-      if (arr[0].err) return;
-      console.log(err.message);
-    }); // run rtc localScreenTracks
-    if (error === true) return; // if error is true this function will end
-    await successShareScreen(); // if error is false this will run
-  } else {
-    handleStopShareScreen();
+  try {
+    if (!rtc.sharingScreen) {
+      let error = false; // let variable for error handling
+      rtc.localScreenTracks = await AgoraRTC.createScreenVideoTrack({
+        withAudio: 'auto',
+      }).catch(async (err) => {
+        console.log(err);
+        const arrErr = tryCatchDeviceErr(err.message);
+        rtc.sharingScreen = false;
+        screenBtn.classList.remove('active');
+        error = !error;
+        if (arrErr[0].err && arrErr[0].msg) return errorMsg(arrErr[0].msg);
+        if (arr[0].err) return;
+        console.log(err.message);
+      }); // run rtc localScreenTracks
+      if (error === true) return; // if error is true this function will end
+      console.log(`run`);
+      await successShareScreen(); // if error is false this will run
+    } else {
+      console.log(`run`);
+      handleStopShareScreen();
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 

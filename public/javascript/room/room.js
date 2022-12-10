@@ -253,7 +253,7 @@ const settings_dom = () => {
         <div id="video-settings"></div>
         <div id="devices-settings"></div>
         <div class='toggle-settings' id='toggle-settings'></div>
-        <span class='text_settings'>Here's the devices available in your setup!</span>
+        <span class='text_settings'>Here's the devices available in your setup! If devices is not available enable permission to used them manually</span>
         <button class="button_box" type="button" id="setup-btn">Done</button>
       </div>
     </div>
@@ -284,10 +284,8 @@ const setRtcDummy = async () => {
         },
         { videoConfig: { cameraId: device?.localVideo } }
       );
-      console.log(`run`);
     } else {
       rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-      console.log(`run`);
     }
   } catch (e) {
     console.log(e);
@@ -323,17 +321,16 @@ const settingsHandler = async () => {
       return errorMsg(err);
     }
     if (!audioDev || !cameraDev) return permissionDeniedDom();
+
     selectDomElements();
     switchHandler('toggle-settings', 'audio-switch');
     switchHandler('toggle-settings', 'camera-switch');
     checkDeviceEnabled();
     checkSwitchToggle();
   } catch (e) {
-    console.log(e);
     const err = tryCatchDeviceErr(e.message);
     if (err[0]) permissionDeniedDom();
     if (err[0].msg) return errorMsg(err[0].msg);
-    console.log(e.message);
   } finally {
     setBtnSettings();
     document.querySelector('#loader_settings').style.display = 'none';

@@ -132,7 +132,7 @@ const joinRoomInit = async () => {
     await rtc.client.enableAudioVolumeIndicator();
     await rtc.client.on('volume-indicator', volumeIndicator);
     await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
-    await settingsHandler(); // set the users camera and mic
+    settingsHandler(); // set the users camera and mic
   } catch (e) {
     console.log(e);
   } finally {

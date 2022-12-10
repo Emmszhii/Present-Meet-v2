@@ -321,7 +321,6 @@ const settingsHandler = async () => {
       return errorMsg(err);
     }
     if (!audioDev || !cameraDev) return permissionDeniedDom();
-
     selectDomElements();
     switchHandler('toggle-settings', 'audio-switch');
     switchHandler('toggle-settings', 'camera-switch');
@@ -359,10 +358,10 @@ const setupBtnOnClick = async () => {
     await rtc.localTracks[1].setDevice(device.localVideo);
     await rtc.localTracks[0].setMuted(!device.boolAudio);
     await rtc.localTracks[1].setMuted(!device.boolVideo);
-    !rtc.localTracks[0].muted
+    device.boolAudio
       ? micBtn.classList.add('active')
       : micBtn.classList.remove('active');
-    !rtc.localTracks[1].muted
+    device.boolVideo
       ? camBtn.classList.add('active')
       : camBtn.classList.remove('active');
   } catch (e) {

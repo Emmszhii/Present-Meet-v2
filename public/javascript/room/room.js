@@ -21,6 +21,7 @@ import {
   checkSwitchToggle,
 } from './switch.js';
 
+const constraint = { video: true, audio: true };
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
@@ -262,66 +263,97 @@ const settings_dom = () => {
 const selectDomElements = () => {
   const videoDom = document.getElementById('Video');
   const audioDom = document.getElementById('Audio');
+  if (video_devices.length === 0 || audio_devices.length === 0)
+    return errorMsg('Devices not detected');
   if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
   if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
   if (!videoDom) createSelectElement('Video', video_devices);
   if (!audioDom) createSelectElement('Audio', audio_devices);
 };
 
-const settingsHandler = async () => {
-  const dom = document.body;
+const setRtcDummy = async () => {
   const dummyId = userData.dummyId;
-  const joined = device.joined;
-  dom.insertAdjacentHTML('beforeend', settings_dom());
-  const playerDom = document.getElementById(`user-container-${dummyId}`);
-  clearDummyTracks();
-  rtc.dummyTracks = null;
   try {
-    if (!playerDom) {
-      document
-        .getElementById('video-settings')
-        .insertAdjacentHTML('beforeend', player(dummyId, ''));
-      document.querySelector('.video__container').style.cursor = 'auto';
+    if (device?.localAudio || device?.localVideo) {
+      rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+        {
+          audioConfig: {
+            config: { ANS: true },
+            microphoneId: device?.localAudio,
+          },
+        },
+        { videoConfig: { cameraId: device?.localVideo } }
+      );
+      console.log(`run`);
+    } else {
+      rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+      console.log(`run`);
     }
-    successMsg(
-      'If stuck at loading please either allow or deny access to the camera and audio manually'
-    );
-    if (!joined) clearLocalTracks();
-    rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-      { microphoneId: device?.localAudio, config: { ANS: true } },
-      { cameraId: device?.localVideo }
-    );
+  } catch (e) {
+    console.log(e);
+    permissionDeniedDom();
+  } finally {
     rtc.dummyTracks[1].play(`user-${dummyId}`);
+  }
+};
 
-    await devices();
+const addPlayerToSettings = () => {
+  const dummyId = userData.dummyId;
+  const playerDom = document.getElementById(`user-container-${dummyId}`);
+  if (!playerDom) {
+    document
+      .getElementById('video-settings')
+      .insertAdjacentHTML('beforeend', player(dummyId, ''));
+    document.querySelector('.video__container').style.cursor = 'auto';
+  }
+};
+
+const settingsHandler = async () => {
+  const joined = device.joined;
+  const dom = document.body;
+  dom.insertAdjacentHTML('beforeend', settings_dom());
+  try {
+    if (!joined) clearLocalTracks();
+    clearDummyTracks();
+    addPlayerToSettings();
+    await setRtcDummy();
+    const { audioDev, cameraDev, err } = await devices();
+    if (err) {
+      permissionDeniedDom();
+      return errorMsg(err);
+    }
+    if (!audioDev || !cameraDev) return permissionDeniedDom();
     selectDomElements();
     switchHandler('toggle-settings', 'audio-switch');
     switchHandler('toggle-settings', 'camera-switch');
     checkDeviceEnabled();
     checkSwitchToggle();
-    document
-      .getElementById('setup-btn')
-      .addEventListener('click', setupBtnOnClick);
-    document
-      .getElementById('refresh')
-      .addEventListener('click', refreshDeviceModal);
   } catch (e) {
     console.log(e);
     const err = tryCatchDeviceErr(e.message);
-    if (err[0]) {
-      permissionDeniedDom();
-      return errorMsg(err[0].msg);
-    }
+    if (err[0]) permissionDeniedDom();
+    if (err[0].msg) return errorMsg(err[0].msg);
     console.log(e.message);
   } finally {
+    setBtnSettings();
     document.querySelector('#loader_settings').style.display = 'none';
   }
+};
+
+const setBtnSettings = () => {
+  document
+    .getElementById('setup-btn')
+    .addEventListener('click', setupBtnOnClick);
+  document
+    .getElementById('refresh')
+    .addEventListener('click', refreshDeviceModal);
 };
 
 const setupBtnOnClick = async () => {
   const camBtn = document.getElementById('camera-btn');
   const micBtn = document.getElementById('mic-btn');
-  document.querySelector(`#modal-settings`).remove();
+  const modal = document.querySelector(`#modal-settings`);
+  if (modal) modal.remove();
   document.getElementById('settings-btn').classList.remove('active');
   try {
     clearLocalTracks();
@@ -405,8 +437,8 @@ const raiseHand = async (e) => {
 
 const visibilityChangeHandler = async () => {
   try {
-    if (rtc.localTracks[0]) await rtc.localTracks[0].setMuted(true);
-    if (rtc.localTracks[1]) await rtc.localTracks[1].setMuted(true);
+    if (rtc.localTracks[0]) rtc.localTracks[0].setMuted(true);
+    if (rtc.localTracks[1]) rtc.localTracks[1].setMuted(true);
   } catch (e) {
     console.log(e);
   }

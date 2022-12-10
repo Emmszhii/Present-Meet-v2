@@ -28,11 +28,9 @@ body {
   font-size: 1.2rem;
   text-align: center;
 }
-
 .title > h1 > span {
   color: blue;
 }
-
 main {
   display: flex;
   justify-content: center;

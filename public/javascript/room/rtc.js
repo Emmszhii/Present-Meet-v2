@@ -98,41 +98,46 @@ const data_init = async () => {
 };
 
 const joinRoomInit = async () => {
-  if (userData.type === 'teacher') makeAttendanceHandler();
-  rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {
-    logFilter: AgoraRTM.LOG_FILTER_WARNING,
-  });
-  const rtmOption = {
-    uid: userData.rtmId,
-    token: userData.rtmToken,
-  };
-  await rtm.client.login(rtmOption);
-  await rtm.client.addOrUpdateLocalUserAttributes({
-    name: userData.fullName,
-    rtcId: userData.rtcId,
-  });
-  rtm.channel = await rtm.client.createChannel(meetingId);
-  await rtm.channel.join();
-  await rtm.channel.on('MemberJoined', handleMemberJoin);
-  await rtm.channel.on('MemberLeft', handleMemberLeft);
-  await rtm.channel.on('ChannelMessage', handleChannelMessage);
-  await rtm.channel.on('token-privilege-will-expire', handleRtmTokenExpire);
-  // get all members in render it to the dom
-  getMembers();
-  rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' }); // initialize setting the rtc
-  await rtc.client.join(
-    userData.APP_ID,
-    meetingId,
-    userData.rtcToken,
-    userData.rtcId
-  ); // join rtc with the params info
-  await rtc.client.on('user-published', handleUserPublished);
-  await rtc.client.on('user-left', handleUserLeft);
-  await rtc.client.enableAudioVolumeIndicator();
-  await rtc.client.on('volume-indicator', volumeIndicator);
-  await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
-  settingsHandler(); // set the users camera and mic
-  roomLoaderHandler(); // if All are loaded loader will be gone
+  try {
+    if (userData.type === 'teacher') makeAttendanceHandler();
+    rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {
+      logFilter: AgoraRTM.LOG_FILTER_WARNING,
+    });
+    const rtmOption = {
+      uid: userData.rtmId,
+      token: userData.rtmToken,
+    };
+    await rtm.client.login(rtmOption);
+    await rtm.client.addOrUpdateLocalUserAttributes({
+      name: userData.fullName,
+      rtcId: userData.rtcId,
+    });
+    rtm.channel = await rtm.client.createChannel(meetingId);
+    await rtm.channel.join();
+    await rtm.channel.on('MemberJoined', handleMemberJoin);
+    await rtm.channel.on('MemberLeft', handleMemberLeft);
+    await rtm.channel.on('ChannelMessage', handleChannelMessage);
+    await rtm.channel.on('token-privilege-will-expire', handleRtmTokenExpire);
+    // get all members in render it to the dom
+    getMembers();
+    rtc.client = await AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' }); // initialize setting the rtc
+    await rtc.client.join(
+      userData.APP_ID,
+      meetingId,
+      userData.rtcToken,
+      userData.rtcId
+    ); // join rtc with the params info
+    await rtc.client.on('user-published', handleUserPublished);
+    await rtc.client.on('user-left', handleUserLeft);
+    await rtc.client.enableAudioVolumeIndicator();
+    await rtc.client.on('volume-indicator', volumeIndicator);
+    await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
+    settingsHandler(); // set the users camera and mic
+  } catch (e) {
+    console.log(e);
+  } finally {
+    roomLoaderHandler(); // if All are loaded loader will be gone
+  }
 };
 
 const volumeIndicator = async (user) => {
@@ -535,14 +540,17 @@ const clearDummyTracks = () => {
     track.close();
     track.stop();
   });
+  rtc.dummyTracks = null;
 };
 const devices = async () => {
   try {
-    const allDevices = await AgoraRTC.getDevices();
+    const allDevices = await AgoraRTC.getDevices({
+      skipPermissionCheck: false,
+    });
     if (!allDevices)
-      return errorMsg(
-        `Devices might be use by other app or access denied by the user`
-      );
+      return {
+        err: `Devices might be use by other app or access denied by the user`,
+      };
     allDevices.map((item) => {
       if (item.deviceId !== 'default' && item.deviceId !== 'communications')
         localDevice.push(item);
@@ -551,9 +559,11 @@ const devices = async () => {
       if (item.kind === 'videoinput') video_devices.push(item);
       if (item.kind === 'audioinput') audio_devices.push(item);
     });
+    return { audioDev: audio_devices, cameraDev: video_devices };
   } catch (e) {
     console.log(e);
-    errorMsg(e.message);
+    console.log(e.message);
+    return { err: e.message };
   }
 };
 

@@ -19,10 +19,8 @@ const switchDom = (id, name) => {
 const switchHandler = (insertHtml, id) => {
   const dom = document.getElementById(insertHtml);
   const name = id.split('-')[0];
-
   if (!dom) return;
   dom.insertAdjacentHTML('beforeend', switchDom(id, name));
-
   document.getElementById(id).addEventListener('change', switchEventHandler);
 };
 
@@ -31,7 +29,6 @@ const checkSwitchToggle = () => {
   const btnCamera = document.getElementById('camera-switch');
   const boolAudio = device.boolAudio;
   const boolVideo = device.boolVideo;
-
   if (!btnAudio && !btnCamera) return;
   if (!boolAudio) btnAudio.checked = false;
   if (!boolVideo) btnCamera.checked = false;
@@ -57,6 +54,7 @@ const checkDeviceEnabled = () => {
   const joined = device.joined;
   const enabledAudio = device.boolAudio;
   const enabledVideo = device.boolVideo;
+  if (!rtc.dummyTracks) return;
   if (!rtc.dummyTracks[1].isPlaying) return;
   if (!joined) {
     if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(enabledAudio);
@@ -76,28 +74,26 @@ const switchEventHandler = async (e) => {
     if (btn.checked) {
       if (name === 'audio') {
         device.boolAudio = true;
-        if (rtc.dummyTracks[0] && !joined)
-          rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
       }
       if (name === 'camera') {
         device.boolVideo = true;
-        if (rtc.dummyTracks[1] && !joined)
-          rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
       }
     } else {
       if (name === 'audio') {
         device.boolAudio = false;
-        if (rtc.dummyTracks[0] && !joined)
-          rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
       }
       if (name === 'camera') {
         device.boolVideo = false;
-        if (rtc.dummyTracks[1] && !joined)
-          rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        // if (!joined) return;
+        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
       }
     }
   } catch (e) {
     console.log(e);
+    console.log(e.message);
   }
 };
 

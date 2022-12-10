@@ -23,9 +23,9 @@ app.use(express.json());
 
 app.use(
   session({
-    cookie: { maxAge: 86400000 }, // 24hrs
+    cookie: { maxAge: 86400000 },
     store: new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
+      checkPeriod: 86400000,
     }),
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -47,14 +47,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash()); // connect flash
-
 app.use((req, res, next) => {
   if (!req.session.initialized) {
     req.session.initialized = true;
     req.session.loginAttempts = 0;
+    req.session.rememberMe;
   }
   next();
-});
+}); // session global vars
 
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');

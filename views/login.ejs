@@ -14,34 +14,47 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
     />
     <link rel="stylesheet" href="css/login.css" />
+    <link rel="stylesheet" href="css/errors.css" />
   </head>
   <body>
     <main>
       <div class="card">
-        <%- include('partials/title') %>
-        <div class="intro">Login</div>
-        <%- include('partials/messages') %>
-        <form action="/login" id="user-login" method="post">
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value=""
-            autocomplete="off"
-          />
-          <label for="email">Email</label>
-          <input
-            type="password"
-            name="password"
-            id="password-input"
-            value=""
-            autocomplete="off"
-          />
-          <label for="password">Password</label>
-          <button type="submit" class="button">Login</button>
-        </form>
-        <p>No account? <a href="/register">Sign up</a> now!</p>
-        <p><a href="/forgot-password">Forgot Password?</a></p>
+        <div class="content">
+          <%- include('partials/title') %>
+          <div class="intro">Login</div>
+          <%- include('partials/messages') %>
+          <form action="/login" id="user-login" method="post">
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                value=""
+                autocomplete="off"
+              />
+              <label for="email">Email</label>
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                id="password-input"
+                value=""
+                autocomplete="off"
+              />
+              <label for="password">Password</label>
+            </div>
+            <div class="form-group remember-me">
+              <input type="checkbox" name="rememberMe" id="rememberMe" />
+              <label for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="button">Login</button>
+          </form>
+          <div class="footer-login">
+            <p>No account? <a href="/register">Sign up</a> now!</p>
+            <p><a href="/forgot-password">Forgot Password?</a></p>
+          </div>
+        </div>
       </div>
     </main>
   </body>

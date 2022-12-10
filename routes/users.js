@@ -29,6 +29,12 @@ router.get('/login', async (req, res) => {
 
 const checkAttempts = (req, res, next) => {
   req.session.loginAttempts++;
+  const { rememberMe } = req.body;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const oneWeek = 1000 * 60 * 60 * 24 * 7;
+  rememberMe
+    ? (req.session.rememberMe = oneWeek)
+    : (req.session.rememberMe = oneDay);
   const attempts = req.session.loginAttempts;
   if (attempts > 3) {
     req.session.loginAttempts = 0;

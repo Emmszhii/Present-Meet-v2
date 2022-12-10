@@ -4,14 +4,12 @@
   padding: 0px;
   margin: 0px;
 }
-
 .flash_messages {
   position: absolute;
   top: 5%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
 a {
   text-decoration: none;
   cursor: pointer;
@@ -20,7 +18,6 @@ a:hover {
   color: black;
   text-decoration: underline;
 }
-
 body {
   overflow: hidden;
   display: flex;
@@ -28,7 +25,6 @@ body {
   width: 100vw;
   height: 100vh;
 }
-
 .title {
   font-weight: bold;
   font-size: 1.2rem;
@@ -39,10 +35,9 @@ body {
   color: blue;
 }
 .title > p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   text-align: center;
 }
-
 main {
   width: 100%;
   display: flex;
@@ -52,7 +47,6 @@ main {
   font-size: 1.4rem;
   flex-direction: column;
 }
-
 .card {
   background-color: white;
   padding: 20px;
@@ -61,7 +55,6 @@ main {
   margin: 10px;
   text-align: center;
 }
-
 .logo {
   background: url('/public/img/logo-no-background.svg') no-repeat center center
     transparent;
@@ -69,8 +62,12 @@ main {
   width: 10%;
   height: 10%;
 }
-
-input {
+.content {
+  font-size: 1.1rem;
+}
+input[type='email'],
+input[type='password'],
+input[type='text'] {
   width: 100%;
   text-align: center;
   border: none;
@@ -78,11 +75,16 @@ input {
   padding: 5px 10px;
   font-size: 1.4rem;
 }
-
+.remember-me {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  float: left;
+}
 input:focus {
   outline: none;
 }
-
 #login {
   display: flex;
   justify-content: center;

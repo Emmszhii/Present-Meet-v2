@@ -48,14 +48,13 @@ const videoUserMedia = async () => {
   const text = document.getElementById('video_text');
   const dom = document.getElementById('video_error');
   const deviceValue = document.getElementById('camera_device').value;
-  let constraint = { video: true };
+  let constraint = { video: true, audio: true };
   if (devices.selectedVideoId)
     constraint = { video: { deviceId: deviceValue } };
   try {
     const media = await navigator.mediaDevices.getUserMedia(constraint);
     video.srcObject = media;
     track = media.getTracks();
-
     if (!text) {
       informationDom('video_text', `Video: Working`);
     } else {
@@ -170,8 +169,8 @@ const faceDetection = async (ms) => {
 
 // PHOTO HANDLER
 const photoHandler = async () => {
-  loader();
   try {
+    loader();
     const { threshold } = await getThreshold();
     console.log(threshold);
     const video = document.getElementById('video');

@@ -132,11 +132,12 @@ const joinRoomInit = async () => {
     await rtc.client.enableAudioVolumeIndicator();
     await rtc.client.on('volume-indicator', volumeIndicator);
     await rtc.client.on('token-privilege-will-expire', handleRtcTokenExpire); // on user publish and left method
-    settingsHandler(); // set the users camera and mic
+    await settingsHandler(); // set the users camera and mic
   } catch (e) {
     console.log(e);
   } finally {
     roomLoaderHandler(); // if All are loaded loader will be gone
+    window.stop();
   }
 };
 

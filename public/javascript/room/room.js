@@ -1,3 +1,4 @@
+import { allVideoAndAudioDevices } from '../helpers/devices.js';
 import { tryCatchDeviceErr } from './error.js';
 import { errorMsg, successMsg } from './msg.js';
 import {
@@ -25,17 +26,15 @@ const constraint = { video: true, audio: true };
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
-
+let displayFrame = document.getElementById('stream__box');
+let videoFrames = document.getElementsByClassName('video__container');
+const userIdInDisplayFrame = { val: null };
 const checkMeetingId = () => {
   const id = urlParams.get('meetingId');
   if (!id) window.location.href = '*';
 };
 
-let displayFrame = document.getElementById('stream__box');
-let videoFrames = document.getElementsByClassName('video__container');
-const userIdInDisplayFrame = { val: null };
-
-const appInitialize = () => {
+const appInitialize = async () => {
   checkMeetingId();
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
@@ -45,16 +44,16 @@ const appInitialize = () => {
     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-    data_init(),
+    await data_init(),
   ])
     .then(() => {
-      console.log(`face api js success`);
+      console.log(`ALL MODEL AND INIT LOADED`);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      window.stop();
+      // window.stop();
     });
 };
 
@@ -82,11 +81,9 @@ const checkIfUserDom = (id, name) => {
 const expandVideoFrame = (e) => {
   let child = displayFrame.children[0];
   if (child) document.getElementById('streams__container').appendChild(child);
-
   displayFrame.style.display = 'block';
   displayFrame.appendChild(e.currentTarget).scrollIntoView();
   userIdInDisplayFrame.val = e.currentTarget.id;
-
   resetTheFrames();
 };
 
@@ -118,7 +115,6 @@ Here's the invitation link :
 ${link}
 
 Enjoy using our service :D`;
-
   navigator.clipboard.writeText(text);
   btn.classList.toggle('copy');
   btn.classList.toggle('check');
@@ -253,7 +249,7 @@ const settings_dom = () => {
         <div id="video-settings"></div>
         <div id="devices-settings"></div>
         <div class='toggle-settings' id='toggle-settings'></div>
-        <span class='text_settings'>Here's the devices available in your setup! If devices is not available enable permission to used them manually</span>
+        <span class='text_settings'>Here's the devices available in your setup! If devices is not available enable manually the permission to used them </span>
         <button class="button_box" type="button" id="setup-btn">Done</button>
       </div>
     </div>
@@ -274,24 +270,20 @@ const selectDomElements = () => {
 const setRtcDummy = async () => {
   const dummyId = userData.dummyId;
   try {
-    if (device?.localAudio || device?.localVideo) {
-      rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-        {
-          audioConfig: {
-            config: { ANS: true },
-            microphoneId: device?.localAudio,
-          },
+    rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+      {
+        audioConfig: {
+          config: { ANS: true },
+          microphoneId: device?.localAudio,
         },
-        { videoConfig: { cameraId: device?.localVideo } }
-      );
-    } else {
-      rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
-    }
+      },
+      { videoConfig: { cameraId: device?.localVideo } }
+    );
+
+    rtc.dummyTracks[1].play(`user-${dummyId}`);
   } catch (e) {
     console.log(e);
     permissionDeniedDom();
-  } finally {
-    rtc.dummyTracks[1].play(`user-${dummyId}`);
   }
 };
 
@@ -314,18 +306,22 @@ const settingsHandler = async () => {
     if (!joined) clearLocalTracks();
     clearDummyTracks();
     addPlayerToSettings();
-    await setRtcDummy();
-    const { audioDev, cameraDev, err } = await devices();
-    if (err) {
-      permissionDeniedDom();
-      return errorMsg(err);
-    }
-    if (!audioDev || !cameraDev) return permissionDeniedDom();
-    selectDomElements();
-    switchHandler('toggle-settings', 'audio-switch');
-    switchHandler('toggle-settings', 'camera-switch');
-    checkDeviceEnabled();
-    checkSwitchToggle();
+    devices()
+      .then(async () => {
+        document.querySelector('#loader_settings').style.display = 'block';
+        await setRtcDummy();
+        selectDomElements();
+        switchHandler('toggle-settings', 'audio-switch');
+        switchHandler('toggle-settings', 'camera-switch');
+        checkDeviceEnabled();
+        checkSwitchToggle();
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        document.querySelector('#loader_settings').style.display = 'none';
+      });
   } catch (e) {
     const err = tryCatchDeviceErr(e.message);
     if (err[0]) permissionDeniedDom();

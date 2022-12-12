@@ -62,5 +62,8 @@ document.addEventListener('keydown', (e) => {
   }
 }); // when users click esc btn close the msg & members modal
 
-window.addEventListener('DOMContentLoaded', appInitialize);
+// window.addEventListener('DOMContentLoaded', appInitialize);
+document.addEventListener('DOMContentLoaded', appInitialize);
+// document.addEventListener('load', appInitialize);
+// window.addEventListener('load', appInitialize);
 // window.addEventListener('visibilitychange', visibilityChangeHandler, false);

@@ -29,12 +29,15 @@ const userNotificationMsg = (msg) => {
 };
 
 const addCloseListener = (type, title) => {
-  document
-    .getElementById(`close_${type}_${title}`)
-    .addEventListener('click', (e) => {
-      const dom = e.currentTarget.parentNode;
-      if (dom) dom.remove();
-    });
+  const domToRemoved = document.getElementById(`close_${type}_${title}`);
+  const parentNode = domToRemoved.parentNode;
+  domToRemoved.addEventListener('click', (e) => {
+    const dom = e.currentTarget.parentNode;
+    if (dom) dom.remove();
+  });
+  setTimeout(() => {
+    if (parentNode) parentNode.remove();
+  }, 5000);
 };
 
 const resetMsg = () => {

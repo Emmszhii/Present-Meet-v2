@@ -342,6 +342,7 @@ const setBtnSettings = () => {
 };
 
 const setupBtnOnClick = async () => {
+  const joined = device.joined;
   const camBtn = document.getElementById('camera-btn');
   const micBtn = document.getElementById('mic-btn');
   const modal = document.querySelector(`#modal-settings`);
@@ -362,6 +363,9 @@ const setupBtnOnClick = async () => {
       : camBtn.classList.remove('active');
   } catch (e) {
     console.log(e);
+  } finally {
+    clearDummyTracks();
+    if (!joined) clearLocalTracks();
   }
 };
 

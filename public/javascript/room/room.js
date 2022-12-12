@@ -36,6 +36,9 @@ const checkMeetingId = () => {
 
 const appInitialize = async () => {
   checkMeetingId();
+  const requirements = AgoraRTC.checkSystemRequirements();
+  if (!requirements)
+    return errorMsg(`Sorry this application does not support your device.`);
   // display the meeting link
   document.querySelector('.link').textContent = meetingId;
   checkIfUserIsMobileHandler();

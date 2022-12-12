@@ -362,10 +362,8 @@ const toggleScreen = async (e) => {
         console.log(err.message);
       }); // run rtc localScreenTracks
       if (error === true) return; // if error is true this function will end
-      console.log(`run`);
       await successShareScreen(); // if error is false this will run
     } else {
-      console.log(`run`);
       handleStopShareScreen();
     }
   } catch (e) {

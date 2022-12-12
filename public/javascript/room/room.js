@@ -249,7 +249,7 @@ const settings_dom = () => {
         <div id="video-settings"></div>
         <div id="devices-settings"></div>
         <div class='toggle-settings' id='toggle-settings'></div>
-        <span class='text_settings'>Here's the devices available in your setup! If devices is not available enable manually the permission to used them </span>
+        <span class='text_settings'>Allow the use of camera and audio in the permission settings.</span>
         <button class="button_box" type="button" id="setup-btn">Done</button>
       </div>
     </div>
@@ -302,14 +302,20 @@ const settingsHandler = async () => {
   const joined = device.joined;
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
+  const loader = document.getElementById('loader_settings');
   try {
     if (!joined) clearLocalTracks();
     clearDummyTracks();
     addPlayerToSettings();
-    devices()
+    setRtcDummy()
       .then(async () => {
-        document.querySelector('#loader_settings').style.display = 'block';
-        await setRtcDummy();
+        loader.style.display = 'block';
+        await devices();
+      })
+      .then(async () => {
+        document.querySelector(
+          '.text_settings'
+        ).innerHTML = `Here's the devices available to your computer.`;
         selectDomElements();
         switchHandler('toggle-settings', 'audio-switch');
         switchHandler('toggle-settings', 'camera-switch');
@@ -320,7 +326,7 @@ const settingsHandler = async () => {
         console.log(e);
       })
       .finally(() => {
-        document.querySelector('#loader_settings').style.display = 'none';
+        loader.style.display = 'none';
       });
   } catch (e) {
     const err = tryCatchDeviceErr(e.message);
@@ -328,7 +334,7 @@ const settingsHandler = async () => {
     if (err[0].msg) return errorMsg(err[0].msg);
   } finally {
     setBtnSettings();
-    document.querySelector('#loader_settings').style.display = 'none';
+    loader.style.display = 'none';
   }
 };
 

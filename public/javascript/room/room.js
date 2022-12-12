@@ -271,6 +271,7 @@ const selectDomElements = () => {
 };
 
 const setRtcDummy = async () => {
+  const boolVideo = device.boolVideo;
   const dummyId = userData.dummyId;
   try {
     rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
@@ -283,7 +284,7 @@ const setRtcDummy = async () => {
       { videoConfig: { cameraId: device?.localVideo } }
     );
 
-    rtc.dummyTracks[1].play(`user-${dummyId}`);
+    if (boolVideo === false) rtc.dummyTracks[1].play(`user-${dummyId}`);
   } catch (e) {
     console.log(e);
     permissionDeniedDom();
@@ -306,39 +307,40 @@ const settingsHandler = async () => {
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
   const loader = document.getElementById('loader_settings');
-  try {
-    if (!joined) clearLocalTracks();
-    clearDummyTracks();
-    addPlayerToSettings();
-    setRtcDummy()
-      .then(async () => {
-        loader.style.display = 'block';
-        await devices();
-      })
-      .then(async () => {
-        document.querySelector(
-          '.text_settings'
-        ).innerHTML = `Here's the devices available to your computer.`;
-        selectDomElements();
-        switchHandler('toggle-settings', 'audio-switch');
-        switchHandler('toggle-settings', 'camera-switch');
-        checkDeviceEnabled();
-        checkSwitchToggle();
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        loader.style.display = 'none';
-      });
-  } catch (e) {
-    const err = tryCatchDeviceErr(e.message);
-    if (err[0]) permissionDeniedDom();
-    if (err[0].msg) return errorMsg(err[0].msg);
-  } finally {
-    setBtnSettings();
-    loader.style.display = 'none';
-  }
+
+  if (!joined) clearLocalTracks();
+  clearDummyTracks();
+  addPlayerToSettings();
+
+  setRtcDummy()
+    .then(async () => {
+      loader.style.display = 'block';
+      return await devices();
+    })
+    .then(async (data) => {
+      const { err, audioDev, cameraDev } = data;
+      if (err) console.log(err);
+      document.querySelector(
+        '.text_settings'
+      ).innerHTML = `Here's the devices available to your computer.`;
+      selectDomElements();
+      switchHandler('toggle-settings', 'audio-switch');
+      switchHandler('toggle-settings', 'camera-switch');
+      checkDeviceEnabled();
+      checkSwitchToggle();
+    })
+    .catch((e) => {
+      const err = tryCatchDeviceErr(e.message);
+      if (err[0]) permissionDeniedDom();
+      if (err[0].msg) return errorMsg(err[0].msg);
+      console.log(e);
+    })
+    .finally(() => {
+      device.changedAudio = false;
+      device.changedVideo = false;
+      setBtnSettings();
+      loader.style.display = 'none';
+    });
 };
 
 const setBtnSettings = () => {
@@ -355,26 +357,29 @@ const setupBtnOnClick = async () => {
   const camBtn = document.getElementById('camera-btn');
   const micBtn = document.getElementById('mic-btn');
   const modal = document.querySelector(`#modal-settings`);
+
+  // const changedAudio = device.changedAudio;
+  // const changedVideo = device.changedVideo;
+  // console.log(changedAudio, changedVideo);
   if (modal) modal.remove();
   document.getElementById('settings-btn').classList.remove('active');
   try {
-    clearLocalTracks();
-    if (!device.joined) return;
+    // clearLocalTracks();
+    clearDummyTracks();
+    if (!joined) return;
     await rtc.localTracks[0].setDevice(device.localAudio);
     await rtc.localTracks[1].setDevice(device.localVideo);
-    await rtc.localTracks[0].setMuted(!device.boolAudio);
-    await rtc.localTracks[1].setMuted(!device.boolVideo);
-    device.boolAudio
+    await rtc.localTracks[0].setMuted(device.boolAudio);
+    await rtc.localTracks[1].setMuted(device.boolVideo);
+
+    device.boolAudio === false
       ? micBtn.classList.add('active')
       : micBtn.classList.remove('active');
-    device.boolVideo
+    device.boolVideo === false
       ? camBtn.classList.add('active')
       : camBtn.classList.remove('active');
   } catch (e) {
     console.log(e);
-  } finally {
-    clearDummyTracks();
-    if (!joined) clearLocalTracks();
   }
 };
 
@@ -389,6 +394,8 @@ const permissionDeniedDom = () => {
       document.getElementById('modal-settings').remove();
     });
   if (settingBtn) settingBtn.classList.remove('active');
+  clearLocalTracks();
+  clearDummyTracks();
 };
 
 const muteStream = async () => {

@@ -674,6 +674,9 @@ select {
 }
 /* End face recognition */
 /* switch */
+#devices-settings select {
+  cursor: pointer;
+}
 .toggle-settings {
   display: flex;
   flex-direction: row-reverse;
@@ -701,6 +704,7 @@ select {
   top: 0;
   left: 0;
   border-radius: 50px;
+  cursor: pointer;
 }
 .switch input[type='checkbox'] {
   visibility: hidden;

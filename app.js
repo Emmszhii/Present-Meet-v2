@@ -8,6 +8,7 @@ const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const PORT = process.env.PORT || 3000;
 
+mongoose.set('strictQuery', false);
 require('./config/passport')(passport); // Passport Config
 const db = require('./config/keys').MongoURI; // DB config
 

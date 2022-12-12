@@ -35,9 +35,11 @@ const audio_devices = [];
 const device = {
   localAudio: null, // selected device
   localVideo: null,
-  boolAudio: true,
-  boolVideo: true,
+  boolAudio: false,
+  boolVideo: false,
   joined: false,
+  changedAudio: false,
+  changedVideo: false,
 };
 const rtc = {
   client: null, // rtc API
@@ -224,31 +226,18 @@ const toggleCamera = async (e) => {
         text: JSON.stringify({ type: 'active_camera', _id: userData.id }),
       });
       setUserToFirstChild(userData.id);
-      device.boolVideo = true;
+      device.boolVideo = false;
       button.classList.add('active');
     } else {
       await rtc.localTracks[1].setMuted(true);
       button.classList.remove('active');
-      device.boolVideo = false;
+      device.boolVideo = true;
     } // rtc video muting
   } catch (err) {
     console.log(err);
   }
 }; // Camera function
-const setCameraToggle = async (boolCamera) => {
-  try {
-    await rtc.localTracks[1].setMuted(boolCamera);
-  } catch (e) {
-    console.log(e);
-  }
-};
-const setAudioToggle = async (boolAudio) => {
-  try {
-    await rtc.localTracks[0].setMuted(boolAudio);
-  } catch (e) {
-    console.log(e);
-  }
-};
+
 const toggleMic = async (e) => {
   try {
     if (!device.localAudio) return errorMsg('No microphone device detected');
@@ -256,11 +245,11 @@ const toggleMic = async (e) => {
     if (rtc.localTracks[0].muted) {
       await rtc.localTracks[0].setMuted(false);
       button.classList.add('active');
-      device.boolAudio = true;
+      device.boolAudio = false;
     } else {
       await rtc.localTracks[0].setMuted(true);
       button.classList.remove('active');
-      device.boolAudio = false;
+      device.boolAudio = true;
     } // rtc audio muting
   } catch (err) {
     console.log(err);
@@ -532,6 +521,7 @@ const leaveStream = async (e) => {
 const clearLocalTracks = () => {
   const joined = device.joined;
   if (joined) return;
+  if (!rtc.localTracks) return;
   if (rtc.localTracks !== null) {
     rtc.localTracks.forEach((track) => {
       track.stop();
@@ -581,8 +571,6 @@ export {
   localDevice,
   audio_devices,
   video_devices,
-  setCameraToggle,
-  setAudioToggle,
   clearLocalTracks,
   clearDummyTracks,
   joinRoomInit,

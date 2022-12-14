@@ -284,7 +284,7 @@ const setRtcDummy = async () => {
       { videoConfig: { cameraId: device?.localVideo } }
     );
 
-    if (boolVideo === false) rtc.dummyTracks[1].play(`user-${dummyId}`);
+    rtc.dummyTracks[1].play(`user-${dummyId}`);
   } catch (e) {
     console.log(e);
     permissionDeniedDom();
@@ -352,32 +352,33 @@ const setBtnSettings = () => {
     .addEventListener('click', refreshDeviceModal);
 };
 
+const setRtcLocalStream = async () => {
+  if (rtc.localTracks) return;
+  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks({
+    audioConfig: {},
+  });
+};
+
 const setupBtnOnClick = async () => {
   const joined = device.joined;
   const camBtn = document.getElementById('camera-btn');
   const micBtn = document.getElementById('mic-btn');
   const modal = document.querySelector(`#modal-settings`);
 
-  // const changedAudio = device.changedAudio;
-  // const changedVideo = device.changedVideo;
-  // console.log(changedAudio, changedVideo);
+  const changedAudio = device.changedAudio;
+  const changedVideo = device.changedVideo;
+  console.log(changedAudio, changedVideo);
   if (modal) modal.remove();
   document.getElementById('settings-btn').classList.remove('active');
   try {
-    // clearLocalTracks();
-    clearDummyTracks();
     if (!joined) return;
-    await rtc.localTracks[0].setDevice(device.localAudio);
-    await rtc.localTracks[1].setDevice(device.localVideo);
-    await rtc.localTracks[0].setMuted(device.boolAudio);
-    await rtc.localTracks[1].setMuted(device.boolVideo);
-
-    device.boolAudio === false
-      ? micBtn.classList.add('active')
-      : micBtn.classList.remove('active');
-    device.boolVideo === false
-      ? camBtn.classList.add('active')
-      : camBtn.classList.remove('active');
+    setRtcLocalStream();
+    // device.boolAudio === false
+    //   ? micBtn.classList.add('active')
+    //   : micBtn.classList.remove('active');
+    // device.boolVideo === false
+    //   ? camBtn.classList.add('active')
+    //   : camBtn.classList.remove('active');
   } catch (e) {
     console.log(e);
   }

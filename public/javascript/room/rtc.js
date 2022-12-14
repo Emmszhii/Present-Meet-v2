@@ -430,6 +430,38 @@ const showButtons = () => {
   // document.getElementById('settings-btn').style.display = 'block';
 };
 
+const setRtcLocalStream = async () => {
+  const joined = device.joined;
+  clearDummyTracks();
+  if (joined) {
+    checkIfUserDom(userData.id, userData.fullName);
+  } else {
+    rtc.client.unpublish();
+    clearDummyTracks();
+    console.log(userData.id);
+    const user = document.getElementById(`user-container-${userData.id}`);
+    console.log(user);
+    if (user) user.remove();
+    checkIfUserDom(userData.id, userData.fullName);
+  }
+
+  if (device.localVideo && device.localAudio) {
+    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+      { microphoneId: device?.localAudio, config: { ANS: true } },
+      { cameraId: device?.localVideo }
+    );
+    await checkDeviceMuted();
+    // handle error on video track
+    await rtc.localTracks[0].on('track-ended', audioTrackEnded);
+    await rtc.localTracks[1].on('track-ended', videoTrackEnded);
+    rtc.localTracks[1].play(`user-${userData.rtcId}`);
+    await rtc.localTracks[0].setMuted(device.boolAudio);
+    await rtc.localTracks[1].setMuted(device.boolVideo);
+    // localTracks[0] for audio and localTracks[1] for the video
+    rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
+  }
+};
+
 // joining the stream
 const joinStream = async () => {
   device.joined = true;
@@ -437,22 +469,10 @@ const joinStream = async () => {
     roomLoaderHandler();
     hideButtons();
     clearLocalTracks();
-    checkIfUserDom(userData.id, userData.fullName);
+
     userJoinMsg();
     addJoinedUserLocalAttribute();
-    if (device.localVideo && device.localAudio) {
-      rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-        { microphoneId: device?.localAudio, config: { ANS: true } },
-        { cameraId: device?.localVideo }
-      );
-      await checkDeviceMuted();
-      // handle error on video track
-      await rtc.localTracks[0].on('track-ended', audioTrackEnded);
-      await rtc.localTracks[1].on('track-ended', videoTrackEnded);
-      rtc.localTracks[1].play(`user-${userData.rtcId}`);
-      // localTracks[0] for audio and localTracks[1] for the video
-      rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
-    }
+    setRtcLocalStream();
   } catch (e) {
     const errMsg = e.message;
     const err = tryCatchDeviceErr(e.message);
@@ -571,6 +591,7 @@ export {
   localDevice,
   audio_devices,
   video_devices,
+  setRtcLocalStream,
   clearLocalTracks,
   clearDummyTracks,
   joinRoomInit,

@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
 
-const { Account, User } = require('../models/User'); // User model
-
 router.get('/', ensureAuthenticated, (req, res) => {
   res.render('home', { type: req.user.type });
 }); // Welcome Page

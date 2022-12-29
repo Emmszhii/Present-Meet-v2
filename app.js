@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 const flash = require('connect-flash');
@@ -13,6 +14,7 @@ require('./config/passport')(passport); // Passport Config
 const db = require('./config/keys').MongoURI; // DB config
 
 // EJS
+app.use(cors());
 app.use(express.static('public'));
 app.use('/public/', express.static('./public'));
 app.use(express.static(__dirname + '/public'));

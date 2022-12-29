@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
 const { ensureAuthenticated } = require('../config/auth');
-const { createJsonToken, verifyJsonToken } = require('../config/jwt');
-const { validateEmpty, comparePassword } = require('./helpers/functions');
 
-const { ObjectId } = require('mongodb');
-// mongoose model
-const { Account, User } = require('../models/User');
-const { Teacher, Classroom, Attendance } = require('../models/Class');
 const {
   classAttendance,
   postAddClassList,

@@ -345,7 +345,7 @@ const dropDownList = (data) => {
     title.value = 'none';
     select.appendChild(title);
 
-    for (const [values] of data.entries()) {
+    for (const [index, values] of data.entries()) {
       const option = document.createElement('option');
       option.value = values._id;
       option.text = values._id;

@@ -91,7 +91,7 @@ const toggleStudentAttendance = async (req, res) => {
     path: 'students',
     match: { _id: student_id },
   });
-  console.log(student);
+
   const queryStudent = student.students[0]._id;
   if (!queryStudent) return res.status(400).json({ err: `Invalid student` });
 

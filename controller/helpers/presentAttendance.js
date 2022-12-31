@@ -1,4 +1,4 @@
-const { Teacher, Classroom, Attendance } = require('../../models/Class');
+const { Classroom, Attendance } = require('../../models/Class');
 
 const students = async (data) => {
   const { attendance_id, classroom_id } = data;

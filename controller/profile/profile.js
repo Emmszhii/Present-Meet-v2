@@ -1,5 +1,4 @@
 const { capitalize } = require('../helpers/functions');
-
 const { Account, User } = require('../../models/User.js');
 
 const getProfile = (req, res) => {
@@ -27,12 +26,6 @@ const postProfile = async (req, res) => {
       .status(400)
       .json({ err: 'First name must contain at least 3 letters' });
   if (!middle_name) middle_name = '';
-  // if (middle_name < 3)
-  //   return res
-  //     .status(400)
-  //     .json({ err: `Middle name must contain at least 3 or more letters` });
-  // if (middle_name.trim() === ``)
-  //   return res.status(400).json({ err: `Middle name is empty` });
 
   // check if last_name is valid
   if (last_name < 3 || last_name.trim() === '')

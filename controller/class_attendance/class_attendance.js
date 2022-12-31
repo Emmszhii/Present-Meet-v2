@@ -172,7 +172,7 @@ const createClassToken = (req, res) => {
   const { id, expire } = req.params;
 
   const classroom = Classroom.findOne({ _id: id });
-  console.log(classroom);
+
   if (!classroom) return res.status(400).json({ err: `Invalid ID` });
 
   const token = createJsonToken(id, expire);

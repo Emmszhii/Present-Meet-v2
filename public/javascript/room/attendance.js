@@ -313,7 +313,9 @@ const attendance = async () => {
         classroom.push(data);
         dropDownList(data);
       }
-      if (msg) console.log(msg);
+      if (msg) {
+        dropDownList({ msg: msg });
+      }
       if (err) console.log(err);
     } catch (e) {
       if (e.name === 'TypeError') return;
@@ -325,33 +327,43 @@ const attendance = async () => {
   }
 };
 
-const dropDownList = (info) => {
+const dropDownList = (data) => {
   const classroomDom = document.getElementById('classroom');
   const classroomList = document.getElementById('classroom_list');
-  const data = info;
 
   const select = document.createElement('select');
   select.name = 'classroom';
   select.id = 'classroom_list';
 
   const title = document.createElement('option');
-  title.text = 'Select a classroom list';
-  title.selected = true;
-  title.disabled = true;
-  title.hidden = true;
-  title.value = 'none';
-  select.appendChild(title);
-
-  for (const [index, values] of data.entries()) {
-    const option = document.createElement('option');
-    option.value = values._id;
-    option.text = values._id;
-    select.appendChild(option);
-  }
-
   const label = document.createElement('label');
-  label.innerHTML = 'List of classroom available';
-  label.htmlFor = 'classroom';
+  if (!data.msg) {
+    title.text = 'Select a classroom list';
+    title.selected = true;
+    title.disabled = true;
+    title.hidden = true;
+    title.value = 'none';
+    select.appendChild(title);
+
+    for (const [values] of data.entries()) {
+      const option = document.createElement('option');
+      option.value = values._id;
+      option.text = values._id;
+
+      select.appendChild(option);
+    }
+    label.innerHTML = 'List of classroom available';
+    label.htmlFor = 'classroom';
+  } else {
+    title.text = data.msg;
+    title.selected = true;
+    title.disabled = true;
+    title.hidden = true;
+    title.value = 'none';
+    select.appendChild(title);
+    label.innerHTML = 'List of classroom is unavailable';
+    label.htmlFor = 'classroom';
+  }
 
   if (!classroomList) {
     classroomDom.appendChild(label);

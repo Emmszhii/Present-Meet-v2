@@ -7,8 +7,9 @@ const forgotPasswordMail = async (email, code) => {
       to: email,
       from: `presentmeet@gmail.com`,
       subject: `Forgot Password <DO NOT REPLY>`,
-      text: `Hi, Good day here's your otp to change your password ${code}`,
-      html: `Hi, Good day here's your otp to change your password \n<code><b>${code}</b></code>\n`,
+      text: `Hi, Good day here's your code to change your password ${code}`,
+      html: `Hi, Good day here's your code to change your password
+      \n<h1><code><b>${code}</b></code></h1>\n`,
     };
 
     sgMail

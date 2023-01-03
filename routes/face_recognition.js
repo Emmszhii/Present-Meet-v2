@@ -7,7 +7,7 @@ const {
   getDescriptor,
   changeDescriptor,
   getStudentDescriptor,
-} = require('../controller/face_recognition/face_recognition');
+} = require('../controller/face_recognition/face_recognition.js');
 
 router.get('/face-recognition', ensureAuthenticated, faceRecognitionPage); // page
 router.get('/get-face-recognition-threshold', ensureAuthenticated, threshold); // threshold

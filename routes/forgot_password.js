@@ -6,7 +6,7 @@ const {
   postForgotPassword,
   getForgotPasswordCodeToken,
   changePassword,
-} = require('../controller/forgot_password/forgot_password');
+} = require('../controller/forgot_password/forgot_password.js');
 
 router.get('/forgot-password', getPage); // page
 router.post('/forgot-password', postForgotPassword); // get email

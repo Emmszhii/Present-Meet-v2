@@ -5,7 +5,7 @@ const { ensureAuthenticated } = require('../config/auth');
 const {
   getStudentsInfo,
   allAttendanceInClassroom,
-} = require('../controller/excel/excel');
+} = require('../controller/excel/excel.js');
 
 router.post('/get-all-users-info', ensureAuthenticated, getStudentsInfo); // all students info
 router.get(

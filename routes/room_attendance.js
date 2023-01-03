@@ -7,7 +7,7 @@ const {
   addStudentAttendance,
   toggleStudentAttendance,
   checkPresent,
-} = require('../controller/room_attendance/room_attendance');
+} = require('../controller/room_attendance/room_attendance.js');
 
 router.post(
   '/create-attendance/:restrict',

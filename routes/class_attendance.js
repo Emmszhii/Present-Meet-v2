@@ -14,7 +14,7 @@ const {
   resultJoiningClass,
   removeStudentFromClass,
   changeActivityOfStudent,
-} = require('../controller/class_attendance/class_attendance');
+} = require('../controller/class_attendance/class_attendance.js');
 
 router.get('/class-attendance', ensureAuthenticated, classAttendance);
 router.get(`/get_classroom`, ensureAuthenticated, getClassrooms);

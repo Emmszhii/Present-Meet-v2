@@ -124,15 +124,4 @@ const deleteStudent = async (e) => {
   }
 };
 
-// const searchStudentDataInArr = (id) => {
-//   const data = students_data[0];
-//   for (const [index, value] of data) {
-//     console.log(index, value);
-//     if (id === value._id) {
-//       console.log(`found`);
-//       return value;
-//     }
-//   }
-// };
-
 export { students_data, fetchStudents, listStudentToDom, studentTableData };

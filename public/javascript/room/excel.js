@@ -179,7 +179,7 @@ const deleteIdInArr = (id) => {
 
 const exportExcelAttendance = async () => {
   const now = new Date().toISOString();
-  const dateNowToUtc = new Date().toUTCString();
+  const dateLocalTime = new Date();
   const wb = XLSX.utils.book_new();
 
   student.forEach((user) => {
@@ -204,7 +204,7 @@ const exportExcelAttendance = async () => {
   const wk = XLSX.utils.aoa_to_sheet(
     [
       ['Meeting ID', '', 'Date Created'],
-      [meetingId, '', dateNowToUtc],
+      [meetingId, '', dateLocalTime],
       ['', '', ''],
     ],
     { origin: 'A1' }
@@ -220,7 +220,7 @@ const exportExcelAttendance = async () => {
   });
 
   XLSX.utils.book_append_sheet(wb, wk, meetingId);
-  XLSX.writeFile(wb, `${meetingId}_${now}.xlsx`);
+  XLSX.writeFile(wb, `${meetingId},${now}.xlsx`);
 };
 
 const exportAttendanceFromDb = async () => {
@@ -243,7 +243,6 @@ const attendanceFromDb = async () => {
   try {
     const { data, err, msg } = await getRequest(url);
     if (err) return errorMsg(err);
-
     exportExcelFromDb(data);
   } catch (e) {
     console.log(e);
@@ -255,6 +254,7 @@ const attendanceFromDb = async () => {
 // const exportExcelFromDb = async (data) => {
 //   const now = new Date().toISOString();
 //   const dateNowToUtc = new Date().toUTCString();
+
 //   const wb = XLSX.utils.book_new();
 //   const wk = XLSX.utils.aoa_to_sheet(
 //     [['Classroom ID', '', 'Date Exported'], [data._id, '', dateNowToUtc], ['']],

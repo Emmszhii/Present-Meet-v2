@@ -13,6 +13,7 @@ const {
   registerPage,
   registerPost,
 } = require('../controller/register/register.js');
+
 const { userSchema } = require('../models/User'); // User model
 const { getProfile, postProfile } = require('../controller/profile/profile.js');
 const { postChangePassword } = require('../controller/password/password.js');

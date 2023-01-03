@@ -29,6 +29,8 @@ const createAttendance = async (req, res) => {
 
       const attendance = new Attendance();
       classroom.attendance_id.push(attendance._id);
+      console.log(attendance);
+      console.log(classroom);
       await attendance.save();
       await classroom.save();
 

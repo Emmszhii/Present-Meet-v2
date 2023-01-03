@@ -1,9 +1,9 @@
 const exportExcelFromDb = async (data) => {
   const now = new Date().toISOString();
-  const dateNowToUtc = new Date().toUTCString();
+  const localDate = new Date();
   const wb = XLSX.utils.book_new();
   const wk = XLSX.utils.aoa_to_sheet(
-    [['Classroom ID', '', 'Date Exported'], [data._id, '', dateNowToUtc], ['']],
+    [['Classroom ID', '', 'Date Exported'], [data._id, '', localDate], ['']],
     { origin: 'A1' }
   );
   const teacher = [
@@ -88,7 +88,7 @@ const exportExcelFromDb = async (data) => {
   });
 
   XLSX.utils.book_append_sheet(wb, wk, data._id);
-  XLSX.writeFile(wb, `${data._id}_${now}.xlsx`);
+  XLSX.writeFile(wb, `${data._id},${now}.xlsx`);
 };
 
 export { exportExcelFromDb };

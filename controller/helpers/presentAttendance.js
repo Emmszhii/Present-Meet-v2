@@ -58,7 +58,8 @@ const restrictMultipleAttendance = async (classId) => {
       const minutes = seconds / 60;
       if (minutes > 1) return { minutes: Math.floor(minutes) };
       if (seconds > 0 && seconds <= 60) return { seconds };
-    });
+    })
+    .catch((e) => console.log(e));
   let err;
   const { minutes, seconds, msg } = classroom;
 
@@ -68,8 +69,10 @@ const restrictMultipleAttendance = async (classId) => {
     err = `Request Timeout! Request again after ${60 - seconds} second(s)`;
   } else if (msg === `ok`) {
     err = 'none';
+  } else {
+    err = 'none';
   }
-
+  console.log(err);
   return { err };
 };
 

@@ -1,13 +1,14 @@
 const {
   students,
   restrictMultipleAttendance,
-} = require('../helpers/presentAttendance');
+} = require('../helpers/presentAttendance.js');
 
 const { Teacher, Classroom, Attendance } = require('../../models/Class');
 
 const createAttendance = async (req, res) => {
   const restrict = req.params.restrict;
   const { meetingId, id: classId } = req.body;
+
   if (restrict !== 'on' && restrict !== 'off')
     return res.status(400).json({ err: `Invalid restriction request` });
   if (!meetingId)
@@ -24,22 +25,22 @@ const createAttendance = async (req, res) => {
         return res.status(400).json({ err: `No student(s) registered` });
 
       const { err } = await restrictMultipleAttendance(classId);
-
       if (err !== 'none') return res.status(400).json({ err });
 
       const attendance = new Attendance();
       classroom.attendance_id.push(attendance._id);
-      console.log(attendance);
-      console.log(classroom);
       await attendance.save();
       await classroom.save();
 
+      const data = {
+        attendance_id: attendance._id,
+      };
+
       return res.status(200).json({
-        data: {
-          attendance_id: attendance._id,
-        },
+        data: data,
       });
     } else {
+      console.log('off');
       res.status(200).json({ msg: `Not yet implemented` });
     }
   } catch (e) {

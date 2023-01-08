@@ -16,21 +16,14 @@
   left: 0;
   z-index: 100;
 }
-.eye-icon {
-  background: url('/public/img/icons/eye.svg') no-repeat center center
-    transparent;
+.icon-password {
   position: absolute;
-  background-size: 50%;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 100;
+  top: 60%;
+  right: 0;
+  transform: translate(-50%);
+  cursor: pointer;
 }
-.eye-icon-slash {
-  background: url('/public/img/icons/eye-slash.svg') no-repeat center center
-    transparent;
-}
+
 body {
   background-color: black;
   font-size: 10px;
@@ -58,18 +51,9 @@ main {
   transform: translate(-50%, -50%);
 }
 
-/* #form {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: black;
-  font-size: 1.5rem;
-} */
-
 .form-group {
   padding: 5px 0px;
+  position: relative;
 }
 
 .intro {

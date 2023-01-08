@@ -129,7 +129,6 @@ const startVideoHandler = async () => {
     const video = document.getElementById('video');
     if (!video) camera.insertBefore(vid, camera.firstChild);
     await videoUserMedia();
-    // if ((await backend()) === 'webgl') await faceDetection(500);
   } catch (err) {
     return errorMsg(err.message);
   } finally {
@@ -275,8 +274,6 @@ const comparePerson = async (referenceImg, queryImg, threshold) => {
     if (!ArrayBuffer.isView(referenceImg))
       return errorMsg(`Record your face descriptor first!`);
     if (!ArrayBuffer.isView(queryImg)) return errorMsg(`Face not recognize`);
-    // matching B query
-
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
     console.log(dist);
     if (dist <= threshold) {

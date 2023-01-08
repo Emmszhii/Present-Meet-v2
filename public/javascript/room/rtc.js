@@ -21,6 +21,7 @@ import {
   roomLoaderHandler,
   checkIfUserDom,
   setUserToFirstChild,
+  raiseHandler,
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { errorMsg } from './msg.js';
@@ -102,6 +103,7 @@ const data_init = async () => {
 const joinRoomInit = async () => {
   try {
     if (userData.type === 'teacher') makeAttendanceHandler();
+    raiseHandler();
     rtm.client = await AgoraRTM.createInstance(userData.APP_ID, {
       logFilter: AgoraRTM.LOG_FILTER_WARNING,
     });

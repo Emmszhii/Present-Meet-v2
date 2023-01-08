@@ -16,12 +16,16 @@ const exportExcelFromDb = async (data) => {
   ];
 
   const date = data.attendance.map((item) =>
-    new Date(item.createdAt).toUTCString()
+    new Date(item.createdAt).toString()
   );
 
   XLSX.utils.sheet_add_aoa(wk, [['TEACHER']], { origin: -1 });
+  XLSX.utils.sheet_add_aoa(wk, [['Last Name', 'First Name', 'Middle Name']], {
+    origin: -1,
+  });
   XLSX.utils.sheet_add_json(wk, teacher, {
     origin: -1,
+    skipHeader: true,
   });
   XLSX.utils.sheet_add_aoa(wk, [['STUDENT(S)']], { origin: -1 });
   XLSX.utils.sheet_add_aoa(
@@ -29,9 +33,9 @@ const exportExcelFromDb = async (data) => {
     [
       [
         `ID`,
-        'LastName',
-        'FirstName',
-        'MiddleName',
+        'Last Name',
+        'First Name',
+        'Middle Name',
         ...date,
         '',
         'Present',

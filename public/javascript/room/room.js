@@ -22,7 +22,6 @@ import {
   checkSwitchToggle,
 } from './switch.js';
 
-const constraint = { video: true, audio: true };
 const url = window.location.search;
 const urlParams = new URLSearchParams(url);
 const meetingId = urlParams.get('meetingId').trim();
@@ -32,6 +31,19 @@ const userIdInDisplayFrame = { val: null };
 const checkMeetingId = () => {
   const id = urlParams.get('meetingId');
   if (!id) window.location.href = '*';
+};
+
+const raiseHandler = () => {
+  if (userData.type !== 'student') return;
+
+  const html = `
+  <button class="button" id="raise-hand">
+    <i class="fa-solid fa-hand"></i>
+  </button>`;
+
+  document.getElementById('camera-btn').insertAdjacentHTML('afterend', html);
+
+  document.getElementById('raise-hand').addEventListener('click', raiseHand);
 };
 
 const appInitialize = async () => {
@@ -54,9 +66,6 @@ const appInitialize = async () => {
     })
     .catch((err) => {
       console.log(err);
-    })
-    .finally(() => {
-      // window.stop();
     });
 };
 
@@ -137,11 +146,15 @@ const roomLoaderHandler = () => {
 // message and participant toggle
 const messagesToggle = (e) => {
   const btn = e.currentTarget;
+  const memberBtn = document.getElementById('users-btn');
   const x = document.getElementById('messages__container');
   const y = document.getElementById('members__container');
   const btnMsgNotification = document.getElementById('notification_msg');
 
-  if (y.style.display === 'block') return;
+  if (y.style.display === 'block') {
+    y.style.display = 'none';
+    memberBtn.classList.remove('active');
+  }
   if (x.style.display === 'block') {
     btn.classList.remove('active');
     x.style.display = 'none';
@@ -154,9 +167,13 @@ const messagesToggle = (e) => {
 
 const membersToggle = (e) => {
   const btn = e.currentTarget;
+  const msgBtn = document.getElementById('chat-btn');
   const x = document.getElementById('members__container');
   const y = document.getElementById('messages__container');
-  if (y.style.display === 'block') return;
+  if (y.style.display === 'block') {
+    y.style.display = 'none';
+    msgBtn.classList.remove('active');
+  }
   if (x.style.display === 'block') {
     btn.classList.remove('active');
     x.style.display = 'none';
@@ -457,6 +474,24 @@ const visibilityChangeHandler = async () => {
   }
 };
 
+const keyDownHandler = (e) => {
+  const membersModal = document.getElementById('members__container');
+  const messagesModal = document.getElementById('messages__container');
+  const membersBtn = document.getElementById('users-btn');
+  const messagesBtn = document.getElementById('chat-btn');
+
+  if (e.key === 'Escape') {
+    if ((membersModal.style.display = 'block')) {
+      membersModal.style.display = 'none';
+      membersBtn.classList.remove('active');
+    }
+    if ((messagesModal.style.display = 'block')) {
+      messagesModal.style.display = 'none';
+      messagesBtn.classList.remove('active');
+    }
+  }
+};
+
 export {
   displayFrame,
   videoFrames,
@@ -481,4 +516,6 @@ export {
   setUserToFirstChild,
   checkMeetingId,
   visibilityChangeHandler,
+  raiseHandler,
+  keyDownHandler,
 };

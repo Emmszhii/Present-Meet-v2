@@ -20,6 +20,7 @@ import {
   checkIfUserIsMobileHandler,
   checkMeetingId,
   visibilityChangeHandler,
+  keyDownHandler,
 } from './room.js';
 
 // Event Listeners
@@ -40,30 +41,10 @@ document
 document
   .getElementById('stream__box')
   .addEventListener('click', hideDisplayFrame); // toggle display Frame
-document.getElementById('raise-hand').addEventListener('click', raiseHand); // raise hand
+// document.getElementById('raise-hand').addEventListener('click', raiseHand); // raise hand
 
 window.addEventListener('beforeunload', leaveChannel); // when a user forced close they will be deleted to the dom
 
-document.addEventListener('keydown', (e) => {
-  const membersModal = document.getElementById('members__container');
-  const messagesModal = document.getElementById('messages__container');
-  const membersBtn = document.getElementById('users-btn');
-  const messagesBtn = document.getElementById('chat-btn');
+document.addEventListener('keydown', keyDownHandler); // when users click esc btn close the msg & members modal
 
-  if (e.key === 'Escape') {
-    if ((membersModal.style.display = 'block')) {
-      membersModal.style.display = 'none';
-      membersBtn.classList.remove('active');
-    }
-    if ((messagesModal.style.display = 'block')) {
-      messagesModal.style.display = 'none';
-      messagesBtn.classList.remove('active');
-    }
-  }
-}); // when users click esc btn close the msg & members modal
-
-// window.addEventListener('DOMContentLoaded', appInitialize);
 document.addEventListener('DOMContentLoaded', appInitialize);
-// document.addEventListener('load', appInitialize);
-// window.addEventListener('load', appInitialize);
-// window.addEventListener('visibilitychange', visibilityChangeHandler, false);

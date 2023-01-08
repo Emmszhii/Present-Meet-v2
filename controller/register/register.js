@@ -55,7 +55,7 @@ const registerPost = async (req, res) => {
 
   if (!isEmail(email)) errors.push({ msg: 'Email is not valid' }); // check if email is valid
 
-  if (password !== password2) errors.push({ msg: 'Passwords do not much' }); // check password match
+  if (password !== password2) errors.push({ msg: 'Passwords do not match' }); // check password match
 
   if (password.length < 6)
     errors.push({ msg: 'Password should be at least 6 characters' }); // check pass length

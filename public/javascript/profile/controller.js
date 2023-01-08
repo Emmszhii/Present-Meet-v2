@@ -8,7 +8,6 @@ import {
   loaderHandler,
 } from './profile.js';
 
-// event listeners
 // modals
 document.getElementById('submit-btn').addEventListener('click', openModal);
 document.getElementById('cancel').addEventListener('click', closeModal);

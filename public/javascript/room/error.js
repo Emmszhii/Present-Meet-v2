@@ -22,6 +22,7 @@ const tryCatchDeviceErr = (errorMessage) => {
     },
     { err: `Cannot read properties of null (reading '0')` },
     { err: `Cannot read properties of undefined (reading 'play')` },
+    { err: `Cannot read properties of null (reading 'removeEventListener')` },
   ];
   return arrErr.filter((arr) => {
     if (errorMessage === arr.err) return arr;

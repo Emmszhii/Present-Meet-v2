@@ -37,7 +37,8 @@ const device = {
   boolAudio: false,
   boolVideo: false,
   joined: false,
-  boolChanges: false,
+  videoDeviceChanges: false,
+  audioDeviceChanges: false,
 };
 const rtc = {
   client: null, // rtc API
@@ -83,7 +84,7 @@ const data_init = async () => {
     userData.id = _id;
     userData.rtcId = _id;
     userData.rtmId = _id;
-    userData.dummyId = _id + 'a';
+    userData.dummyId = _id + '1234a';
     const rtcUrl = `/rtc/${meetingId}/publisher/uid`;
     const { rtcToken } = await getRequest(rtcUrl);
     userData.rtcToken = rtcToken;
@@ -438,12 +439,10 @@ const setRtcLocalStream = async () => {
   checkDeviceMuted();
   rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
     {
-      audioConfig: {
-        config: { ANS: true },
-        microphoneId: device?.localAudio,
-      },
+      config: { ANS: true },
+      microphoneId: device?.localAudio,
     },
-    { videoConfig: { cameraId: device?.localVideo } }
+    { cameraId: device?.localVideo, facingMode: `user` }
   );
   checkIfUserDom(userData.id, userData.fullName);
   await rtc.localTracks[0].on('track-ended', audioTrackEnded);

@@ -68,37 +68,29 @@ const checkDeviceEnabled = () => {
 const switchEventHandler = async (e) => {
   const btn = e.currentTarget;
   const name = btn.id.split('-')[0];
-  const setEnabledAudio = device.boolAudio;
-  const setEnabledVideo = device.boolVideo;
+  const setEnabledAudio = !device.boolAudio;
+  const setEnabledVideo = !device.boolVideo;
   const dummyId = userData.dummyId;
   try {
     if (btn.checked) {
       if (name === 'audio') {
         device.boolAudio = false;
-
-        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
-        device.boolChanges = true;
+        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setMuted(setEnabledAudio);
       }
       if (name === 'camera') {
         device.boolVideo = false;
-
-        if (!rtc.dummyTracks[1].isPlaying)
+        if (rtc.dummyTracks[1].isPlaying === false)
           rtc.dummyTracks[1].play(`user-${dummyId}`);
-        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
-        device.boolChanges = true;
+        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setMuted(setEnabledVideo);
       }
     } else {
       if (name === 'audio') {
         device.boolAudio = true;
-
-        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
-        device.boolChanges = true;
+        if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setMuted(setEnabledAudio);
       }
       if (name === 'camera') {
         device.boolVideo = true;
-
-        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
-        device.boolChanges = true;
+        if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setMuted(setEnabledVideo);
       }
     }
   } catch (e) {

@@ -39,8 +39,8 @@ const device = {
   boolAudio: false,
   boolVideo: false,
   joined: false,
-  changedAudio: false,
-  changedVideo: false,
+  boolChanges: false,
+  boolSettings: true,
 };
 const rtc = {
   client: null, // rtc API
@@ -421,7 +421,6 @@ const addJoinedUserLocalAttribute = async () => {
 const hideButtons = () => {
   document.getElementsByClassName('mainBtn')[0].style.display = 'none';
   document.getElementsByClassName('middleBtn')[0].style.display = 'flex';
-  // document.getElementById('settings-btn').style.display = 'none';
 };
 
 const showButtons = () => {
@@ -429,42 +428,35 @@ const showButtons = () => {
   document.getElementById('mic-btn').classList.remove('active');
   document.getElementsByClassName('mainBtn')[0].style.display = 'flex';
   document.getElementsByClassName('middleBtn')[0].style.display = 'none';
-  // document.getElementById('settings-btn').style.display = 'block';
 };
 
 const setRtcLocalStream = async () => {
-  const joined = device.joined;
-  clearDummyTracks();
-  if (joined) {
-    checkIfUserDom(userData.id, userData.fullName);
-  } else {
-    rtc.client.unpublish();
-    clearDummyTracks();
-    console.log(userData.id);
-    const user = document.getElementById(`user-container-${userData.id}`);
-    console.log(user);
-    if (user) user.remove();
-    checkIfUserDom(userData.id, userData.fullName);
-  }
-
-  if (device.localVideo && device.localAudio) {
-    rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-      { microphoneId: device?.localAudio, config: { ANS: true } },
-      { cameraId: device?.localVideo }
-    );
-    await checkDeviceMuted();
-    // handle error on video track
-    await rtc.localTracks[0].on('track-ended', audioTrackEnded);
-    await rtc.localTracks[1].on('track-ended', videoTrackEnded);
-    rtc.localTracks[1].play(`user-${userData.rtcId}`);
-    await rtc.localTracks[0].setMuted(device.boolAudio);
-    await rtc.localTracks[1].setMuted(device.boolVideo);
-    // localTracks[0] for audio and localTracks[1] for the video
-    rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
-  }
+  const userContainer = document.getElementById(
+    `user-container-${userData.id}`
+  );
+  if (userContainer) userContainer.remove();
+  if (device.joined === false) return;
+  clearLocalTracks();
+  rtc.client.unpublish();
+  checkDeviceMuted();
+  rtc.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
+    {
+      audioConfig: {
+        config: { ANS: true },
+        microphoneId: device?.localAudio,
+      },
+    },
+    { videoConfig: { cameraId: device?.localVideo } }
+  );
+  checkIfUserDom(userData.id, userData.fullName);
+  await rtc.localTracks[0].on('track-ended', audioTrackEnded);
+  await rtc.localTracks[1].on('track-ended', videoTrackEnded);
+  rtc.localTracks[0].setMuted(device.boolAudio);
+  rtc.localTracks[1].setMuted(device.boolVideo);
+  rtc.localTracks[1].play(`user-${userData.id}`);
+  rtc.client.publish([rtc.localTracks[0], rtc.localTracks[1]]);
 };
 
-// joining the stream
 const joinStream = async () => {
   device.joined = true;
   try {
@@ -484,7 +476,7 @@ const joinStream = async () => {
   } finally {
     roomLoaderHandler();
   }
-};
+}; // joining the stream
 
 const userJoinMsg = async () => {
   rtm.channel.sendMessage({

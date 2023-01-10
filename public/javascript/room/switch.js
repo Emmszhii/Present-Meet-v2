@@ -75,31 +75,34 @@ const switchEventHandler = async (e) => {
     if (btn.checked) {
       if (name === 'audio') {
         device.boolAudio = false;
-        device.changedAudio = true;
+
         if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        device.boolChanges = true;
       }
       if (name === 'camera') {
         device.boolVideo = false;
-        device.changedVideo = true;
+
         if (!rtc.dummyTracks[1].isPlaying)
           rtc.dummyTracks[1].play(`user-${dummyId}`);
         if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        device.boolChanges = true;
       }
     } else {
       if (name === 'audio') {
         device.boolAudio = true;
-        device.changedAudio = true;
+
         if (rtc.dummyTracks[0]) rtc.dummyTracks[0].setEnabled(setEnabledAudio);
+        device.boolChanges = true;
       }
       if (name === 'camera') {
         device.boolVideo = true;
-        device.changedVideo = true;
+
         if (rtc.dummyTracks[1]) rtc.dummyTracks[1].setEnabled(setEnabledVideo);
+        device.boolChanges = true;
       }
     }
   } catch (e) {
     console.log(e);
-    console.log(e.message);
   }
 };
 

@@ -29,22 +29,19 @@ const postChangePassword = async (req, res) => {
 
   const booleanPassword = await comparePassword(oldPw, account.password);
   if (booleanPassword) {
-    try {
-      const hash = await generateHashPassword(newPw);
-      Account.updateOne(
-        { _id: req.user._id },
-        { password: hash },
-        (error, result) => {
-          if (error) res.status(400).json({ err: 'Something went wrong' });
-          if (result.acknowledged) {
-            return res.status(200).json({ msg: `Password has been changed` });
-          }
+    const hash = await generateHashPassword(newPw);
+    Account.updateOne(
+      { _id: req.user._id },
+      { password: hash },
+      (error, result) => {
+        if (error) res.status(400).json({ err: 'Something went wrong' });
+        if (result.acknowledged) {
+          return res.status(200).json({ msg: `Password has been changed` });
         }
-      );
-    } catch (e) {
-      console.log(e);
-      return res.status(400).json({ err: `Something gone wrong` });
-    }
+      }
+    );
+  } else {
+    res.status(400).json({ err: `Invalid Password` });
   }
 };
 

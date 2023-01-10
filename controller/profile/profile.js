@@ -1,4 +1,5 @@
-const { capitalize } = require('../helpers/functions');
+const { capitalize, comparePassword } = require('../helpers/functions');
+
 const { Account, User } = require('../../models/User.js');
 
 const getProfile = (req, res) => {

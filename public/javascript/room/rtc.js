@@ -16,7 +16,6 @@ import {
   userIdInDisplayFrame,
   expandVideoFrame,
   resetTheFrames,
-  createSelectElement,
   settingsHandler,
   roomLoaderHandler,
   checkIfUserDom,
@@ -25,8 +24,7 @@ import {
 } from './room.js';
 import { getRequest, postRequest } from '../helpers/helpers.js';
 import { errorMsg } from './msg.js';
-import { student, teacher, deleteIdInArr } from './excel.js';
-import { allVideoAndAudioDevices } from '../helpers/devices.js';
+import { deleteIdInArr } from './excel.js';
 import { tryCatchDeviceErr } from './error.js';
 import { checkDeviceMuted } from './switch.js';
 const userData = {}; // User Local Data and Tokens
@@ -40,7 +38,6 @@ const device = {
   boolVideo: false,
   joined: false,
   boolChanges: false,
-  boolSettings: true,
 };
 const rtc = {
   client: null, // rtc API
@@ -143,7 +140,7 @@ const joinRoomInit = async () => {
     roomLoaderHandler(); // if All are loaded loader will be gone
     window.stop();
   }
-};
+}; // Initialize the application
 
 const volumeIndicator = async (user) => {
   const streams = document.getElementById('streams__container');

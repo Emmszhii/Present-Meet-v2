@@ -322,7 +322,6 @@ const addPlayerToSettings = () => {
 const settingsHandler = async () => {
   const joined = device.joined;
   const dom = document.body;
-  device.boolSettings = true;
   dom.insertAdjacentHTML('beforeend', settings_dom());
   const loader = document.getElementById('loader_settings');
 
@@ -336,7 +335,7 @@ const settingsHandler = async () => {
       return await devices();
     })
     .then(async (data) => {
-      const { err, audioDev, cameraDev } = data;
+      const { err } = data;
       if (err) console.log(err);
       document.querySelector(
         '.text_settings'
@@ -369,12 +368,11 @@ const setBtnSettings = () => {
 };
 
 const setupBtnOnClick = async () => {
-  const modal = document.querySelector(`#modal-settings`);
+  const modal = document.getElementById(`modal-settings`);
   if (modal) modal.remove();
   document.getElementById('settings-btn').classList.remove('active');
   clearDummyTracks();
   setRtcLocalStream();
-  device.boolSettings = false;
 };
 
 const permissionDeniedDom = () => {

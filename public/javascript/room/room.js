@@ -351,19 +351,16 @@ const settingsHandler = async () => {
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
   const loader = document.getElementById('loader_settings');
-  devices();
-
-  setRtcDummy()
-    .then(async () => {
-      loader.style.display = 'block';
-      selectDomElements();
-      // return await devices();
+  loader.style.display = 'block';
+  devices()
+    .then(() => {
+      setRtcDummy();
     })
     .then(async () => {
       document.querySelector(
         '.text_settings'
       ).innerHTML = `Here's the devices available to your computer.`;
-      // selectDomElements();
+      selectDomElements();
       switchHandler('toggle-settings', 'audio-switch');
       switchHandler('toggle-settings', 'camera-switch');
       checkDeviceEnabled();

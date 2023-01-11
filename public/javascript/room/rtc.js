@@ -139,7 +139,7 @@ const joinRoomInit = async () => {
     console.log(e);
   } finally {
     roomLoaderHandler(); // if All are loaded loader will be gone
-    window.stop();
+    // window.stop();
   }
 }; // Initialize the application
 
@@ -216,6 +216,7 @@ const handleUserLeft = async (user) => {
   }
   deleteIdInArr(user.uid);
 }; // user left the meeting
+
 const toggleCamera = async (e) => {
   try {
     if (!device.localVideo) return errorMsg('No camera device detected');

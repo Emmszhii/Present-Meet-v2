@@ -184,9 +184,23 @@ const membersToggle = (e) => {
   }
 };
 
-const settingsToggle = () => {
-  const btn = document.getElementById('settings-btn');
+const settingsToggle = (e) => {
+  const btn = e.currentTarget;
   const modal = document.getElementById('settings-modal');
+  const membersContainer = document.getElementById('members__container');
+  const memberBtn = document.getElementById(`users-btn`);
+  const messagesContainer = document.getElementById('messages__container');
+  const messagesBtn = document.getElementById('chat-btn');
+
+  if (membersContainer.style.display === 'block') {
+    membersContainer.style.display = 'none';
+    memberBtn.classList.remove('active');
+  }
+  if (messagesContainer.style.display === 'block') {
+    messagesContainer.style.display = 'none';
+    messagesBtn.classList.remove('active');
+  }
+
   if (!modal) {
     resetDevices();
     settingsHandler();
@@ -232,28 +246,24 @@ const createSelectElement = (name, val) => {
 const changeSelectDeviceListener = (e) => {
   const kind = e.currentTarget[e.target.selectedIndex].dataset.kind;
   const deviceId = e.currentTarget[e.target.selectedIndex].dataset.deviceId;
-  if (kind === 'audioinput') {
-    const dev = audio_devices.find((device) => device.deviceId === deviceId);
+  try {
+    if (kind === 'audioinput') {
+      const dev = audio_devices.find((device) => device.deviceId === deviceId);
 
-    rtc.dummyTracks[0].setDevice(dev.deviceId).catch((e) => {
-      const err = tryCatchDeviceErr(e.message);
-      console.log(err);
-      if (err[0].msg) return errorMsg(err[0].msg);
-    });
-    device.localAudio = dev.deviceId;
-    device.audioDeviceChanges = true;
-  }
-  if (kind === 'videoinput') {
-    const dev = video_devices.find((device) => device.deviceId === deviceId);
+      device.localAudio = dev.deviceId;
+      setRtcDummy();
+    }
+    if (kind === 'videoinput') {
+      const dev = video_devices.find((device) => device.deviceId === deviceId);
 
-    rtc.dummyTracks[1].setDevice(dev.deviceId).catch(async (e) => {
-      const err = tryCatchDeviceErr(e.message);
-      console.log(err);
-      if (err[0].msg) return errorMsg(err[0].msg);
-      console.log(e.message);
-    });
-    device.localVideo = dev.deviceId;
-    device.videoDeviceChanges = true;
+      device.localVideo = dev.deviceId;
+      setRtcDummy();
+    }
+  } catch (e) {
+    const err = tryCatchDeviceErr(e.message);
+    console.log(err);
+    if (err[0].msg) return errorMsg(err[0].msg);
+    console.log(e.message);
   }
 };
 
@@ -302,8 +312,11 @@ const selectDomElements = () => {
 };
 
 const setRtcDummy = async () => {
-  addPlayerToSettings();
   const dummyId = userData.dummyId;
+  const dummyContainer = document.getElementById(`user-container-${dummyId}`);
+  if (dummyContainer) dummyContainer.remove();
+  addPlayerToSettings();
+  clearDummyTracks();
   try {
     rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
       {
@@ -338,19 +351,19 @@ const settingsHandler = async () => {
   const dom = document.body;
   dom.insertAdjacentHTML('beforeend', settings_dom());
   const loader = document.getElementById('loader_settings');
+  devices();
 
   setRtcDummy()
     .then(async () => {
       loader.style.display = 'block';
-      return await devices();
+      selectDomElements();
+      // return await devices();
     })
-    .then(async (data) => {
-      const { err } = data;
-      if (err) console.log(err);
+    .then(async () => {
       document.querySelector(
         '.text_settings'
       ).innerHTML = `Here's the devices available to your computer.`;
-      selectDomElements();
+      // selectDomElements();
       switchHandler('toggle-settings', 'audio-switch');
       switchHandler('toggle-settings', 'camera-switch');
       checkDeviceEnabled();

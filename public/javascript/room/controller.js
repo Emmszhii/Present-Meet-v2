@@ -10,16 +10,11 @@ import {
 import { sendMessage, leaveChannel } from './rtm.js';
 import {
   appInitialize,
-  meetingId,
   membersToggle,
   messagesToggle,
   copyClipboard,
   hideDisplayFrame,
   settingsToggle,
-  raiseHand,
-  checkIfUserIsMobileHandler,
-  checkMeetingId,
-  visibilityChangeHandler,
   keyDownHandler,
 } from './room.js';
 
@@ -41,7 +36,6 @@ document
 document
   .getElementById('stream__box')
   .addEventListener('click', hideDisplayFrame); // toggle display Frame
-// document.getElementById('raise-hand').addEventListener('click', raiseHand); // raise hand
 
 window.addEventListener('beforeunload', leaveChannel); // when a user forced close they will be deleted to the dom
 

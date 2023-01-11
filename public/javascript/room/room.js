@@ -221,13 +221,20 @@ const createSelectElement = (name, val) => {
   select.id = name;
 
   for (let i = 0; val.length > i; i++) {
-    const option = document.createElement('option');
+    let option = document.createElement('option');
     option.value = val[i].label;
     option.text = val[i].label;
     option.dataset.deviceId = val[i].deviceId;
     option.dataset.kind = val[i].kind;
-    if (val[i].deviceId === device.localAudio) option.selected = true;
-    if (val[i].deviceId === device.localVideo) option.selected = true;
+    if (val[i].deviceId === device.localAudio) {
+      option.selected = true;
+      console.log(val[i].deviceId, device.localAudio);
+    }
+
+    if (val[i].deviceId === device.localVideo) {
+      option.selected = true;
+      console.log(val[i].deviceId, device.localVideo);
+    }
     select.appendChild(option);
   }
   const label = document.createElement('label');
@@ -249,13 +256,11 @@ const changeSelectDeviceListener = (e) => {
   try {
     if (kind === 'audioinput') {
       const dev = audio_devices.find((device) => device.deviceId === deviceId);
-
       device.localAudio = dev.deviceId;
       setRtcDummy();
     }
     if (kind === 'videoinput') {
       const dev = video_devices.find((device) => device.deviceId === deviceId);
-
       device.localVideo = dev.deviceId;
       setRtcDummy();
     }
@@ -307,6 +312,7 @@ const selectDomElements = () => {
     return errorMsg('Devices not detected');
   if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
   if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
+  console.log(device.localAudio, device.localVideo);
   if (!videoDom) createSelectElement('Video', video_devices);
   if (!audioDom) createSelectElement('Audio', audio_devices);
 };
@@ -314,16 +320,19 @@ const selectDomElements = () => {
 const setRtcDummy = async () => {
   const dummyId = userData.dummyId;
   const dummyContainer = document.getElementById(`user-container-${dummyId}`);
-  if (dummyContainer) dummyContainer.remove();
-  addPlayerToSettings();
-  clearDummyTracks();
+  const loader = document.getElementById('loader_settings');
   try {
+    console.log(device.localAudio, device.localVideo);
+    loader.style.display = 'block';
+    if (dummyContainer) dummyContainer.remove();
+    addPlayerToSettings();
+    clearDummyTracks();
     rtc.dummyTracks = await AgoraRTC.createMicrophoneAndCameraTracks(
       {
         config: { ANS: true },
-        microphoneId: device.localAudio,
+        microphoneId: device?.localAudio,
       },
-      { cameraId: device.localVideo, facingMode: `user` }
+      { cameraId: device?.localVideo }
     );
     rtc.dummyTracks[0].setMuted(device.boolAudio);
     rtc.dummyTracks[1].setMuted(device.boolVideo);
@@ -331,6 +340,8 @@ const setRtcDummy = async () => {
   } catch (e) {
     console.log(e);
     permissionDeniedDom();
+  } finally {
+    loader.style.display = 'none';
   }
 };
 
@@ -354,13 +365,13 @@ const settingsHandler = async () => {
   loader.style.display = 'block';
   devices()
     .then(() => {
-      setRtcDummy();
+      selectDomElements();
     })
     .then(async () => {
+      setRtcDummy();
       document.querySelector(
         '.text_settings'
       ).innerHTML = `Here's the devices available to your computer.`;
-      selectDomElements();
       switchHandler('toggle-settings', 'audio-switch');
       switchHandler('toggle-settings', 'camera-switch');
       checkDeviceEnabled();

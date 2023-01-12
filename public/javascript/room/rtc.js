@@ -1,6 +1,6 @@
-// initializing the variables
 const cameraBtn = document.getElementById('camera-btn');
 const screenBtn = document.getElementById('screen-btn');
+
 import { makeAttendanceHandler } from './attendance.js';
 import {
   users,
@@ -37,13 +37,9 @@ const device = {
   boolAudio: false,
   boolVideo: false,
   joined: false,
-  videoDeviceChanges: false,
-  audioDeviceChanges: false,
 };
 const rtc = {
-  client: null, // rtc API
-  localAudioTrack: null,
-  localVideoTrack: null,
+  client: null,
   localTracks: null,
   dummyTracks: null,
   localScreenTracks: null,

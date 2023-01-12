@@ -288,6 +288,28 @@ const restrictDom = () => {
   `;
 };
 
+const toggleOtherThanAttendance = () => {
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsContainer = document.getElementById('settings-modal');
+  const membersContainer = document.getElementById('members__container');
+  const membersBtn = document.getElementById(`users-btn`);
+  const messagesContainer = document.getElementById('messages__container');
+  const messagesBtn = document.getElementById('chat-btn');
+
+  if (membersContainer.style.display === 'block') {
+    membersContainer.style.display = 'none';
+    membersBtn.classList.remove('active');
+  }
+  if (messagesContainer.style.display === 'block') {
+    messagesContainer.style.display = 'none';
+    messagesBtn.classList.remove('active');
+  }
+  if (settingsContainer) {
+    settingsContainer.remove();
+    settingsBtn.classList.remove('active');
+  }
+};
+
 const attendance = async () => {
   roomLoaderHandler();
   const btn = document.getElementById('attendance-btn');
@@ -301,6 +323,7 @@ const attendance = async () => {
     students.length = 0;
     roomLoaderHandler();
   } else {
+    toggleOtherThanAttendance();
     btn.classList.add('active');
     body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
@@ -314,9 +337,7 @@ const attendance = async () => {
         classroom.push(data);
         dropDownList(data);
       }
-      if (msg) {
-        dropDownList({ msg: msg });
-      }
+      if (msg) dropDownList({ msg: msg });
       if (err) console.log(err);
     } catch (e) {
       if (e.name === 'TypeError') return;

@@ -5,7 +5,6 @@ import {
   toggleScreen,
   joinStream,
   leaveStream,
-  data_init,
 } from './rtc.js';
 import { sendMessage, leaveChannel } from './rtm.js';
 import {

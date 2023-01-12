@@ -226,15 +226,8 @@ const createSelectElement = (name, val) => {
     option.text = val[i].label;
     option.dataset.deviceId = val[i].deviceId;
     option.dataset.kind = val[i].kind;
-    if (val[i].deviceId === device.localAudio) {
-      option.selected = true;
-      console.log(val[i].deviceId, device.localAudio);
-    }
-
-    if (val[i].deviceId === device.localVideo) {
-      option.selected = true;
-      console.log(val[i].deviceId, device.localVideo);
-    }
+    if (val[i].deviceId === device.localAudio) option.selected = true;
+    if (val[i].deviceId === device.localVideo) option.selected = true;
     select.appendChild(option);
   }
   const label = document.createElement('label');
@@ -312,7 +305,6 @@ const selectDomElements = () => {
     return errorMsg('Devices not detected');
   if (!device.localVideo) device.localVideo = video_devices[0].deviceId;
   if (!device.localAudio) device.localAudio = audio_devices[0].deviceId;
-  console.log(device.localAudio, device.localVideo);
   if (!videoDom) createSelectElement('Video', video_devices);
   if (!audioDom) createSelectElement('Audio', audio_devices);
 };
@@ -322,7 +314,6 @@ const setRtcDummy = async () => {
   const dummyContainer = document.getElementById(`user-container-${dummyId}`);
   const loader = document.getElementById('loader_settings');
   try {
-    console.log(device.localAudio, device.localVideo);
     loader.style.display = 'block';
     if (dummyContainer) dummyContainer.remove();
     addPlayerToSettings();

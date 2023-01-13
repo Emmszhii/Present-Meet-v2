@@ -1,4 +1,5 @@
 import { allVideoAndAudioDevices } from '../helpers/devices.js';
+import { removeClassModal } from './attendance.js';
 import { tryCatchDeviceErr } from './error.js';
 import { errorMsg, successMsg } from './msg.js';
 import {
@@ -148,56 +149,63 @@ const roomLoaderHandler = () => {
 const messagesToggle = (e) => {
   const btn = e.currentTarget;
   const memberBtn = document.getElementById('users-btn');
-  const x = document.getElementById('messages__container');
-  const y = document.getElementById('members__container');
+  const messagesModal = document.getElementById('messages__container');
+  const membersModal = document.getElementById('members__container');
   const btnMsgNotification = document.getElementById('notification_msg');
+  const attendanceModal = document.getElementById('attendance__container');
 
-  if (y.style.display === 'block') {
-    y.style.display = 'none';
+  if (attendanceModal) removeClassModal();
+  if (membersModal.style.display === 'block') {
+    membersModal.style.display = 'none';
     memberBtn.classList.remove('active');
   }
-  if (x.style.display === 'block') {
+  if (messagesModal.style.display === 'block') {
     btn.classList.remove('active');
-    x.style.display = 'none';
+    messagesModal.style.display = 'none';
   } else {
     if (btnMsgNotification.classList.contains('red__icon')) notificationMsg();
     btn.classList.add('active');
-    x.style.display = 'block';
+    messagesModal.style.display = 'block';
   }
 };
 
 const membersToggle = (e) => {
   const btn = e.currentTarget;
-  const msgBtn = document.getElementById('chat-btn');
-  const x = document.getElementById('members__container');
-  const y = document.getElementById('messages__container');
-  if (y.style.display === 'block') {
-    y.style.display = 'none';
-    msgBtn.classList.remove('active');
+  const messagesBtn = document.getElementById('chat-btn');
+  const membersModal = document.getElementById('members__container');
+  const messagesModal = document.getElementById('messages__container');
+  const attendanceModal = document.getElementById('attendance__container');
+
+  if (attendanceModal) removeClassModal();
+  if (messagesModal.style.display === 'block') {
+    messagesModal.style.display = 'none';
+    messagesBtn.classList.remove('active');
   }
-  if (x.style.display === 'block') {
+  if (membersModal.style.display === 'block') {
     btn.classList.remove('active');
-    x.style.display = 'none';
+    membersModal.style.display = 'none';
   } else {
     btn.classList.add('active');
-    x.style.display = 'block';
+    membersModal.style.display = 'block';
   }
 };
 
 const settingsToggle = (e) => {
   const btn = e.currentTarget;
   const modal = document.getElementById('settings-modal');
-  const membersContainer = document.getElementById('members__container');
-  const memberBtn = document.getElementById(`users-btn`);
-  const messagesContainer = document.getElementById('messages__container');
+  const membersModal = document.getElementById('members__container');
+  const membersBtn = document.getElementById(`users-btn`);
+  const messagesModal = document.getElementById('messages__container');
   const messagesBtn = document.getElementById('chat-btn');
+  const attendanceModal = document.getElementById('attendance__container');
 
-  if (membersContainer.style.display === 'block') {
-    membersContainer.style.display = 'none';
-    memberBtn.classList.remove('active');
+  if (attendanceModal) removeClassModal();
+  if (membersModal.style.display === 'block') {
+    membersModal.style.display = 'none';
+    membersBtn.classList.remove('active');
   }
-  if (messagesContainer.style.display === 'block') {
-    messagesContainer.style.display = 'none';
+  if (messagesModal.style.display === 'block') {
+    messagesModal.style.display = 'none';
     messagesBtn.classList.remove('active');
   }
 

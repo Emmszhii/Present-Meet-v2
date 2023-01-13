@@ -164,7 +164,7 @@ const makeAttendanceHandler = () => {
 
   document
     .getElementById('attendance-btn')
-    .addEventListener('click', attendance);
+    .addEventListener('click', attendanceModal);
 };
 
 const restrictToggleHandler = () => {
@@ -310,22 +310,26 @@ const toggleOtherThanAttendance = () => {
   }
 };
 
-const attendance = async () => {
+const removeClassModal = () => {
+  const attendanceBtn = document.getElementById('attendance-btn');
+  const attendanceContainer = document.getElementById('attendance__container');
+  attendanceBtn.classList.remove('active');
+  if (attendanceContainer) attendanceContainer.remove();
+  classroom.length = 0;
+  students.length = 0;
+};
+
+const attendanceModal = async () => {
   roomLoaderHandler();
   const btn = document.getElementById('attendance-btn');
-  const body = document.body;
-  const attendanceContainer = document.getElementById('attendance__container');
 
   if (btn.classList.contains('active')) {
-    btn.classList.remove('active');
-    if (attendanceContainer) attendanceContainer.remove();
-    classroom.length = 0;
-    students.length = 0;
+    removeClassModal();
     roomLoaderHandler();
   } else {
     toggleOtherThanAttendance();
     btn.classList.add('active');
-    body.insertAdjacentHTML('beforeend', attendanceDom());
+    document.body.insertAdjacentHTML('beforeend', attendanceDom());
     loaderHandler();
     restrictToggleHandler();
 
@@ -459,8 +463,6 @@ const getStudents = async (id) => {
     if (err) console.log(err);
   } catch (e) {
     console.log(e);
-  } finally {
-    // loaderHandler();
   }
 };
 
@@ -507,4 +509,5 @@ export {
   checkStudentDescriptor,
   loaderHandler,
   studentsDom,
+  removeClassModal,
 };

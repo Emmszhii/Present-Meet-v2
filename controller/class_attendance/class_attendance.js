@@ -47,17 +47,22 @@ const postAddNewClassList = async (req, res) => {
 
       teacher.classroom_id.push(id);
 
-      await teacher.save().then(() => {
+      const result = await teacher.save();
+      console.log(result);
+      if (result) {
         return res.status(200).json({
           data: `ok`,
           msg: `Class list successfully save to database`,
         });
-      });
+      } else {
+        return res.status(500).json({ err: `Something went wrong.` });
+      }
     } else {
       return res.status(400).json({ err: `Invalid Password` });
     }
   } catch (e) {
     console.log(e);
+    return res.status(500), json({ err: `Something went wrong.` });
   }
 };
 

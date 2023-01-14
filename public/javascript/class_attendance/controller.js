@@ -4,6 +4,4 @@ document
   .getElementById('add_class_list')
   .addEventListener('click', classListHandler);
 
-window.addEventListener('load', () => {
-  getClassroomHandler();
-});
+window.addEventListener('DOMContentLoaded', getClassroomHandler);

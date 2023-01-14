@@ -4,7 +4,7 @@ const { ensureAuthenticated } = require('../config/auth');
 
 const {
   classAttendance,
-  postAddClassList,
+  postAddNewClassList,
   getClassrooms,
   getStudentsId,
   postUpdateClass,
@@ -29,7 +29,7 @@ router.get(
   ensureAuthenticated,
   studentJoinClassPage
 ); // student joining
-router.post('/add-class-list', ensureAuthenticated, postAddClassList);
+router.post('/add-class-list', ensureAuthenticated, postAddNewClassList);
 router.post('/update-class', ensureAuthenticated, postUpdateClass);
 router.post('/delete-class-list', ensureAuthenticated, deleteClassList);
 router.get('/join-class', ensureAuthenticated, resultJoiningClass); // result student joining

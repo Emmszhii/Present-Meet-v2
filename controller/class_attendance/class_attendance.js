@@ -16,16 +16,17 @@ const classAttendance = (req, res) => {
   res.render('class_attendance');
 };
 
-const postAddClassList = async (req, res) => {
+const postAddNewClassList = async (req, res) => {
   if (req.user.type !== 'teacher')
     return res.status(400).json({ err: 'Invalid Request' });
 
   const { subject, year_level, section, password } = req.body;
 
-  if (!subject) res.status(400).json({ err: `Subject is required` });
-  if (!year_level) res.status(400).json({ err: `Year level is required` });
-  if (!section) res.status(400).json({ err: `Section is required` });
-  if (!password) res.status(400).json({ err: `Password is required` });
+  if (!subject) return res.status(400).json({ err: `Subject is required` });
+  if (!year_level)
+    return res.status(400).json({ err: `Year level is required` });
+  if (!section) return res.status(400).json({ err: `Section is required` });
+  if (!password) return res.status(400).json({ err: `Password is required` });
 
   const classroom = new Classroom({
     subject,
@@ -335,7 +336,7 @@ const changeActivityOfStudent = async (req, res) => {
 
 module.exports = {
   classAttendance,
-  postAddClassList,
+  postAddNewClassList,
   getClassrooms,
   getStudentsId,
   postUpdateClass,

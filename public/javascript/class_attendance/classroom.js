@@ -135,7 +135,7 @@ const copyLink = () => {
 
 const studentDomHandler = async () => {
   const expireTime = ['15m', '30m', '1h', '1d', '7d'];
-  const id = document.getElementById('main_list').dataset.value;
+  // const id = document.getElementById('main_list').dataset.value;
   const url = window.location.href;
 
   document.querySelector('.link').insertAdjacentHTML('beforeend', linkDom());
@@ -150,19 +150,14 @@ const studentDomHandler = async () => {
   }
 
   const { token } = await getClassToken();
-
   const link = `${url}/join-class?token=${token}`;
-
   document.getElementById('link_classroom').value = link;
-
   linkDropDown.addEventListener('change', onChangeLinkDropDown);
-
   document.getElementById('copy').addEventListener('click', copyLink);
 };
 
 const editClassHandler = () => {
   const id = document.getElementById('main_list').dataset.value;
-
   removeChildElement();
 
   document
@@ -174,7 +169,6 @@ const editClassHandler = () => {
   document.querySelector('.close').addEventListener('click', closeParentNode);
 
   document.getElementById('add_list').dataset.value = id;
-
   document.getElementById('class_text').textContent = `Edit a CLass List`;
   document.getElementById('subject').value = data.subject;
   document.getElementById('year_level').value = data.year_level;
@@ -228,7 +222,6 @@ const searchTeacherDataInArr = (id) => {
 };
 
 const infoClass = async (id) => {
-  // class info
   const data = searchTeacherDataInArr(id);
 
   document.getElementById('main_list').dataset.value = data._id;
@@ -238,7 +231,7 @@ const infoClass = async (id) => {
     'year_level'
   ).textContent = `Year Level: ${data.year_level}`;
   document.getElementById('section').textContent = `Section: ${data.section}`;
-};
+}; // class info
 
 const loadClassHandler = async (e) => {
   const id = e.currentTarget.dataset.value;
@@ -490,7 +483,6 @@ const listTeacherToDom = () => {
   }
 };
 
-// Class List
 const getClassroomHandler = async () => {
   loaderHandler();
   const url = '/get_classroom';
@@ -510,7 +502,7 @@ const getClassroomHandler = async () => {
   } finally {
     loaderHandler();
   }
-};
+}; // Class List
 
 export {
   teacher_data,

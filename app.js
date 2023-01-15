@@ -8,6 +8,7 @@ const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const PORT = process.env.PORT || 3000;
+const { faceApiThreshold } = require('./controller/helpers/functions.js');
 
 mongoose.set('strictQuery', false);
 require('./config/passport')(passport); // Passport Config
@@ -91,6 +92,7 @@ mongoose
       console.log(`Server is up and listening on PORT ${PORT}`);
     });
     console.log(`MongoDB connected...`);
+    console.log(`Face API Threshold : ${faceApiThreshold}`);
   })
   .catch((err) => {
     console.log(err);

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-const faceApiThreshold = process.env.THRESHOLD || 0.42;
+const faceApiThreshold = process.env.THRESHOLD || 0.37;
 
 const capitalize = (string) => {
   const name = string.toLowerCase().split(' ');

@@ -275,7 +275,8 @@ const comparePerson = async (referenceImg, queryImg, threshold) => {
       return errorMsg(`Record your face descriptor first!`);
     if (!ArrayBuffer.isView(queryImg)) return errorMsg(`Face not recognize`);
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
-    console.log(dist);
+    console.log(`Query descriptor: ${referenceImg}`);
+    console.log(`Euclidean distance: ${dist}`);
     if (dist <= threshold) {
       successMsg(`Face are match! Please submit it to register`);
       createPostButton();

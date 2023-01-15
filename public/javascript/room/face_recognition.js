@@ -247,7 +247,8 @@ const faceRecognized = async () => {
       descriptorDb,
       query[0].descriptor
     );
-    console.log(dist);
+    console.log(`Query image: ${query[0].descriptor}`);
+    console.log(`Euclidean distance: ${dist}`);
     if (dist <= threshold) {
       successMsg(`User match, Attendance sending...`);
       sendAttendance({

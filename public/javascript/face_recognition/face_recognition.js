@@ -21,12 +21,40 @@ const devices = {
   selectedVideoId: null,
 };
 
-const tinyFaceOption = new faceapi.TinyFaceDetectorOptions({
-  inputSize: 416,
-});
+const tinyFaceOptions = async () => {
+  try {
+    const url = `/face-recognition/tiny-face-options`;
+    return await getRequest(url);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-const backend = async () => {
-  return await faceapi.tf.getBackend();
+const getThreshold = async () => {
+  try {
+    const url = `/face-recognition/threshold`;
+    return getRequest(url);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const init = () => {
+  Promise.all([
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
+    fetchPrevDescriptor(),
+  ])
+    .then(async () => {
+      await informationHandler();
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      loader();
+    });
 };
 
 const onChangeCameraDevice = async (e) => {
@@ -170,8 +198,6 @@ const faceDetection = async (ms) => {
 const photoHandler = async () => {
   try {
     loader();
-    const { threshold } = await getThreshold();
-    console.log(threshold);
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
     const displaySize = { width: video.width, height: video.height };
@@ -189,30 +215,31 @@ const photoHandler = async () => {
     canvas.id = 'canvas';
     camera.append(canvas);
 
+    const faceOptions = await tinyFaceOptions();
+    const options = new faceapi.TinyFaceDetectorOptions(faceOptions);
+    console.log(options);
     const detection = await faceapi
-      .detectAllFaces(canvas, tinyFaceOption)
+      .detectAllFaces(canvas, options)
       .withFaceLandmarks(useTinyModel)
       .withFaceDescriptors();
-
+    console.log(detection);
     // if no detection function done
     if (detection.length < 1 || detection.length > 1) {
       stopVideo();
       errorMsg('Image are invalid. Please Try again!');
       return startVideoHandler();
     }
-    // if face is detected
-    // stop video play
-    stopVideo();
-    // display face landmarks
+
+    stopVideo(); // if face is detected stop video
     await faceapi.matchDimensions(canvas, displaySize);
     const resizedDetections = await faceapi.resizeResults(
       detection,
       displaySize
-    );
+    ); // display face landmarks
     await faceapi.draw.drawDetections(canvas, resizedDetections);
     await faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    // store user descriptor
-    refUser.descriptor = detection[0].descriptor;
+
+    refUser.descriptor = detection[0].descriptor; // store user descriptor
     successMsg(
       'If you are satisfied with this photo try to recognize else retry'
     );
@@ -223,21 +250,11 @@ const photoHandler = async () => {
   }
 };
 
-const getThreshold = async () => {
-  try {
-    const url = `/get-face-recognition-threshold`;
-    const { threshold } = await getRequest(url);
-    return threshold;
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 // RECOGNIZE HANDLER
 const recognizeHandler = async () => {
   loader();
   try {
-    const threshold = await getThreshold();
+    const { threshold } = await getThreshold();
     const video = document.getElementById('video');
     if (!video) return errorMsg('Start the camera first!');
     if (refUser.length === 0) return errorMsg('No reference descriptor!');
@@ -246,21 +263,26 @@ const recognizeHandler = async () => {
     canvas.id = 'canvas';
     camera.append(canvas);
 
-    // face api detection
+    const faceOptions = await tinyFaceOptions();
+    const options = new faceapi.TinyFaceDetectorOptions(faceOptions);
+    console.log(options);
+
     const detection = await faceapi
-      .detectAllFaces(canvas, tinyFaceOption)
+      .detectAllFaces(canvas, options)
       .withFaceLandmarks(useTinyModel)
-      .withFaceDescriptors();
-    // if no detection or some faces are detected
+      .withFaceDescriptors(); // face api detection
+    console.log(detection);
+
     if (detection.length < 1 || detection.length > 1) {
       stopVideo();
       errorMsg('Face invalid, try again');
       return startVideoHandler();
-    }
+    } // if no detection or some faces are detected
+
     const img2 = detection[0].descriptor;
     stopVideo();
-    // comparing the 2 image
-    await comparePerson(img1, img2, threshold);
+
+    await comparePerson(img1, img2, threshold); // comparing the 2 image
   } catch (e) {
     console.log(e);
   } finally {
@@ -277,6 +299,7 @@ const comparePerson = async (referenceImg, queryImg, threshold) => {
     const dist = faceapi.euclideanDistance(referenceImg, queryImg);
     console.log(`Query descriptor: ${referenceImg}`);
     console.log(`Euclidean distance: ${dist}`);
+    console.log(`Threshold: ${threshold}`);
     if (dist <= threshold) {
       successMsg(`Face are match! Please submit it to register`);
       createPostButton();
@@ -375,4 +398,5 @@ export {
   informationHandler,
   cameraDeviceHandler,
   onChangeCameraDevice,
+  init,
 };

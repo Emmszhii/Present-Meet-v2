@@ -7,8 +7,16 @@ const faceRecognitionPage = (req, res) => {
     : res.redirect('/');
 };
 
-const threshold = async (req, res) => {
-  res.status(200).json({ threshold: faceApiThreshold });
+const getThreshold = async (req, res) => {
+  console.log(+process.env.THRESHOLD);
+  res.status(200).json({ threshold: +process.env.THRESHOLD });
+};
+
+const getTinyFaceOptions = (req, res) => {
+  res.status(200).json({
+    inputSize: +process.env.INPUT_SIZE,
+    scoreThreshold: +process.env.SCORE_THRESHOLD,
+  });
 };
 
 const getDescriptor = async (req, res) => {
@@ -97,8 +105,9 @@ const getStudentDescriptor = async (req, res) => {
 
 module.exports = {
   faceRecognitionPage,
-  threshold,
+  getThreshold,
   getDescriptor,
   changeDescriptor,
   getStudentDescriptor,
+  getTinyFaceOptions,
 };

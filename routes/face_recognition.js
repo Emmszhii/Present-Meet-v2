@@ -3,14 +3,15 @@ const router = express.Router();
 const { ensureAuthenticated } = require('../config/auth');
 const {
   faceRecognitionPage,
-  threshold,
+  getThreshold,
   getDescriptor,
   changeDescriptor,
   getStudentDescriptor,
+  getTinyFaceOptions,
 } = require('../controller/face_recognition/face_recognition.js');
 
 router.get('/face-recognition', ensureAuthenticated, faceRecognitionPage); // page
-router.get('/get-face-recognition-threshold', ensureAuthenticated, threshold); // threshold
+router.get('/face-recognition/threshold', ensureAuthenticated, getThreshold); // threshold
 router.get('/get-descriptor', ensureAuthenticated, getDescriptor); // get descriptor
 router.post('/descriptor', ensureAuthenticated, changeDescriptor); // set descriptor
 router.get(
@@ -18,5 +19,10 @@ router.get(
   ensureAuthenticated,
   getStudentDescriptor
 ); // student descriptor
+router.get(
+  '/face-recognition/tiny-face-options',
+  ensureAuthenticated,
+  getTinyFaceOptions
+);
 
 module.exports = router;

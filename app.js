@@ -92,7 +92,10 @@ mongoose
       console.log(`Server is up and listening on PORT ${PORT}`);
     });
     console.log(`MongoDB connected...`);
-    console.log(`Face API Threshold : ${faceApiThreshold}`);
+    console.log(`Face API Threshold : ${process.env.THRESHOLD}`);
+    console.log(
+      `Tiny Face Options: {inputSize: ${process.env.INPUT_SIZE}, scoreThreshold: ${process.env.SCORE_THRESHOLD}} `
+    );
   })
   .catch((err) => {
     console.log(err);

@@ -8,7 +8,6 @@ const faceRecognitionPage = (req, res) => {
 };
 
 const getThreshold = async (req, res) => {
-  console.log(+process.env.THRESHOLD);
   res.status(200).json({ threshold: +process.env.THRESHOLD });
 };
 
@@ -67,9 +66,11 @@ const changeDescriptor = async (req, res) => {
       },
       { upsert: true },
       (err) => {
-        if (err) return res.status(400).json({ err });
+        if (err) {
+          console.log(err);
+          return res.status(400).json({ err });
+        }
         return res.status(200).json({ msg: `/` });
-        // res.redirect('/');
       }
     );
   } catch (e) {
